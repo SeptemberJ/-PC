@@ -1,0 +1,25 @@
+html, body{
+    min-height: 600px !important;
+    min-width: 1024px;
+}
+.ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu), .ivu-menu-dark.ivu-menu-vertical .ivu-menu-submenu-title-active:not(.ivu-menu-submenu){
+	background: #2b85e4 !important;
+	color: #fff !important;
+}
+.ivu-menu-light{
+	background: #2d8cf0 !important;
+}
+.ivu-menu{
+	color: #fff !important;
+}
+.ivu-layout-sider{
+	/*width: 20% !important;
+	max-width: 20% !important;
+	min-width: 20% !important;*/
+	background: #2d8cf0 !important;
+}
+.ivu-layout{
+	width: 100% !important;
+	height: 100vh !important;
+	background: #2d8cf0 !important;
+}
