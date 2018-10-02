@@ -6,6 +6,7 @@ import store from './vuex/store'
 import App from './App'
 import router from './router'
 import iView from 'iview'
+import echarts from 'echarts'
 // import '../my-theme/dist/iview.css'
 import 'iview/dist/styles/iview.css'
 
@@ -14,6 +15,8 @@ Vue.use(iView, {
   transfer: true,
   size: 'large'
 })
+
+Vue.prototype.$echarts = echarts
 
 Vue.config.productionTip = false
 

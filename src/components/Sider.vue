@@ -41,5 +41,7 @@ export default {
 <style scoped>
 .ivu-menu-light.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu){
   font-size: 18px;
+  background: #fff;
 }
+.ivu-menu-light.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu)
 </style>

@@ -1,6 +1,60 @@
+html{
+	font-size: 62.5%; /* 10 ÷ 16 × 100% = 62.5% */
+}
 html, body{
     min-height: 600px !important;
     min-width: 1024px;
+}
+@font-face {
+	font-family: "myfont";/*定义字体名称*/
+	src:url('../font/MekarScript.ttf');
+	src:url('../font/MekarScript.eot');
+	src:url('../font/MekarScript.otf');
+	src:url('../font/MekarScript.woff');
+}
+/*spin*/
+.demo-spin-icon-load{
+  animation: ani-demo-spin 1s linear infinite;
+}
+/*self*/
+.TextAlignC{
+	text-align: center;
+}
+.TextAlignR{
+	text-align: right;
+}
+.ColorRed{
+	color: red;
+}
+.ColorWhite{
+	color: white;
+}
+.MarginT_10{
+	margin-top: 10px !important;
+}
+.MarginT_20{
+	margin-top: 20px !important;
+}
+.MarginB_10{
+	margin-bottom: 10px !important;
+}
+.MarginT_30{
+	margin-top: 30px !important;
+}
+.BorderT_gray{
+	border-top: 1px solid #dcdee2;
+}
+.PaddingT_16{
+	padding-top: 16px !important;
+}
+.Padding_16{
+	padding: 16px !important;
+}
+.PaddingL_16{
+	padding-left: 16px !important;
+}
+.PaddingR_16{
+	padding-right: 16px !important;
 }
 .ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu), .ivu-menu-dark.ivu-menu-vertical .ivu-menu-submenu-title-active:not(.ivu-menu-submenu){
 	background: #2b85e4 !important;
@@ -22,4 +76,12 @@ html, body{
 	width: 100% !important;
 	height: 100vh !important;
 	background: #2d8cf0 !important;
+}
+/*card*/
+/*.houseCard .ivu-card-head{
+  background: cadetblue !important;
+}*/
+/*radio*/
+.ivu-radio-group-button.ivu-radio-group-large .ivu-radio-wrapper{
+  margin: 5px 5px 5px 0;
 }

@@ -25,6 +25,8 @@ module.exports = {
     'generator-star-spacing': 'off',
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'no-tabs': 'off',
+    'no-mixed-spaces-and-tabs': 'off',
     'vue/no-parsing-error': [2, { 'x-invalid-end-tag': false }]
   }
 }
