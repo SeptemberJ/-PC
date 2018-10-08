@@ -1,7 +1,7 @@
 <template>
   <Row class="TextAlignC NoData">
     <Col class="demo-spin-col" span="24">
-      <img src="../../static/img/icons/noData.png">
+      <!-- <img src="../../static/img/icons/noData.png"> -->
       <p>暂无数据</p>
     </Col>
   </Row>
@@ -9,7 +9,7 @@
 
 <script>
 export default {
-  name: '暂无数据',
+  name: 'NoData',
   data () {
     return {
     }
@@ -26,6 +26,9 @@ export default {
   img{
     width: 100px;
     height: 100px;
+  }
+  p{
+    color: #fff;
   }
 }
 </style>

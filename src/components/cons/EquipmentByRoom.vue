@@ -15,7 +15,7 @@
       </Col>
       <Col span="12" class="TextAlignR PaddingR_16">
         <Col span="24" v-if="locationIdex == -1" class="TextAlignR PaddingR_16">
-          <Button type="primary" icon="md-add" @click="addNewRoom">添加房间</Button>
+          <Button type="error" icon="md-add" :disabled="!curHome.isCreater" @click="addNewRoom">添加房间</Button>
         </Col>
         <Col span="24" v-if="locationIdex != -1" class="TextAlignR PaddingR_16">
           <!-- <Button type="primary" icon="md-add" @click="addEQ">添加设备</Button> -->
@@ -108,6 +108,7 @@ export default {
   },
   computed: {
     ...mapState({
+      curHome: state => state.curHome,
       curMenu: state => state.sider.curMenu
     })
   },
@@ -138,6 +139,10 @@ export default {
       this.getMasterControl()
     },
     editRoomInfo (Room) {
+      if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
       this.$Modal.confirm({
         onOk: () => {
           this.sureModify(Room)
@@ -185,6 +190,10 @@ export default {
     },
     // 删除房间
     deleteRoom (Room) {
+      if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
       this.$Modal.confirm({
         title: '提示',
         content: '该操作会将该房间下的设备也删除，确定删除该房间?',
@@ -401,5 +410,4 @@ export default {
     margin-bottom: 30px;
   }
 }
-
 </style>

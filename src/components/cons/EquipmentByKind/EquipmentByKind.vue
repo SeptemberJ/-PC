@@ -14,9 +14,9 @@
         </Breadcrumb>
       </Col>
       <Col span="12" class="TextAlignR PaddingR_16">
-        <Button v-if="locationIdex == 0" type="primary" icon="md-add" @click="addMasterControl">添加主控</Button>
-        <Button v-if="locationIdex == 1" type="primary" icon="md-add" @click="addSecondControl">添加从控</Button>
-        <Button v-if="locationIdex == 2" type="primary" icon="md-add" @click="addEQ">添加设备</Button>
+        <Button v-if="locationIdex == 0" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addMasterControl">添加主控</Button>
+        <Button v-if="locationIdex == 1" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addSecondControl">添加从控</Button>
+        <Button v-if="locationIdex == 2" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备</Button>
       </Col>
     </Row>
     <div class="modules">
@@ -75,6 +75,7 @@ export default {
   },
   computed: {
     ...mapState({
+      curHome: state => state.curHome,
       curMenu: state => state.sider.curMenu
     }),
     ifAddMaster: {

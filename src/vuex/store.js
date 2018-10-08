@@ -45,6 +45,30 @@ const state = {
       gt: 250,
       color: '#7e0023'
     }],
+    'PM10': [{
+      gt: 0,
+      lte: 35,
+      color: '#096'
+    }, {
+      gt: 35,
+      lte: 75,
+      color: '#ffde33'
+    }, {
+      gt: 75,
+      lte: 115,
+      color: '#ff9933'
+    }, {
+      gt: 115,
+      lte: 150,
+      color: '#cc0033'
+    }, {
+      gt: 150,
+      lte: 250,
+      color: '#660099'
+    }, {
+      gt: 250,
+      color: '#7e0023'
+    }],
     'CO2': [{
       gt: 350,
       lte: 450,
@@ -124,6 +148,18 @@ const state = {
     }, {
       gt: 28,
       color: '#cc0033'
+    }],
+    '湿度': [{
+      gt: 0,
+      lte: 40,
+      color: '#cc0033'
+    }, {
+      gt: 40,
+      lte: 60,
+      color: '#87CEFA'
+    }, {
+      gt: 60,
+      color: '#0000FF'
     }]
   }
 }
@@ -133,6 +169,8 @@ const actions = {
     commit('setSpin', STATUS)
   },
   changeCurHome ({commit, state}, CURHOME) {
+    console.log('CURHOME-----------------')
+    console.log(CURHOME)
     commit('setCurHome', CURHOME)
   },
   changeHomeList ({commit, state}, HOMELIST) {

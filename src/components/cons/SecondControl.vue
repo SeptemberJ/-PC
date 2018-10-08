@@ -115,6 +115,7 @@ export default {
   },
   computed: {
     ...mapState({
+      curHome: state => state.curHome,
       roomList: state => state.roomList
     }),
     ifAddSecond: {
@@ -144,6 +145,10 @@ export default {
       'changeModalShow'
     ]),
     editSecondControl (MasterControlId) {
+      if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
       this.$Modal.confirm({
         onOk: () => {
           if (this.newSecondControlName.trim() === '') {
@@ -190,6 +195,10 @@ export default {
       })
     },
     deleteSecondControl (SecondControl) {
+      if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
       this.$Modal.confirm({
         title: '提示',
         content: '该操作会将' + SecondControl.second_control_name + '从控下面的设备全部删除，确定删除该从控?',

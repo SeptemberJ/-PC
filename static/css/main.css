@@ -72,10 +72,13 @@ html, body{
 	min-width: 20% !important;*/
 	background: #2d8cf0 !important;
 }
+.ivu-menu-vertical.ivu-menu-light:after{
+	background: transparent !important
+}
 .ivu-layout{
 	width: 100% !important;
-	height: 100vh !important;
-	background: #2d8cf0 !important;
+	height: 85vh !important;
+	/*background: #2d8cf0 !important;*/
 }
 /*card*/
 /*.houseCard .ivu-card-head{
@@ -84,4 +87,10 @@ html, body{
 /*radio*/
 .ivu-radio-group-button.ivu-radio-group-large .ivu-radio-wrapper{
   margin: 5px 5px 5px 0;
+}
+.ivu-breadcrumb a{
+  color: #fff !important;
+}
+.ivu-breadcrumb>span:last-child{
+  color: #fff !important;
 }

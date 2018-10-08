@@ -43,8 +43,12 @@ const getters = {
 // actions
 const actions = {
   changeCurTab ({commit, state}, CURTAB) {
-    commit('setCurTab', CURTAB)
-    commit('setCurMenuText', state.menuList[CURTAB].menu[state.curMenu].text)
+    if (state.curTab === CURTAB) {
+      return false
+    } else {
+      commit('setCurTab', CURTAB)
+      commit('setCurMenuText', state.menuList[CURTAB].menu[state.curMenu].text)
+    }
   },
   changeCurMenu ({commit, state}, CURMENU) {
     commit('setCurMenu', CURMENU)

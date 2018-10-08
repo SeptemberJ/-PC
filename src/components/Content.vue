@@ -32,10 +32,16 @@ export default {
   },
   computed: {
     ...mapState({
+      curHome: state => state.curHome,
       ifSpin: state => state.ifSpin,
       curMenu: state => state.sider.curMenu,
       curMenuText: state => state.sider.curMenuText
     })
+  },
+  watch: {
+    curHome: function (val) {
+      this.getMasterControl()
+    }
   },
   components: {
     HomeManage,
@@ -48,8 +54,8 @@ export default {
   },
   created () {
     this.getAddList()
-    this.getMasterControl()
     this.getEQType()
+    this.getMasterControl()
   },
   methods: {
     toggleSpin () {
@@ -78,7 +84,7 @@ export default {
     // 所有主控
     getMasterControl () {
       send({
-        name: '/mainControl?home_id=' + this.curHomeId + '&register_id=' + this.$store.state.register_id,
+        name: '/mainControl?home_id=' + this.$store.state.curHome.home_id + '&register_id=' + this.$store.state.register_id,
         method: 'GET',
         data: {
         }

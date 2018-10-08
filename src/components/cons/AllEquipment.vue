@@ -13,7 +13,8 @@
                   <p>位置: {{EQ.house_name}} </p>
                   <Row class="operationIcon">
                     <Col span="24">
-                      <img class="iconImg" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
+                      <img v-if="curHome.isCreater" class="iconImg" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
+                      <img v-if="!curHome.isCreater" class="iconImg" src="../../../static/img/icons/move-up_gray.png" @click="moveEq(EQ)">
                       <img v-if="EQ.default_device_type == 'HAir(有线)'" class="iconImg" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts()">
                     </Col>
                   </Row>
@@ -142,15 +143,33 @@
       </div>
     </Modal>
     <!-- chart -->
-    <Modal v-model="ifShowChart" fullscreen title="Fullscreen Modal">
-        <div>数据详情</div>
-        <!-- <div class="kindBar">
-          <RadioGroup v-model="金斑蝶">
-            <Radio label="金斑蝶" disabled></Radio>
-            <Radio label="爪哇犀牛"></Radio>
-            <Radio label="印度黑羚"></Radio>
-          </RadioGroup>
-        </div> -->
+    <Modal v-model="ifShowChart" fullscreen title="数据详情">
+        <!-- <div class="MarginB_10">选择类型</div> -->
+        <div class="kindBar" style="text-align:left">
+          <Row>
+            <Col span="4">选择类型</Col>
+            <Col span="20">
+              <RadioGroup v-model="curKind" @on-change="changeKind">
+                <Radio v-for="(item, idx) in kind" :key="idx" :label="item"></Radio>
+              </RadioGroup>
+            </Col>
+          </Row>
+          <Row class="MarginB_10">
+            <Col span="4">选择时间间隔</Col>
+            <Col span="20">
+              <RadioGroup v-model="time" @on-change="changeTime">
+                <Radio label="6"></Radio>
+                <Radio label="12"></Radio>
+                <Radio label="48"></Radio>
+              </RadioGroup>
+            </Col>
+          </Row>
+        </div>
+        <div v-show="hasData" id="myChart" :style="{width: '1024px', height: '300px', margin: '0 auto'}"></div>
+        <div class="TextAlignC MarginT_30" v-show="!hasData && !ifSpin">
+          <img style="width:100px;height:100px;margin:30px auto;" src="../../../static/img/icons/nodata.png">
+          <p>暂无数据</p>
+        </div>
     </Modal>
 
   </div>
@@ -198,6 +217,7 @@ export default {
         ]
       },
       // 一般三级设备
+      loading: false,
       SecondControlList: [],
       choosedMaster: {},
       choosedSecond: {},
@@ -225,11 +245,20 @@ export default {
         eqType: [
           { required: true, message: '请选择设备类型！', trigger: 'change' }
         ]
-      }
+      },
+      // chhart
+      curKind: 'PM2.5',
+      curKindI: 'pm25',
+      time: '6',
+      kindI: ['pm25', 'temperature', 'humidity', 'pm100', 'formaldehyde', 'voc', 'co2', 'co'],
+      kind: ['PM2.5', '温度', '湿度', 'PM10', '甲醛', 'VOCs', 'CO2', 'CO'],
+      hasData: false
     }
   },
   computed: {
     ...mapState({
+      curHome: state => state.curHome,
+      ifSpin: state => state.ifSpin,
       HouseList: state => state.roomList
     }),
     ifAddEQ: {
@@ -252,6 +281,12 @@ export default {
   watch: {
     curHomeId: function (val) {
       this.getAllEq()
+    },
+    curKind: function (val) {
+      this.drawLine()
+    },
+    time: function (val) {
+      this.drawLine()
     }
   },
   components: {
@@ -268,6 +303,10 @@ export default {
       'changeModalShow'
     ]),
     editEqInfo (EqId) {
+      if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
       this.$Modal.confirm({
         onOk: () => {
           this.sureModify(EqId)
@@ -289,6 +328,10 @@ export default {
       })
     },
     deleteEq (EQ) {
+      if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
       this.$Modal.confirm({
         title: '提示',
         content: '确定删除该设备?',
@@ -328,6 +371,10 @@ export default {
     },
     // 设备移动Moadl
     moveEq (item) {
+      if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
       this.curEQName = item.device_name
       this.curEQRoom = item.house_name
       this.moveDestination = item.house_name
@@ -337,6 +384,126 @@ export default {
     // 查看chart
     showCharts () {
       this.changeModalShow('Chart')
+    },
+    changeKind (val) {
+      this.kind.map((item, idx) => {
+        if (item === val) {
+          this.curKindI = this.kindI[idx]
+        }
+      })
+    },
+    changeTime (val) {
+      this.time = val
+      console.log(val)
+    },
+    drawLine () {
+      this.toggleSpin(true)
+      let _THIS = this
+      // 初始化echarts实例
+      let myChart = this.$echarts.init(document.getElementById('myChart'))
+      send({
+        name: '/hair?device_id=00123456&type=' + _THIS.curKindI + '&hh=' + _THIS.time,
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        if (_res.data.result.hairList.length === 0) {
+          _THIS.hasData = false
+          this.toggleSpin(false)
+          return false
+        } else {
+          _THIS.hasData = true
+        }
+        switch (_res.data.result.code) {
+          case 1:
+            let tempData = _res.data.result.hairList
+            let option = {
+              title: {
+                text: ''
+              },
+              tooltip: {
+                trigger: 'axis'
+              },
+              xAxis: {
+                data: tempData.map(function (item) {
+                  return item.faddtime || ''
+                })
+              },
+              yAxis: {
+                splitLine: {
+                  show: false
+                }
+              },
+              toolbox: {
+                left: 'center',
+                feature: {
+                  dataZoom: {
+                    yAxisIndex: 'none'
+                  },
+                  restore: {},
+                  saveAsImage: {}
+                }
+              },
+              dataZoom: [{
+                startValue: '2018-09-01'
+              }, {
+                type: 'inside'
+              }],
+              visualMap: {
+                top: 10,
+                right: 10,
+                pieces: _THIS.$store.state.LimitRange[_THIS.curKind],
+                outOfRange: {
+                  color: '#999'
+                }
+              },
+              series: {
+                name: _THIS.curKind + '数值',
+                type: 'line',
+                data: tempData.map(function (item) {
+                  return item[_THIS.curKindI]
+                }),
+                markLine: {
+                  silent: true,
+                  data: [{
+                    yAxis: 50
+                  }, {
+                    yAxis: 100
+                  }, {
+                    yAxis: 150
+                  }, {
+                    yAxis: 200
+                  }, {
+                    yAxis: 300
+                  }]
+                }
+              }
+            }
+            myChart.setOption(option)
+            this.toggleSpin(false)
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.toggleSpin(false)
+        this.$Message.error('Interface Error!')
+      })
+      // 绘制图表
+      // myChart.setOption({
+      //   title: { text: '' },
+      //   tooltip: {},
+      //   xAxis: {
+      //     data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
+      //   },
+      //   yAxis: {},
+      //   series: [{
+      //     name: '销量',
+      //     type: 'bar',
+      //     data: [5, 20, 36, 10, 10, 20]
+      //   }]
+      // })
     },
     // 获取目标房间ID
     changeDestinationRoom (RommName) {
@@ -618,6 +785,38 @@ export default {
         console.log(_res)
         // this.toggleSpin(false)
         this.btLoading = false
+        this.$Message.error('Interface Error!')
+      })
+    },
+    // 所有主控
+    remoteMethod (query) {
+      let that = this
+      if (query !== '') {
+        that.loading = true
+        setTimeout(() => {
+          that.loading = false
+          that.getMasterControl()
+        }, 200)
+      } else {
+        that.MasterControlList = []
+      }
+    },
+    getMasterControl () {
+      send({
+        name: '/mainControl?home_id=' + this.curHomeId + '&register_id=' + this.$store.state.register_id,
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            this.MasterControlList = _res.data.homeList
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((_res) => {
+        console.log(_res)
         this.$Message.error('Interface Error!')
       })
     }

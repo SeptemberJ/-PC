@@ -1,11 +1,12 @@
 <template>
   <div class="layout">
     <Layout>
-      <Sider ref="side1" :style="{position: 'fixed', left: 0, top: 0, height: '100%', zIndex: 999}" hide-trigger collapsible collapsed-width="100%" v-model="isCollapsed">
+      <Sider ref="side1" :style="{position: 'fixed', left: 0, top: 0, height: '95%', zIndex: 999, borderRight: '2px solid #eee'}" hide-trigger collapsible collapsed-width="100%" v-model="isCollapsed">
         <SIDER/>
       </Sider>
-      <Layout class="mainContent" style="position:absolute;top:0;left:200px;padding-right: 200px;">
-        <Content :style="{margin: '20px 0', background: '#fff', minHeight: windowHeight + 'px'}">
+      <Layout class="mainContent" style="position:absolute;top:0;left:200px;padding-right: 200px;height: 600px !important; overflow: hidden">
+        <Content :style="{margin: '20px 0', background: '#2d8cf0', overflowX: 'hidden', overflowY: 'scroll'}">
+        <!-- <Content :style="{margin: '20px 0', background: '#fff', minHeight: windowHeight + 'px'}"> -->
           <!-- <Row v-if="curTab == 1" style="position:fixed;top:0;width: 100%;background:#fff;zIndex:999;border-bottom: 1px solid #fff;box-shadow: 0px 10px 0px 0px #fff;"> -->
           <Row v-if="curTab == 1">
             <Col span="4" class="PaddingL_16"><h1>当前家</h1></Col>
@@ -15,14 +16,14 @@
               </Select>
             </Col>
             <!-- add button -->
-            <Col v-if="curMenuText === '家列表'" span="12" offset="0" class="TextAlignR"><Button type="primary" icon="md-add">添加家</Button></Col>
-            <Col v-if="curMenuText === '所有设备'" span="12" offset="0" class="TextAlignR"><Button type="primary" icon="md-add" @click="addEQ">添加设备</Button></Col>
+            <Col v-if="curMenuText === '家列表'" span="11" offset="0" class="TextAlignR"><Button type="primary" icon="md-add">添加家</Button></Col>
+            <Col v-if="curMenuText === '所有设备'" span="11" offset="0" class="TextAlignR"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备</Button></Col>
           </Row>
           <CONTENT :curHomeId="curHome.home_id"/>
         </Content>
       </Layout>
     </Layout>
-      <TAB/>
+    <TAB/>
       <!-- <BackTop :height="10" :bottom="300">
         <div class="top">返回顶端</div>
       </BackTop> -->
@@ -47,6 +48,8 @@ export default {
   created () {
     this.windowHeight = window.innerHeight
     this.checkIfHasHome()
+    console.log('this.curHome----------------')
+    console.log(this.curHome)
   },
   computed: {
     ...mapState({
@@ -74,7 +77,6 @@ export default {
     ...mapActions([
       'changeHomeList',
       'changeCurHome',
-      'changeCurHome',
       'changeRoomList',
       'changeModalShow'
     ]),
@@ -97,7 +99,7 @@ export default {
               home_name: HomeInfo.home_name,
               faddress: HomeInfo.faddress,
               home_id: HomeInfo.home_id,
-              isCreater: true,
+              isCreater: HomeInfo.register_id === this.$store.state.register_id,
               isdefault: 1,
               register_id: this.$store.state.register_id
             }
@@ -157,7 +159,29 @@ export default {
       })
     },
     addEQ () {
+       console.log('this.curHome=======================')
+      console.log(this.curHome)
+      // this.getMasterControl()
       this.changeModalShow('EQ')
+    },
+    getMasterControl () {
+      send({
+        name: '/mainControl?home_id=' + this.curHome.home_id + '&register_id=' + this.$store.state.register_id,
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            this.MasterControlList = _res.data.homeList
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.$Message.error('Interface Error!')
+      })
     }
   }
 }
@@ -166,7 +190,7 @@ export default {
 <style lang="css" scoped>
 .layout{
   border: 0px solid #d7dde4;
-  background: #2d8cf0;
+  /*background: #2d8cf0;*/
   position: relative;
   overflow: hidden;
   /*height: 600px*/
@@ -214,7 +238,24 @@ export default {
   font-size: 22px;
 }
 .mainContent{
-  background: #fff !important;
+  background: #2d8cf0 !important;
+}
+.mainContent h1 {
+  color: #fff;
+}
+.mainContent::-webkit-scrollbar {/*滚动条整体样式*/
+    width: 10px;     /*高宽分别对应横竖滚动条的尺寸*/
+    height: 1px;
+}
+.mainContent::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+    border-radius: 10px;
+     -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+    background: #535353;
+}
+.mainContent::-webkit-scrollbar-track {/*滚动条里面轨道*/
+    -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    background: #EDEDED;
 }
 .top{
   padding: 10px;

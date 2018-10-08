@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import {mapActions} from 'vuex'
+import {mapState, mapActions} from 'vuex'
 import {send} from '../../util/send'
 import NoData from '../NoData.vue'
 export default {
@@ -82,6 +82,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      curHome: state => state.curHome
+    }),
     ifAddMaster: {
       get: function () {
         return this.$store.state.ifAddMaster
@@ -109,6 +112,10 @@ export default {
       'changeModalShow'
     ]),
     editMasterInfo (MasterControlId) {
+       if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
       this.$Modal.confirm({
         onOk: () => {
           if (this.newMasterControlName.trim() === '') {
@@ -155,6 +162,10 @@ export default {
       })
     },
     deleteMaster (MasterControl) {
+       if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
       this.$Modal.confirm({
         title: '提示',
         content: '该操作会将' + MasterControl.main_control_name + '主控下面的从控以及设备全部删除，确定删除该主控?',

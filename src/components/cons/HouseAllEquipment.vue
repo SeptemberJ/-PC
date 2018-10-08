@@ -13,7 +13,8 @@
                   <p>位置: {{choosedHouseName}}</p>
                   <Row class="operationIcon">
                     <Col span="24">
-                      <img class="iconImg" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
+                      <img v-if="curHome.isCreater" class="iconImg" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
+                      <img v-if="!curHome.isCreater" class="iconImg" src="../../../static/img/icons/move-up_gray.png" @click="moveEq(EQ)">
                       <img v-if="EQ.default_device_type == 'HAir(有线)'" class="iconImg" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts()">
                     </Col>
                   </Row>
@@ -246,6 +247,7 @@ export default {
   },
   computed: {
     ...mapState({
+      curHome: state => state.curHome,
       ifSpin: state => state.ifSpin,
       HouseList: state => state.roomList
     }),
@@ -287,7 +289,7 @@ export default {
     NoData
   },
   mounted () {
-    this.drawLine()
+    // this.drawLine()
   },
   created () {
     // this.getHouseAllEq()
@@ -300,6 +302,10 @@ export default {
       'changeModalShow'
     ]),
     editEqInfo (EqId) {
+      if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
       this.$Modal.confirm({
         onOk: () => {
           this.sureModify(EqId)
@@ -321,6 +327,10 @@ export default {
       })
     },
     deleteEq (EQ) {
+      if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
       this.$Modal.confirm({
         title: '提示',
         content: '确定删除该设备?',
@@ -360,6 +370,10 @@ export default {
     },
     // 设备移动Moadl
     moveEq (item) {
+      if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
       this.curEQName = item.device_name
       this.curEQRoom = this.choosedHouseName // item.house_name
       this.moveDestination = this.choosedHouseName // item.house_name
