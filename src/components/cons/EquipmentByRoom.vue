@@ -167,7 +167,7 @@ export default {
     sureModify (Room) {
       this.toggleSpin(true)
       send({
-        name: '/house?home_id=' + this.curHomeId + '&id=' + Room.id + '&house_name=' + this.newRoomName,
+        name: encodeURI('/house?home_id=' + this.curHomeId + '&id=' + Room.id + '&house_name=' + this.newRoomName),
         method: 'PUT',
         data: {
         }

@@ -1,8 +1,7 @@
 <template>
 	<div class="createHome" :style="{minHeight: windowHeight + 'px'}">
+    <div class="glass"></div>
 	  <div class="homeBox">
-			<!-- <div class="triangle_border_up">
-			</div> -->
 			<div class="formBox">
 				<Form :model="homeinfo" label-position="left" :label-width="100">
 	        <FormItem label="家庭名称">
@@ -13,7 +12,7 @@
 	        </FormItem>
 	        <Row class="tipsTit">
 		        <Col span="8">在哪些房间有智能设备</Col>
-		        <Col span="8" offset="8" class="TextAlignR"><span @click="addOtherRoom">添加其他房间</span></Col>
+		        <Col span="8" offset="8" class="TextAlignR CursorPointer"><span @click="addOtherRoom">添加其他房间</span></Col>
 			    </Row>
 			    <Row>
 			    	<Col span="24">
@@ -73,7 +72,7 @@ export default {
     ]),
   	getDefaultRooms () {
   		send({
-        name: 'house_default',
+        name: '/house_default',
         method: 'GET',
         data: {
         }
@@ -102,7 +101,7 @@ export default {
   			return false
   		}
   		send({
-        name: 'home',
+        name: '/home',
         method: 'POST',
         data: {
         	'home': [
@@ -122,7 +121,7 @@ export default {
   	      	// this.$router.push({name: 'Home'})
   	      	break
 	      	default:
-	      	this.$Message.error(_res.data.message)
+	      	  this.$Message.error(_res.data.message)
 	      }
       }).catch((res) => {
         this.$Message.error('Interface Error!')
@@ -130,7 +129,7 @@ export default {
   	},
     updateCurHome (HomeId) {
       send({
-        name: 'home?isdefault=1&id=' + HomeId + '&home_name=' + this.homeinfo.name.trim() + '&faddress=' + this.homeinfo.address.trim() + '&register_id=' + this.$store.state.register_id,
+        name: '/home?isdefault=1&id=' + HomeId + '&home_name=' + this.homeinfo.name.trim() + '&faddress=' + this.homeinfo.address.trim() + '&register_id=' + this.$store.state.register_id,
         method: 'PUT',
         data: {
         }
@@ -186,8 +185,22 @@ export default {
 @bgPrimary: #2d8cf0;
 .createHome{
 	width: 100%;
+  .glass{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: url('https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1527675541760&di=ab2fabe587b140a66482d9cdf83d3bc9&imgtype=0&src=http%3A%2F%2Fn1.itc.cn%2Fimg8%2Fwb%2Frecom%2F2016%2F06%2F17%2F146614328257949855.JPEG') no-repeat center center/cover;
+    filter: alpha(opacity=80);
+    -webkit-filter: blur(2px);
+  }
 	.homeBox{
-		width: 500px;
+    width: 500px;
+    position: relative;
+    top: 0;
+    left: 0;
+    z-index:9999;
 		margin: 0px auto;
 		transform: translateY(30px);
 		.triangle_border_up{

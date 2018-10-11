@@ -29,6 +29,9 @@ html, body{
 .ColorWhite{
 	color: white;
 }
+.CursorPointer{
+	cursor: pointer;
+}
 .MarginT_10{
 	margin-top: 10px !important;
 }
@@ -49,6 +52,10 @@ html, body{
 }
 .Padding_16{
 	padding: 16px !important;
+}
+.PaddingTB_10{
+	padding-top: 10px !important;
+	padding-bottom: 10px !important;
 }
 .PaddingL_16{
 	padding-left: 16px !important;
@@ -77,7 +84,7 @@ html, body{
 }
 .ivu-layout{
 	width: 100% !important;
-	height: 85vh !important;
+	height: 100vh !important;
 	/*background: #2d8cf0 !important;*/
 }
 /*card*/

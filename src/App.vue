@@ -7,10 +7,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import SIDER from './components/Sider.vue'
-import TAB from './components/Tab.vue'
-import CONTENT from './components/Content.vue'
+import { mapState, mapActions } from 'vuex'
+import {getRegisterId, getAccount} from './util/send'
 
 export default {
   name: 'App',
@@ -22,6 +20,8 @@ export default {
   },
   created () {
     this.windowHeight = window.innerHeight
+    this.changeCurRegisterId(getRegisterId())
+    this.changeCurAccountPhone(getAccount())
   },
   computed: {
     ...mapState({
@@ -29,16 +29,21 @@ export default {
     })
   },
   components: {
-    SIDER,
-    TAB,
-    CONTENT
   },
   methods: {
+    ...mapActions([
+      'changeCurRegisterId',
+      'changeCurAccountPhone'
+    ])
   }
 }
 </script>
 
 <style lang="css" scoped>
+.child-view{
+  height: 100%;
+  overflow: hidden;
+}
 /*.layout{
   border: 0px solid #d7dde4;
   background: #2d8cf0;

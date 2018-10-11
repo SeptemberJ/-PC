@@ -15,7 +15,8 @@
                     <Col span="24">
                       <img v-if="curHome.isCreater" class="iconImg" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
                       <img v-if="!curHome.isCreater" class="iconImg" src="../../../static/img/icons/move-up_gray.png" @click="moveEq(EQ)">
-                      <img v-if="EQ.default_device_type == 'HAir(有线)'" class="iconImg" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts()">
+                      <img v-if="EQ.default_device_type == 'HAir(有线)'" class="iconImg" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts(EQ)">
+                      <!-- <i-switch style="float:right;margin-top:5px;" size="small" @on-change="setConfig(EQ)"/> -->
                     </Col>
                   </Row>
                 </Col>
@@ -53,7 +54,6 @@
               </Radio>
             </RadioGroup>
           </Form>
-
       </div>
       <div slot="footer">
           <!-- <Button type="error" size="large" long  @click="sureMove">确认移动</Button> -->
@@ -61,7 +61,6 @@
             <span v-if="!btLoading">确认移动</span>
             <span v-else>Loading...</span>
           </Button>
-
       </div>
     </Modal>
     <!-- 添加设备 -->
@@ -160,7 +159,7 @@
               <RadioGroup v-model="time" @on-change="changeTime">
                 <Radio label="6"></Radio>
                 <Radio label="12"></Radio>
-                <Radio label="48"></Radio>
+                <Radio label="24"></Radio>
               </RadioGroup>
             </Col>
           </Row>
@@ -171,7 +170,6 @@
           <p>暂无数据</p>
         </div>
     </Modal>
-
   </div>
 </template>
 
@@ -382,8 +380,14 @@ export default {
       this.ifMove = true
     },
     // 查看chart
-    showCharts () {
-      this.changeModalShow('Chart')
+    showCharts (EQ) {
+      // 没配置过先配置
+      if (EQ.device_config !== '1') {
+        this.setConfig(EQ)
+      } else {
+        this.changeModalShow('Chart')
+        this.drawLine()
+      }
     },
     changeKind (val) {
       this.kind.map((item, idx) => {
@@ -464,18 +468,18 @@ export default {
                   return item[_THIS.curKindI]
                 }),
                 markLine: {
-                  silent: true,
-                  data: [{
-                    yAxis: 50
-                  }, {
-                    yAxis: 100
-                  }, {
-                    yAxis: 150
-                  }, {
-                    yAxis: 200
-                  }, {
-                    yAxis: 300
-                  }]
+                  silent: true
+                  // data: [{
+                  //   yAxis: 50
+                  // }, {
+                  //   yAxis: 100
+                  // }, {
+                  //   yAxis: 150
+                  // }, {
+                  //   yAxis: 200
+                  // }, {
+                  //   yAxis: 300
+                  // }]
                 }
               }
             }
@@ -490,20 +494,134 @@ export default {
         this.toggleSpin(false)
         this.$Message.error('Interface Error!')
       })
-      // 绘制图表
-      // myChart.setOption({
-      //   title: { text: '' },
-      //   tooltip: {},
-      //   xAxis: {
-      //     data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
-      //   },
-      //   yAxis: {},
-      //   series: [{
-      //     name: '销量',
-      //     type: 'bar',
-      //     data: [5, 20, 36, 10, 10, 20]
-      //   }]
-      // })
+    },
+    // 命令序号
+    getCurCNS (MasterCode) {
+      return new Promise((resolve, reject) => {
+        send({
+          name: '/deviceSequence?main_control_code=' + MasterCode,
+          method: 'GET',
+          data: {
+          }
+        }).then(_res => {
+          switch (_res.data.code) {
+            case 1:
+              resolve(_res.data.sequence_number)
+              break
+            case 0:
+              this.$Message.error(_res.data.message)
+              break
+            default:
+              this.$Message.error(_res.data.message)
+          }
+        }).catch((_res) => {
+          console.log(_res)
+          this.$Message.error('Interface Error!')
+        })
+      })
+    },
+    setConfig (EQ) {
+      this.EqConfig(EQ)
+    },
+    async EqConfig (eqItem) {
+      var sendCurCns = await this.getCurCNS(eqItem.master_control)
+      send({
+        name: '/deviceConfig?main_control_id=' + eqItem.master_control + '&second_control_id=00123456' + '&sequence_number=' + sendCurCns + '&measure_point=08&control_point=00&qty=01',
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            // this.EqPlay(eqItem, sendCurCns)
+            this.UpdateConfigStatus(eqItem.id, eqItem.master_control)
+            break
+          case 0:
+            this.$Message.error(_res.data.message)
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.$Message.error('Interface Error!')
+      })
+    },
+    // async EqPlay (eqItem, sendCurCns) {
+    //   // var sendCurCns = await this.getCurCNS(eqItem.main_control_code)
+    //   wepy.showLoading({
+    //     title: '加载中'
+    //   })
+    //   return new Promise((resolve, reject) => {
+    //     wepy.request({
+    //       url: this.urlPre + '/payload?topic=' + eqItem.main_control_code + '/ConfigAck&sequence_number=' + sendCurCns,
+    //       method: 'GET'
+    //     }).then((res) => {
+    //       console.log(res)
+    //       switch (res.data.result.code) {
+    //         case 1:
+    //           wepy.hideLoading()
+    //           // console.log(res.data.result.payload.payload)
+    //           // console.log(res.data.result.payload.payload === 'sendCurCns')
+    //           // if (res.data.result.payload.payload === 'sendCurCns') {
+    //           //   wepy.showToast({
+    //           //     title: '指令匹配!',
+    //           //     icon: 'success'
+    //           //   })
+    //           // } else {
+    //           //   this.$invoke('toast', 'show', {
+    //           //     title: '指令不匹配!',
+    //           //     img: '../../images/icons/attention.png'
+    //           //   })
+    //           // }
+    //           this.UpdateConfigStatus(eqItem.id, eqItem.main_control_code)
+    //           resolve(res)
+    //           break
+    //         case 0:
+    //           wepy.hideLoading()
+    //           this.$invoke('toast', 'show', {
+    //             title: res.data.result.message,
+    //             img: '../images/icons/attention.png'
+    //           })
+    //           break
+    //         default:
+    //           wepy.hideLoading()
+    //           this.$invoke('toast', 'show', {
+    //             title: '服务器繁忙！',
+    //             img: '../images/icons/attention.png'
+    //           })
+    //       }
+    //     }).catch((res) => {
+    //       console.log(res)
+    //       wepy.hideLoading()
+    //       this.$invoke('toast', 'show', {
+    //         title: '服务器繁忙！',
+    //         img: '../images/icons/attention.png'
+    //       })
+    //     })
+    //   })
+    // }
+    UpdateConfigStatus (EQID, MasterCode) {
+      send({
+        name: '/deviceConfig?id=' + EQID + '&device_config=1' + '&main_control_code=' + MasterCode,
+        method: 'PUT',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            this.getAllEq()
+            break
+          case 0:
+            this.$Message.error('Interface Error!')
+            break
+          default:
+            this.$Message.error('Interface Error!')
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.$Message.error('Interface Error!')
+      })
     },
     // 获取目标房间ID
     changeDestinationRoom (RommName) {

@@ -1,7 +1,7 @@
 <template>
   <Row class="TextAlignC NoData">
     <Col class="demo-spin-col" span="24">
-      <!-- <img src="../../static/img/icons/noData.png"> -->
+      <img src="../../static/img/icons/noData1.png">
       <p>暂无数据</p>
     </Col>
   </Row>
@@ -16,18 +16,20 @@ export default {
   },
   computed: {
   },
+  created () {
+  },
   methods: {
   }
 }
 </script>
 <style lang="less" scoped>
 .NoData{
-  margin-top: 50px;
+  margin-top: 150px;
   img{
-    width: 100px;
-    height: 100px;
+    width: 150px;
   }
   p{
+    font-size: 22px;
     color: #fff;
   }
 }

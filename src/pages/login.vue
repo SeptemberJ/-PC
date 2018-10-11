@@ -2,7 +2,7 @@
 	<div class="Login" :style="{minHeight: windowHeight + 'px'}">
 		<h1>SmarHox</h1>
 		<div class="loginItem">
-			<Input v-model="phone" placeholder="请输入手机号..." style="width: 300px" />
+			<Input v-model="phone" placeholder="请输入手机号..." @on-blur="checkPhoneNumber" style="width: 300px" />
 		</div>
 		<div class="loginItem">
 			<Input v-model="psd" placeholder="请输入密码..." style="width: 300px" />
@@ -12,7 +12,7 @@
 		</div>
 		<div class="loginItem">
 			<div class="operationBar">
-				<Button type="text" ghost>忘记密码</Button>
+				<Button type="text" ghost @click="forgetPsd">忘记密码</Button>
 				<Button type="text" ghost @click="goSign">去注册</Button>
 			</div>
 		</div>
@@ -20,57 +20,101 @@
 </template>
 
 <script>
-// import CryptoJS from 'crypto-js'
-import {send} from '../util/send'
-// import {setCookie, getCookie, Encrypt, Decrypt} from '../util/util'
+import { mapState, mapActions } from 'vuex'
+import {send, setRegisterId, setAccount} from '../util/send'
 import {setCookie, Encrypt} from '../util/util'
 
 export default {
   name: 'Home',
   data () {
     return {
-    	cityList: [
-        {
-          value: 'New York',
-          label: 'New York'
-        },
-        {
-          value: 'London',
-          label: 'London'
-        },
-        {
-          value: 'Sydney',
-          label: 'Sydney'
-        }
-      ],
-      model1: '',
-      phone: '18234567890',
-      psd: '111'
+      phone: '',
+      psd: ''
     }
   },
   created () {
     this.windowHeight = window.innerHeight
   },
+  computed: {
+    ...mapState({
+      register_id: state => state.register_id
+    })
+  },
   methods: {
-    goSign () {
-      this.$router.push({name: 'Sign'})
+  	...mapActions([
+      'changeCurRegisterId',
+      'changeCurAccountPhone'
+    ]),
+  	// 检测用户注册状态
+  	checkPhoneNumber () {
+  		if (!/^1[34578]\d{9}$/.test(this.phone)) {
+    		this.$Message.error('手机号格式不正确!')
+    		return false
+    	}
+    	send({
+	        name: '/checkUserPC?mobile=' + this.phone,
+	        method: 'POST',
+	        data: {
+	        }
+	      }).then(_res => {
+	      	switch (_res.data.code) {
+	      		case 0:
+	      		this.goSign(0)
+	      		break
+	      		case 2:
+	      			this.goSign(1)
+	      		break
+	      	}
+	      }).catch((res) => {
+	        this.$Message.error('Interface Error!')
+	      })
+  	},
+  	forgetPsd () {
+  		this.goSign(1)
+  	},
+    goSign (type) {
+      this.$router.push({name: 'Sign', params: { type: type || 0 }})
     },
     goLogin () {
-      let cookieStr = this.phone.toString() + this.psd.toString()
-      setCookie('btznkz', Encrypt(cookieStr), 6)
-      this.checkIfHasHome()
-
-      // let EncryptionName = CryptoJS.AES.encrypt('留白', this.$store.state.PlainText).toString()
-      // let EncryptionId = CryptoJS.AES.encrypt('123', this.$store.state.PlainText).toString()
-      // let EncryptionType = CryptoJS.AES.encrypt('0', this.$store.state.PlainText).toString()
-      // localStorage.setItem('BT_name', EncryptionName)
-      // localStorage.setItem('BT_id', EncryptionId)
-      // localStorage.setItem('BT_type', EncryptionType)
-      // this.$router.push({name: 'Home'})
-    },
-    checkIfHasHome () {
+    	if (this.phone.trim() === '') {
+    		this.$Message.error('请输入手机号!')
+    		return false
+    	}
+    	if (!/^1[34578]\d{9}$/.test(this.phone)) {
+    		this.$Message.error('手机号格式不正确!')
+    		return false
+    	}
+    	if (this.psd.trim() === '') {
+    		this.$Message.error('请输入密码!')
+    		return false
+    	}
     	send({
-        name: '/home?register_id=4dd928bab4a811e88d1a00163e11716c',
+        name: '/userLoginPC?mobile=' + this.phone + '&fpassword=' + this.psd,
+        method: 'POST',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            this.$Message.success('登陆成功！')
+            let cookieStr = this.phone.toString() + this.psd.toString()
+			      setCookie('btznkz', Encrypt(cookieStr), 6)
+			      this.changeCurRegisterId(_res.data.memberInfo.id)
+            this.changeCurAccountPhone(_res.data.memberInfo.ftelephone)
+			      this.checkIfHasHome(_res.data.memberInfo.id)
+            setRegisterId(_res.data.memberInfo.id)
+            setAccount(_res.data.memberInfo.ftelephone)
+            break
+          default:
+          	this.$Message.error(_res.data.message)
+        }
+      }).catch((res) => {
+        this.$Message.error('Interface Error!')
+      })
+    },
+    checkIfHasHome (RegisterId) {
+    	send({
+        name: '/home?register_id=' + RegisterId,
         method: 'GET',
         data: {
         }

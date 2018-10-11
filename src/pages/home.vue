@@ -1,38 +1,41 @@
 <template>
-  <div class="layout">
-    <Layout>
-      <Sider ref="side1" :style="{position: 'fixed', left: 0, top: 0, height: '95%', zIndex: 999, borderRight: '2px solid #eee'}" hide-trigger collapsible collapsed-width="100%" v-model="isCollapsed">
-        <SIDER/>
-      </Sider>
-      <Layout class="mainContent" style="position:absolute;top:0;left:200px;padding-right: 200px;height: 600px !important; overflow: hidden">
-        <Content :style="{margin: '20px 0', background: '#2d8cf0', overflowX: 'hidden', overflowY: 'scroll'}">
-        <!-- <Content :style="{margin: '20px 0', background: '#fff', minHeight: windowHeight + 'px'}"> -->
-          <!-- <Row v-if="curTab == 1" style="position:fixed;top:0;width: 100%;background:#fff;zIndex:999;border-bottom: 1px solid #fff;box-shadow: 0px 10px 0px 0px #fff;"> -->
-          <Row v-if="curTab == 1">
-            <Col span="4" class="PaddingL_16"><h1>当前家</h1></Col>
-            <Col span="8" offset="0">
-              <Select :value="curHomeIdx" style="width:100%;height:50px;" @on-change="selectChangeCurHome">
-                <Option v-for="(home, idx) in homeList" :value="idx" :key="idx">{{home.home_name}}</Option>
-              </Select>
-            </Col>
-            <!-- add button -->
-            <Col v-if="curMenuText === '家列表'" span="11" offset="0" class="TextAlignR"><Button type="primary" icon="md-add">添加家</Button></Col>
-            <Col v-if="curMenuText === '所有设备'" span="11" offset="0" class="TextAlignR"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备</Button></Col>
-          </Row>
-          <CONTENT :curHomeId="curHome.home_id"/>
-        </Content>
-      </Layout>
-    </Layout>
-    <TAB/>
-      <!-- <BackTop :height="10" :bottom="300">
-        <div class="top">返回顶端</div>
-      </BackTop> -->
-  </div>
+  <Row>
+    <Col span="24">
+      <div style="height: 550px;background: #2d8cf0;overflow: hidden">
+        <Sider ref="side1" :style="{position: 'relative', left: 0, top: 0, height: '550px', zIndex: 999, borderRight: '2px solid #eee'}" hide-trigger collapsible collapsed-width="100%" v-model="isCollapsed">
+          <SIDER/>
+        </Sider>
+        <div style="position:absolute;top:0;left:200px;padding-right: 200px;width: 100%;height: 550px !important;overflow-y:scroll">
+          <Layout class="mainContent">
+            <Content :style="{margin: '0', background: '#2d8cf0', overflowX: 'hidden', overflowY: 'scroll'}">
+              <p @click="ToLogout" class='ColorWhite CursorPointer TextAlignR PaddingTB_10 PaddingR_16'>{{accountPhone}} | 退出</p>
+              <Row type="flex" justify="start" class="code-row-bg">
+                <Col span="4"><h1 v-if="curTab == 1">当前家</h1></Col>
+                <Col span="8">
+                  <Select v-if="curTab == 1" :value="curHomeIdx" style="width:100%;height:50px;" @on-change="selectChangeCurHome">
+                    <Option v-for="(home, idx) in homeList" :value="idx" :key="idx">{{home.home_name}}</Option>
+                  </Select>
+                </Col>
+                <!-- add button -->
+                <!-- <Col v-if="curMenuText === '家列表'" span="12" offset="0" class="TextAlignR PaddingR_16"><Button type="error" icon="md-add" @click="addHome">添加家</Button></Col> -->
+                <Col v-if="curMenuText === '所有设备'" span="12" offset="0" class="TextAlignR PaddingR_16"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备</Button></Col>
+              </Row>
+              <CONTENT :curHomeId="curHome.home_id"/>
+            </Content>
+          </Layout>
+        </div>
+      </div>
+    </Col>
+    <Col span="24">
+      <TAB/>
+    </Col>
+  </Row>
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import {send} from '../util/send'
+import {send, logout} from '../util/send'
+import {clearCookie} from '../util/util'
 import SIDER from '../components/Sider.vue'
 import TAB from '../components/Tab.vue'
 import CONTENT from '../components/Content.vue'
@@ -53,6 +56,7 @@ export default {
   },
   computed: {
     ...mapState({
+      accountPhone: state => state.accountPhone,
       curHome: state => state.curHome,
       curTab: state => state.sider.curTab,
       curMenuText: state => state.sider.curMenuText,
@@ -80,6 +84,11 @@ export default {
       'changeRoomList',
       'changeModalShow'
     ]),
+    ToLogout () {
+      logout()
+      clearCookie('btznkz')
+      this.$router.push({name: 'Login'})
+    },
     selectChangeCurHome (IDX) {
       this.updateCurHome(this.homeList[IDX])
     },
@@ -115,7 +124,7 @@ export default {
     },
     checkIfHasHome () {
       send({
-        name: '/home?register_id=4dd928bab4a811e88d1a00163e11716c',
+        name: '/home?register_id=' + this.$store.state.register_id,
         method: 'GET',
         data: {
         }
@@ -159,10 +168,13 @@ export default {
       })
     },
     addEQ () {
-       console.log('this.curHome=======================')
+      console.log('this.curHome=======================')
       console.log(this.curHome)
       // this.getMasterControl()
       this.changeModalShow('EQ')
+    },
+    addHome () {
+      this.$router.push({name: 'CreateHome'})
     },
     getMasterControl () {
       send({
@@ -188,12 +200,14 @@ export default {
 </script>
 
 <style lang="css" scoped>
+.home{
+  position: relative;
+}
 .layout{
   border: 0px solid #d7dde4;
   /*background: #2d8cf0;*/
   position: relative;
   overflow: hidden;
-  /*height: 600px*/
 }
 .layout-header-bar{
   background: #fff;
@@ -239,20 +253,21 @@ export default {
 }
 .mainContent{
   background: #2d8cf0 !important;
+  margin-left: 34px;
 }
 .mainContent h1 {
   color: #fff;
 }
-.mainContent::-webkit-scrollbar {/*滚动条整体样式*/
+.mainContent1::-webkit-scrollbar {/*滚动条整体样式*/
     width: 10px;     /*高宽分别对应横竖滚动条的尺寸*/
     height: 1px;
 }
-.mainContent::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+.mainContent1::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
     border-radius: 10px;
      -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
     background: #535353;
 }
-.mainContent::-webkit-scrollbar-track {/*滚动条里面轨道*/
+.mainContent1::-webkit-scrollbar-track {/*滚动条里面轨道*/
     -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
     border-radius: 10px;
     background: #EDEDED;

@@ -112,7 +112,7 @@ export default {
       'changeModalShow'
     ]),
     editMasterInfo (MasterControlId) {
-       if (!this.curHome.isCreater) {
+      if (!this.curHome.isCreater) {
         this.$Message.warning('您不是管理员不能进行该操作！')
         return false
       }
@@ -162,7 +162,7 @@ export default {
       })
     },
     deleteMaster (MasterControl) {
-       if (!this.curHome.isCreater) {
+      if (!this.curHome.isCreater) {
         this.$Message.warning('您不是管理员不能进行该操作！')
         return false
       }

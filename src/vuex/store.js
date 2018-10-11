@@ -11,7 +11,8 @@ const state = {
   count: 10,
   PlainText: 'ZNKZ',
   ifSpin: false,
-  register_id: '4dd928bab4a811e88d1a00163e11716c',
+  register_id: '', // '2f40a8dacb9711e88d1a00163e11716c', // '4dd928bab4a811e88d1a00163e11716c',
+  accountPhone: '',
   curHome: {},
   homeList: [],
   roomList: [],
@@ -165,6 +166,12 @@ const state = {
 }
 // actions
 const actions = {
+  changeCurRegisterId ({commit, state}, ID) {
+    commit('setCurRegisterId', ID)
+  },
+  changeCurAccountPhone ({commit, state}, PHONE) {
+    commit('setCurAccountPhone', PHONE)
+  },
   toggleSpin ({commit, state}, STATUS) {
     commit('setSpin', STATUS)
   },
@@ -186,6 +193,12 @@ const actions = {
 
 // mutations
 const mutations = {
+  setCurRegisterId (state, ID) {
+    state.register_id = ID
+  },
+  setCurAccountPhone (state, PHONE) {
+    state.accountPhone = PHONE
+  },
   setSpin (state, STATUS) {
     state.ifSpin = STATUS
   },

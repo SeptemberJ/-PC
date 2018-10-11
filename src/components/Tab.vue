@@ -7,28 +7,34 @@
   </Row>
   <Row>
     <Col span="6">
-      <Card style="width:90%;margin-top: 10px;background: chocolate;color: #fff;cursor: pointer;">
-        <div style="text-align:center" @click="changeTab(0)">
-          <img style="height: 50px;" src="../../static/img/icons/tab_home.png">
-          <h3>家管理</h3>
-        </div>
-      </Card>
+      <span @click="changeTab(0)">
+        <Card style="width:90%;margin: 20px auto 50px auto;background: chocolate;color: #fff;cursor: pointer;">
+          <div style="text-align:center">
+            <img style="height: 50px;" src="../../static/img/icons/tab_home.png">
+            <h3>家管理</h3>
+          </div>
+        </Card>
+      </span>
     </Col>
     <Col span="6">
-      <Card style="width:90%;margin-top: 10px;background: blueviolet;color: #fff;cursor: pointer;">
-        <div style="text-align:center" @click="changeTab(1)">
-          <img style="height: 50px;" src="../../static/img/icons/tab_eq.png">
-          <h3>设备管理</h3>
-        </div>
-      </Card>
+      <span @click="changeTab(1)">
+        <Card style="width:90%;margin: 20px auto 50px auto;background: blueviolet;color: #fff;cursor: pointer;">
+          <div style="text-align:center">
+            <img style="height: 50px;" src="../../static/img/icons/tab_eq.png">
+            <h3>设备管理</h3>
+          </div>
+        </Card>
+      </span>
     </Col>
     <Col span="6">
-      <Card style="width:90%;margin-top: 10px;background: cadetblue;color: #fff;cursor: pointer;">
-        <div style="text-align:center" @click="changeTab(2)">
-          <img style="height: 50px;" src="../../static/img/icons/tab_set.png">
-          <h3>设置</h3>
-        </div>
-      </Card>
+      <span @click="changeTab(2)">
+        <Card style="width:90%;margin: 20px auto 50px auto;background: cadetblue;color: #fff;cursor: pointer;">
+          <div style="text-align:center">
+            <img style="height: 50px;" src="../../static/img/icons/tab_set.png">
+            <h3>设置</h3>
+          </div>
+        </Card>
+      </span>
     </Col>
     <Col span="6">col-8</Col>
   </Row>
@@ -84,9 +90,11 @@ export default {
 <style lang='less' scoped>
 .footerTab{
   width: 100%;
-  height: 150px;
+  height: 200px;
   background: #fff;
-  position: relative;
+}
+.ll{
+  position: absolute;
   left: 0;
   bottom: 0;
   z-index: 999;
