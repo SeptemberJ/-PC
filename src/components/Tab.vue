@@ -36,7 +36,9 @@
         </Card>
       </span>
     </Col>
-    <Col span="6">col-8</Col>
+    <Col span="6">
+      <p></p>
+    </Col>
   </Row>
 </div>
 <!--   <div>

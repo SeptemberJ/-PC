@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import sider from './modules/sider'
+import home from './modules/home'
 // import * as actions from './actions'
 
 Vue.use(Vuex)
@@ -233,7 +234,8 @@ const mutations = {
 export default new Vuex.Store({
   state,
   modules: {
-    sider
+    sider,
+    home
   },
   // getters,
   actions,

@@ -308,23 +308,23 @@ export default {
         data: {
         }
       }).then(_res => {
-        switch (_res.data.code) {
-          case 1:
-            // this.toggleSpin(false)
-            this.changeModalShow('Second')
-            this.$Message.success('添加成功！')
-            this.btLoading = false
-            // 1-无下挂自动添加下级设备
-            if (this.choosedSecond[0].devcieType === '1') {
-              this.addAutoEq(_res.data.id, this.formSecond.secondCode)
-            }
-            this.getSecondControl()
-            break
-          default:
-            // this.toggleSpin(false)
-            this.btLoading = false
-            this.$Message.error(_res.data.message)
-        }
+        // switch (_res.data.code) {
+        //   case 1:
+        //     // this.toggleSpin(false)
+        //     this.changeModalShow('Second')
+        //     this.$Message.success('添加成功！')
+        //     this.btLoading = false
+        //     // 1-无下挂自动添加下级设备
+        //     if (this.choosedSecond[0].devcieType === '1') {
+        //       this.addAutoEq(_res.data.id, this.formSecond.secondCode)
+        //     }
+        //     this.getSecondControl()
+        //     break
+        //   default:
+        //     // this.toggleSpin(false)
+        //     this.btLoading = false
+        //     this.$Message.error(_res.data.message)
+        // }
       }).catch((_res) => {
         // this.toggleSpin(false)
         this.btLoading = false
