@@ -2,7 +2,7 @@
 
 const state = {
   CurType: 0,
-  app_URL: 'http://www.smart-hox.com:8081/hoxJK/'
+  app_URL: 'http://www.smart-hox.com:8081/hoxJK/' // 'http://205.168.1.106:8081/hoxJK/'
 }
 
 // getters

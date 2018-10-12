@@ -150,7 +150,7 @@ export default {
         render: (h) => {
           return h('Input', {
             props: {
-              value: this.newEqName,
+              value: this.newRoomName === '' ? Room.house_name : this.newRoomName,
               autofocus: true,
               placeholder: '请输入新的房间名称...'
             },
@@ -176,6 +176,7 @@ export default {
           case 1:
             this.toggleSpin(false)
             this.$Message.success('修改成功!')
+            this.newRoomName = ''
             this.getAllRoom()
             break
           default:

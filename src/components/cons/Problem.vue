@@ -4,7 +4,7 @@
       <Col span="12" class="PaddingL_16"><h1>常见问题</h1></Col>
       <Col span="12" class="PaddingR_16"><Input v-model="keyWord" clearable search placeholder="输入关键字..."/></Col>
     </Row>
-    <div class="problemList">
+    <div class="problemList PaddingL_16">
       <div v-if="!ifSearch && problemList.length > 0" class="problemItem" v-for="(problem, idx) in problemList" :key="idx">
         <Row type="flex" justify="start" class="code-row-bg">
           <Col span="8" class="tit"><h3><span>{{idx + 1}}. </span>{{problem.tit}}</h3></Col>
@@ -32,10 +32,10 @@ export default {
   name: 'Problem',
   data () {
     return {
-      keyWord: '主控',
+      keyWord: '',
       ifSearch: false,
       resultList: [],
-      problemList: [{tit: '主控问题'}, {tit: '从控问题一问题一问题一'}, {tit: '问题二问题一问题一问题一问题一'}]
+      problemList: [{tit: '主控问题'}, {tit: '从控问题'}, {tit: '设备问题'}]
     }
   },
   computed: {

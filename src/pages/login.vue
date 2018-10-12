@@ -13,7 +13,7 @@
 		<div class="loginItem">
 			<div class="operationBar">
 				<Button type="text" ghost @click="forgetPsd">忘记密码</Button>
-				<Button type="text" ghost @click="goSign">去注册</Button>
+				<Button type="text" ghost @click="goSign(0)">去注册</Button>
 			</div>
 		</div>
 	</div>

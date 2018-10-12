@@ -10,7 +10,7 @@
                 <Col span="16">
                   <h4>{{MasterControl.main_control_name}}</h4>
                   <Row class="MarginT_20">
-                    <Col span="12"><img class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editMasterInfo(MasterControl.id)">编辑</span></Col>
+                    <Col span="12"><img class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editMasterInfo(MasterControl.id, MasterControl.main_control_name)">编辑</span></Col>
                     <Col span="12" class="TextAlignR"><img class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteMaster(MasterControl)">删除</span></Col>
                   </Row>
                 </Col>
@@ -111,7 +111,7 @@ export default {
       'toggleSpin',
       'changeModalShow'
     ]),
-    editMasterInfo (MasterControlId) {
+    editMasterInfo (MasterControlId, MasterControlName) {
       if (!this.curHome.isCreater) {
         this.$Message.warning('您不是管理员不能进行该操作！')
         return false
@@ -127,7 +127,7 @@ export default {
         render: (h) => {
           return h('Input', {
             props: {
-              value: this.newMasterControlName,
+              value: this.newMasterControlName === '' ? MasterControlName : this.newMasterControlName,
               autofocus: true,
               placeholder: '请输入新的主控名称...'
             },
@@ -152,6 +152,7 @@ export default {
           case 1:
             this.$Message.success('修改成功!')
             this.getMasterControl()
+            this.newMasterControlName = ''
             break
           default:
             this.$Message.error(_res.data.message)

@@ -22,7 +22,7 @@
                 </Col>
               </Row>
               <Row class="MarginT_10 PaddingT_16 BorderT_gray">
-                <Col span="12"><img class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editEqInfo(EQ.id)">编辑</span></Col>
+                <Col span="12"><img class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editEqInfo(EQ.id, EQ.device_name)">编辑</span></Col>
                 <Col span="12" class="TextAlignR"><img class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteEq(EQ)">删除</span></Col>
               </Row>
             </div>
@@ -302,7 +302,7 @@ export default {
       'toggleSpin',
       'changeModalShow'
     ]),
-    editEqInfo (EqId) {
+    editEqInfo (EqId, EqName) {
       if (!this.curHome.isCreater) {
         this.$Message.warning('您不是管理员不能进行该操作！')
         return false
@@ -314,7 +314,7 @@ export default {
         render: (h) => {
           return h('Input', {
             props: {
-              value: this.newEqName,
+              value: this.newEqName === '' ? EqName : this.newEqName,
               autofocus: true,
               placeholder: '请输入新的设备名称...'
             },

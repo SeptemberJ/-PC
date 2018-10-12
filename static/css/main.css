@@ -26,8 +26,20 @@ html, body{
 .ColorRed{
 	color: red;
 }
+.ColorGray{
+	color: #ccc;
+}
 .ColorWhite{
 	color: white;
+}
+.colorPrimary{
+	color: #2d8cf0;
+}
+.smallSize{
+	font-size: 12px;
+}
+.Bold{
+	font-weight: bold;
 }
 .CursorPointer{
 	cursor: pointer;

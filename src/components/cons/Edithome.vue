@@ -1,6 +1,6 @@
 <template>
   <!-- <h1>Edithome...</h1> -->
-  <div class="homeManage" style="width:97%;margin-left:3%">
+  <div class="homeManage">
     <Row type="flex" justify="start" class="code-row-bg">
       <Col span="12"  v-show = "show">
         <template>
@@ -91,7 +91,8 @@
       <Col span="24">
         <Card style="width:400px">
           <p slot="title">房间管理</p>
-          <p class="p" v-for="item in roomlist" :key="item.id"><span style="margin-right:30px">{{item.house_name}}</span><span style="float:right"><Icon type="ios-trash-outline" style="font-size:25px;cursor:pointer" @click="delhomenames(item.id)"/></span>&nbsp;<span style="float:right"><Icon type="ios-create-outline" style="color:#2d8cf0;font-size:25px;cursor:pointer" @click="edithomenames(item.id,item.house_name)"/></span></p>
+          <p class="p" v-for="item in roomlist" :key="item.id"><span style="margin-right:30px">{{item.house_name}}</span><span style="float:right"><img src="../../../static/img/icons/delete.png" style="width:20px;height:20px;vertical-align: middle;cursor:pointer;margin-left:5px;" @click="delhomenames(item.id)"></span>&nbsp;<span style="float:right"><img src="../../../static/img/icons/editor-line.png" style="width:20px;height:20px;vertical-align: middle;cursor:pointer" @click="edithomenames(item.id,item.house_name)"></span></p>
+          <!-- <p class="p" v-for="item in roomlist" :key="item.id"><span style="margin-right:30px">{{item.house_name}}</span><span style="float:right"><Icon type="ios-trash-outline" style="font-size:25px;cursor:pointer" @click="delhomenames(item.id)"/></span>&nbsp;<span style="float:right"><Icon type="ios-create-outline" style="color:#2d8cf0;font-size:25px;cursor:pointer" @click="edithomenames(item.id,item.house_name)"/></span></p> -->
           <div style="text-align:right"><span><Button type="primary" class="butt1" ghost  @click="addnewrooms()">新增</Button></span><span><Button type="primary" class="butt"  @click="turnback()">返回</Button></span></div>
         </Card>
       </Col>
@@ -606,11 +607,11 @@ export default {
             ).then((res) => {
                 if (res.data.code ==1 ){
                     if (res.data.homeList.length == 0){
-                        this.$Message.success('暂无数据!')//here
+                        this.$Message.warning('暂无数据!')//here
                     }else{
                         this.fnamelist = res.data.homeList
                         this.adminid = this.fnamelist[0].id
-                        this.$Message.success('加载成功!')
+                        // this.$Message.success('加载成功!')
                     }
                 }else{
                 this.$Message.error('加载失败!')
@@ -627,7 +628,7 @@ export default {
             ).then((res) => {
                 if (res.data.code ==1 ){
                     if (res.data.homeList.length == 0){
-                        this.$Message.success('暂无数据!')//here
+                        this.$Message.warning('暂无数据!')//here
                     }else{
                         this.fnamelist = res.data.homeList
                         this.adminid = this.fnamelist[0].id
@@ -646,7 +647,7 @@ export default {
                 let temp = []
                 if (res.data.code ==1 ){
                     if (res.data.homeList == 0){
-                        this.$Message.success('暂无数据!')
+                        this.$Message.warning('暂无数据!')
                     }else{
                         temp = res.data.homeList.slice(0)
                         // this.$Message.success('加载成功!')
@@ -678,11 +679,11 @@ export default {
                 let temp = []
                 if (res.data.code ==1 ){
                     if (res.data.homeList == 0){
-                        this.$Message.success('暂无数据!')
+                        this.$Message.warning('暂无数据!')
                     }else{
                         temp = res.data.homeList.slice(0)
-                        this.$Message.success('加载成功!')
-                        // 循环Homelist 取id ，
+                        // this.$Message.success('加载成功!')
+                        // 循环Homelist 取id
                         for (let j = 0, lenJ = temp.length; j < lenJ; ++j) {
                             axios.get(this.$store.state.home.app_URL + 'house?home_id=' + temp[j].home_id
                             ).then((res) => {
@@ -733,11 +734,11 @@ export default {
             ).then((res) => {
                 if (res.data.code ==1 ){
                     if (res.data.homeList.length == 0){
-                        this.$Message.success('暂无数据!')//here
+                        this.$Message.warning('暂无数据!')
                     }else{
                         this.fnamelist = res.data.homeList
                         this.adminid = this.fnamelist[0].id
-                        this.$Message.success('加载成功!')
+                        // this.$Message.success('加载成功!')
                     }
                 }else{
                 this.$Message.error('加载失败!')
@@ -776,10 +777,10 @@ export default {
             ).then((res) => {
                 if (res.data.code ==1 ){
                     if (res.data.houseList.length == 0){
-                        this.$Message.success('暂无数据!')
+                        this.$Message.warning('暂无数据!')
                     }else{
                         this.roomlist = res.data.houseList
-                        this.$Message.success('加载成功!')
+                        // this.$Message.success('加载成功!')
                     }
                 }else{
                 this.$Message.error('加载失败!')
@@ -803,9 +804,9 @@ export default {
                     ).then((res) => {
                         if (res.data.code ==1 ){
                             if (res.data.houseList.length == 0){
-                                this.$Message.success('暂无数据!')
+                                this.$Message.warning('暂无数据!')
                             }else{
-                                this.$Message.success('加载成功!')
+                                // this.$Message.success('加载成功!')
                                 this.roomlist = res.data.houseList
                                 console.log(this.roomlist)
                             }
@@ -830,14 +831,14 @@ export default {
                     ).then((res) => {
                         if (res.data.code ==1 ){
                             if (res.data.houseList.length == 0){
-                                this.$Message.success('暂无数据!')
+                                this.$Message.warning('暂无数据!')
                             }else{
                                 this.roomlist = res.data.houseList
                                 console.log(this.roomlist)
                             }
                         }
                     })
-            this.$Message.success('修改成功!')//成功重新加载房间列表
+            this.$Message.success('修改成功!') // 成功重新加载房间列表
             }else{
             this.$Message.error('修改失败!')
             }
@@ -863,7 +864,7 @@ export default {
                         }
                     })
             }else{
-                this.$Message.success('加载成功!')
+                // this.$Message.success('加载成功!')
                 this.roomlist = res.data.houseList
                 console.log(this.roomlist)
             }
@@ -884,10 +885,10 @@ export default {
       this.cardshow = false
     },
     ok () {
-      this.$Message.info('点击了确定')
+      // this.$Message.info('点击了确定')
     },
     cancel () {
-      this.$Message.info('已取消')
+      // this.$Message.info('已取消')
     },
     del () {
     //   this.$store.state.homeshowtype = 2 // 删除
@@ -1017,14 +1018,17 @@ export default {
 .homeManage h1{
   color: #fff;
 }
+.tipsTit{
+  margin-bottom: 15px;
+}
 .list{
     width: 100%;
-    height: 110px;
+    height: 120px;
     background-color: white;
     border-radius: 8px;
     margin-top: 30px;
-    margin-right:10px;
-    box-shadow: rgb(212, 211, 211) 5px 5px 10px 2px ;
+    margin-right:0px;
+    box-shadow: rgb(212, 211, 211) 0px 0px 5px 1px ;
 }
 .icon{
     background-color: rgb(209, 207, 207);

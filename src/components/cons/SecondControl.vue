@@ -10,7 +10,7 @@
                 <Col span="16">
                   <h4>{{SecondControl.second_control_name}}</h4>
                   <Row class="MarginT_20">
-                    <Col span="12"><img class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editSecondControl(SecondControl.id)">编辑</span></Col>
+                    <Col span="12"><img class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editSecondControl(SecondControl.id, SecondControl.second_control_name)">编辑</span></Col>
                     <Col span="12" class="TextAlignR"><img class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteSecondControl(SecondControl)">删除</span></Col>
                   </Row>
                 </Col>
@@ -144,7 +144,7 @@ export default {
       'toggleSpin',
       'changeModalShow'
     ]),
-    editSecondControl (MasterControlId) {
+    editSecondControl (SecondControlId, SecondControlName) {
       if (!this.curHome.isCreater) {
         this.$Message.warning('您不是管理员不能进行该操作！')
         return false
@@ -155,12 +155,12 @@ export default {
             this.$Message.error('从控名称不能为空!')
             return false
           }
-          this.sureModify(MasterControlId)
+          this.sureModify(SecondControlId)
         },
         render: (h) => {
           return h('Input', {
             props: {
-              value: this.newSecondControlName,
+              value: this.newSecondControlName === '' ? SecondControlName : this.newSecondControlName,
               autofocus: true,
               placeholder: '请输入新的从控名称...'
             },
@@ -185,6 +185,7 @@ export default {
           case 1:
             this.$Message.success('修改成功!')
             this.getSecondControl()
+            this.newSecondControlName = ''
             break
           default:
             this.$Message.error(_res.data.message)
@@ -308,23 +309,23 @@ export default {
         data: {
         }
       }).then(_res => {
-        // switch (_res.data.code) {
-        //   case 1:
-        //     // this.toggleSpin(false)
-        //     this.changeModalShow('Second')
-        //     this.$Message.success('添加成功！')
-        //     this.btLoading = false
-        //     // 1-无下挂自动添加下级设备
-        //     if (this.choosedSecond[0].devcieType === '1') {
-        //       this.addAutoEq(_res.data.id, this.formSecond.secondCode)
-        //     }
-        //     this.getSecondControl()
-        //     break
-        //   default:
-        //     // this.toggleSpin(false)
-        //     this.btLoading = false
-        //     this.$Message.error(_res.data.message)
-        // }
+        switch (_res.data.code) {
+          case 1:
+            // this.toggleSpin(false)
+            this.changeModalShow('Second')
+            this.$Message.success('添加成功！')
+            this.btLoading = false
+            // 1-无下挂自动添加下级设备
+            if (this.choosedSecond[0].devcieType === '1') {
+              this.addAutoEq(_res.data.id, this.formSecond.secondCode)
+            }
+            this.getSecondControl()
+            break
+          default:
+            // this.toggleSpin(false)
+            this.btLoading = false
+            this.$Message.error(_res.data.message || 'Interface Error!')
+        }
       }).catch((_res) => {
         // this.toggleSpin(false)
         this.btLoading = false

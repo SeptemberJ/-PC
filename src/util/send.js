@@ -68,6 +68,7 @@ export function send (options) {
           resolve(res)
         }).catch((error) => {
           console.log(error)
+          this.$Message.error('Interface Error!')
         })
         break
       case 'GET':
@@ -76,6 +77,7 @@ export function send (options) {
           resolve(res)
         }).catch((error) => {
           console.log(error)
+          this.$Message.error('Interface Error!')
         })
         break
       case 'DELETE':
@@ -84,6 +86,7 @@ export function send (options) {
           resolve(res)
         }).catch((error) => {
           console.log(error)
+          this.$Message.error('Interface Error!')
         })
         break
       case 'PUT':
@@ -92,6 +95,7 @@ export function send (options) {
           resolve(res)
         }).catch((error) => {
           console.log(error)
+          this.$Message.error('Interface Error!')
         })
         break
     }
