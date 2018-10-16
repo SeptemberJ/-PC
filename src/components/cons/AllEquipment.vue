@@ -6,15 +6,14 @@
           <Card style="width: 90%;margin:0 auto 30px auto;">
             <div style="text-align:left">
               <Row>
-                <Col span="8"><img :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'"></Col>
+                <Col span="8" class="CursorPointer"><img @click="showCharts(EQ)" :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'"></Col>
                 <Col span="16">
-                  <h4>{{EQ.device_name}}</h4>
+                  <h4 class="CursorPointer" @click="showCharts(EQ)">{{EQ.device_name}}</h4>
                   <p>状态: {{EQ.on_off_status == 0 ? '在线' : '离线'}}</p>
                   <p>位置: {{EQ.house_name}} </p>
                   <Row class="operationIcon">
                     <Col span="24">
-                      <img v-if="curHome.isCreater" class="iconImg" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
-                      <img v-if="!curHome.isCreater" class="iconImg" src="../../../static/img/icons/move-up_gray.png" @click="moveEq(EQ)">
+                      <img class="iconImg" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
                       <img v-if="EQ.default_device_type == 'HAir(有线)'" class="iconImg" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts(EQ)">
                       <!-- <i-switch style="float:right;margin-top:5px;" size="small" @on-change="setConfig(EQ)"/> -->
                     </Col>
@@ -37,23 +36,23 @@
           <span>设备移动</span>
       </p>
       <div style="text-align:left">
-          <Form label-position="left" :label-width="100">
-            <FormItem label="设备名称" style="margin-bottom: 10px;">
-              <p>{{curEQName}}</p>
-            </FormItem>
-            <FormItem label="当前房间" style="margin-bottom: 10px;">
-              <p>{{curEQRoom}}</p>
-            </FormItem>
-            <FormItem label="移动至" style="margin-bottom: 10px;">
-              <p>{{moveDestination}}</p>
-            </FormItem>
-            <RadioGroup v-model="moveDestination" vertical @on-change="changeDestinationRoom">
-              <Radio :label="House.house_name" v-for="(House, idx) in HouseList" :key="idx">
-                  <Icon type="social-apple"></Icon>
-                  <span>{{House.house_name}}</span>
-              </Radio>
-            </RadioGroup>
-          </Form>
+        <Form label-position="left" :label-width="100">
+          <FormItem label="设备名称" style="margin-bottom: 10px;">
+            <p>{{curEQName}}</p>
+          </FormItem>
+          <FormItem label="当前房间" style="margin-bottom: 10px;">
+            <p>{{curEQRoom}}</p>
+          </FormItem>
+          <FormItem label="移动至" style="margin-bottom: 10px;">
+            <p>{{moveDestination}}</p>
+          </FormItem>
+          <RadioGroup v-model="moveDestination" vertical @on-change="changeDestinationRoom">
+            <Radio :label="House.house_name" v-for="(House, idx) in HouseList" :key="idx">
+                <Icon type="social-apple"></Icon>
+                <span>{{House.house_name}}</span>
+            </Radio>
+          </RadioGroup>
+        </Form>
       </div>
       <div slot="footer">
           <!-- <Button type="error" size="large" long  @click="sureMove">确认移动</Button> -->
@@ -82,14 +81,18 @@
          <!-- 单品 -->
           <Form v-show="EqType == '单品'" :model="formSingle" ref="formSingle" :rules="ruleValidateSingle" label-position="left" :label-width="100">
             <FormItem label="选择单品类型" prop="SingleSelectName">
-              <Select v-model="formSingle.SingleSelectName">
-                <Option v-for="item in SingleList" :value="item.deviceDescibe" :key="item.id">{{ item.deviceDescibe }}</Option>
+              <!-- <Select v-model="formSingle.SingleSelectName" @on-change="changeSingle"> -->
+              <Select @on-change="changeSingle">
+                <Option v-for="item in SingleList" :value="item.id" :key="item.id">{{ item.deviceDescibe }}</Option>
               </Select>
             </FormItem>
-            <FormItem label="选择房间" prop="selectRoomId">
+            <FormItem label="选择房间" prop="selectRoomId" v-if="HouseList.length > 0">
               <Select v-model="formSingle.selectRoomId">
                 <Option v-for="item in HouseList" :value="item.id" :key="item.id">{{ item.house_name }}</Option>
               </Select>
+            </FormItem>
+            <FormItem label="选择房间" prop="selectMasterId" v-if="HouseList.length == 0">
+              <Button size="small" type="text" @click="toAddRoom">还未添加房间，点击去添加</Button>
             </FormItem>
             <FormItem label="单品名称" prop="SingleName">
               <Input v-model="formSingle.SingleName" placeholder="可输入自定义名称" style="" />
@@ -100,20 +103,29 @@
           </Form>
           <!-- 无线设备 一般三级设备 -->
           <Form v-show="EqType == '无线设备'" :model="formEQNormal" ref="formEQNormal" :rules="ruleValidateEQ" label-position="left" :label-width="100">
-            <FormItem label="选择主控" prop="selectMasterId">
+            <FormItem label="选择主控" prop="selectMasterId" v-if="MasterControlList.length > 0">
               <Select v-model="formEQNormal.selectMasterId" @on-change="selectChangeMaster">
                 <Option v-for="item in MasterControlList" :value="item.id" :key="item.id">{{ item.main_control_name }}</Option>
               </Select>
             </FormItem>
-            <FormItem label="选择从控" prop="selectSecondId">
+            <FormItem label="选择主控" prop="selectMasterId" v-if="MasterControlList.length == 0">
+              <Button size="small" type="text" @click="toAddMS">还未添加主控，点击去添加</Button>
+            </FormItem>
+            <FormItem label="选择从控" prop="selectSecondId" v-if="SecondControlList.length > 0">
               <Select v-model="formEQNormal.selectSecondId" @on-change="selectChangeSecond">
                 <Option v-for="item in SecondControlList" :value="item.id" :key="item.id">{{ item.second_control_name }}</Option>
               </Select>
             </FormItem>
-            <FormItem label="选择房间" prop="selectRoomId">
+            <FormItem label="选择从控" prop="selectMasterId" v-if="SecondControlList.length == 0">
+              <Button size="small" type="text" @click="toAddMS">改主控下还未添加从控，点击去添加</Button>
+            </FormItem>
+            <FormItem label="选择房间" prop="selectRoomId" v-if="HouseList.length > 0">
               <Select v-model="formEQNormal.selectRoomId">
                 <Option v-for="item in HouseList" :value="item.id" :key="item.id">{{ item.house_name }}</Option>
               </Select>
+            </FormItem>
+            <FormItem label="选择房间" prop="selectMasterId" v-if="HouseList.length == 0">
+              <Button size="small" type="text" @click="toAddRoom">还未添加房间，点击去添加</Button>
             </FormItem>
             <FormItem label="选择设备类型" prop="eqType">
               <Select v-model="formEQNormal.eqType">
@@ -124,7 +136,7 @@
               <Input v-model="formEQNormal.EQName" placeholder="可输入自定义名称" style="" />
             </FormItem>
             <FormItem label="设码" prop="SingleCode">
-              <Input v-model="formEQNormal.EQCode" placeholder="请输入主控码" style="" />
+              <Input v-model="formEQNormal.EQCode" placeholder="请输入设备码" style="" />
             </FormItem>
           </Form>
       </div>
@@ -199,6 +211,7 @@ export default {
       formSingle: {
         SingleName: '',
         SingleCode: '',
+        SingleType: '',
         SingleSelectName: '',
         selectRoomId: '',
         selectMasterId: ''
@@ -208,7 +221,7 @@ export default {
           { required: true, message: '请选择单品！', trigger: 'change' }
         ],
         SingleCode: [
-          { required: true, message: '单品码不能为空！', trigger: 'blur' }
+          { required: true, message: '单品码不能为空！', trigger: 'change' }
         ],
         selectRoomId: [
           { required: true, message: '请选择所在房间！', trigger: 'change' }
@@ -235,7 +248,7 @@ export default {
           { required: true, message: '请选择从控！', trigger: 'change' }
         ],
         EQCode: [
-          { required: true, message: '单品码不能为空！', trigger: 'blur' }
+          { required: true, message: '单品码不能为空！', trigger: 'change' }
         ],
         selectRoomId: [
           { required: true, message: '请选择所在房间！', trigger: 'change' }
@@ -285,6 +298,33 @@ export default {
     },
     time: function (val) {
       this.drawLine()
+    },
+    MasterControlList: function (val) {
+      console.log('new val-----------------')
+      console.log(val)
+      this.initialSelect(val)
+    },
+    ifAddEQ: function (val) {
+      if (!val) {
+        this.$refs['formEQNormal'].resetFields()
+        this.$refs['formSingle'].resetFields()
+      }
+    },
+    EqType: function (val) {
+      switch (val) {
+        case '无线设备':
+          this.$refs['formEQNormal'].resetFields()
+          this.initialSelect(this.MasterControlList)
+          break
+        case '红外设备':
+          break
+        case '单品':
+          this.$refs['formSingle'].resetFields()
+          break
+      }
+    },
+    HouseList: function (val) {
+      this.initialSelectRoom()
     }
   },
   components: {
@@ -293,6 +333,21 @@ export default {
   created () {
     this.getAllEq()
     this.filterSingle()
+    this.initialSelectRoom()
+    this.initialSelect(this.MasterControlList)
+    // 设置默认项
+    // if (this.MasterControlList[0]) {
+    //   this.formEQNormal.selectMasterId = this.MasterControlList[0].id
+    //   this.choosedMaster = this.MasterControlList[0]
+    //   this.getSecondControlList(this.MasterControlList[0].main_control_code)
+    // } else {
+    //   this.formEQNormal.selectMasterId = ''
+    //   this.choosedMaster = []
+    //   this.SecondControlList = []
+    //   this.formEQNormal.selectSecondId = ''
+    //   this.choosedSecond = []
+    // }
+    // this.formEQNormal.selectSecondId = this.MasterControlList[0].id
     // this.getAllRoom()
   },
   methods: {
@@ -300,6 +355,40 @@ export default {
       'toggleSpin',
       'changeModalShow'
     ]),
+    ...mapActions('sider', [
+      'changeCurMenu'
+    ]),
+    // 去添加主控或从控
+    toAddMS () {
+      this.changeModalShow('EQ')
+      this.changeCurMenu(2)
+    },
+    // 去添加房间
+    toAddRoom () {
+      this.changeModalShow('EQ')
+      this.changeCurMenu(1)
+    },
+    // 初始化房间
+    initialSelectRoom () {
+      if (this.HouseList[0]) {
+        this.formSingle.selectRoomId = this.HouseList[0].id
+        this.formEQNormal.selectRoomId = this.HouseList[0].id
+      }
+    },
+    // 初始化select选项
+    initialSelect (Master) {
+      if (Master[0]) {
+        this.formEQNormal.selectMasterId = Master[0].id
+        this.choosedMaster = Master[0]
+        this.getSecondControlList(Master[0].main_control_code)
+      } else {
+        this.formEQNormal.selectMasterId = ''
+        this.choosedMaster = {}
+        this.SecondControlList = []
+        this.formEQNormal.selectSecondId = ''
+        this.choosedSecond = {}
+      }
+    },
     editEqInfo (EqId, EqName) {
       if (!this.curHome.isCreater) {
         this.$Message.warning('您不是管理员不能进行该操作！')
@@ -754,6 +843,15 @@ export default {
         }
       })
     },
+    // 选择单品
+    changeSingle (SingleId) {
+      this.SingleList.map((item, idx) => {
+        if (item.id === SingleId) {
+          this.formSingle.SingleSelectName = item.deviceDescibe
+          this.formSingle.SingleType = item.deviceTypeName
+        }
+      })
+    },
     // 添加单品
     addSingleProduct () {
       // this.toggleSpin(true)
@@ -774,7 +872,7 @@ export default {
           second_contrl_code: '',
           device_name: this.formSingle.SingleName.trim() === '' ? this.formSingle.SingleSelectName : this.formSingle.SingleName,
           device_code: this.formSingle.SingleCode,
-          default_device_type: '',
+          default_device_type: this.formSingle.SingleType,
           device_img: '',
           device_status: 0,
           deviceType: 2,
@@ -811,16 +909,25 @@ export default {
     },
     // 切换主控
     selectChangeMaster (MasterId) {
-      let temp = this.formEQNormal
+      // let temp = this.formEQNormal
       let Master = this.MasterControlList.filter(master => {
         if (master.id === MasterId) {
           return master
         }
       })
-      this.choosedMaster = Master[0]
-      this.getSecondControlList(Master[0].main_control_code)
-      temp.selectSecondId = ''
-      this.formEQNormal = temp
+      this.initialSelect(Master)
+      // if (Master[0]) {
+      //   this.choosedMaster = Master[0]
+      //   this.getSecondControlList(Master[0].main_control_code)
+      //   temp.selectSecondId = ''
+      //   this.formEQNormal = temp
+      // } else {
+      //   this.formEQNormal.selectMasterId = ''
+      //   this.choosedMaster = []
+      //   this.SecondControlList = []
+      //   this.formEQNormal.selectSecondId = ''
+      //   this.choosedSecond = []
+      // }
     },
     // 获取该主控下所有从控
     getSecondControlList (MasterCode) {
@@ -832,7 +939,15 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
-            this.SecondControlList = _res.data.secondControlList
+            if (_res.data.secondControlList.length > 0) {
+              this.SecondControlList = _res.data.secondControlList
+              this.formEQNormal.selectSecondId = _res.data.secondControlList[0].id
+              this.choosedSecond = _res.data.secondControlList[0]
+            } else {
+              this.SecondControlList = []
+              this.formEQNormal.selectSecondId = ''
+              this.choosedSecond = {}
+            }
             break
           default:
             this.$Message.error(_res.data.message)

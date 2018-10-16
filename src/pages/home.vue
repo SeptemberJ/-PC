@@ -1,11 +1,44 @@
 <template>
   <Row>
+    <Col span="24" style="height: 70%">
+      <div class="home" style="height: 100%;background: #2d8cf0;overflow: hidden">
+        <Row style="width: 100%;height: 100%;">
+          <Col span="6" style="height: 100%;borderRight: 2px solid #fff;">
+            <SIDER/>
+          </Col>
+          <Col span="18" style="height: 100%;">
+            <div style="position:absolute;top:0;left:34px;padding-right: 0;width: 100%;height:100% !important;overflow-x:hidden;overflow-y:scroll">
+              <Layout class="mainContent">
+                <Content :style="{margin: '0', background: '#2d8cf0', overflowX: 'hidden', overflowY: 'scroll'}">
+                  <p @click="ToLogout" class='ColorWhite CursorPointer TextAlignR PaddingTB_10 PaddingR_16'>{{accountPhone}} | 退出</p>
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="4"><h1 v-if="curTab == 1">当前家</h1></Col>
+                    <Col span="8">
+                      <Select v-if="curTab == 1" :value="curHomeIdx" style="width:100%;height:50px;" @on-change="selectChangeCurHome">
+                        <Option v-for="(home, idx) in homeList" :value="idx" :key="idx">{{home.home_name}}</Option>
+                      </Select>
+                    </Col>
+                    <Col v-if="curMenuText === '所有设备'" span="12" offset="0" class="TextAlignR PaddingR_16"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备12</Button></Col>
+                  </Row>
+                  <CONTENT :curHomeId="curHome.home_id" ref="content"/>
+                </Content>
+              </Layout>
+            </div>
+          </Col>
+        </Row>
+      </div>
+    </Col>
     <Col span="24">
-      <div style="height: 550px;background: #2d8cf0;overflow: hidden">
-        <Sider ref="side1" :style="{position: 'relative', left: 0, top: 0, height: '550px', zIndex: 999, borderRight: '2px solid #eee'}" hide-trigger collapsible collapsed-width="100%" v-model="isCollapsed">
+      <TAB/>
+    </Col>
+  </Row>
+<!--   <Row>
+    <Col span="24" style="height: 70%">
+      <div class="home123" style="height: 100%;background: #2d8cf0;overflow: hidden">
+        <Sider ref="side1" :style="{width: '25%', position: 'relative', left: 0, top: 0, height: '100%', zIndex: 999, borderRight: '2px solid #eee'}" hide-trigger collapsible collapsed-width="100%" v-model="isCollapsed">
           <SIDER/>
         </Sider>
-        <div style="position:absolute;top:0;left:200px;padding-right: 200px;width: 100%;height: 550px !important;overflow-y:scroll">
+        <div style="position:absolute;top:0;left:25%;padding-right: 25%;width: 100%;height:100% !important;overflow-y:scroll">
           <Layout class="mainContent">
             <Content :style="{margin: '0', background: '#2d8cf0', overflowX: 'hidden', overflowY: 'scroll'}">
               <p @click="ToLogout" class='ColorWhite CursorPointer TextAlignR PaddingTB_10 PaddingR_16'>{{accountPhone}} | 退出</p>
@@ -16,11 +49,9 @@
                     <Option v-for="(home, idx) in homeList" :value="idx" :key="idx">{{home.home_name}}</Option>
                   </Select>
                 </Col>
-                <!-- add button -->
-                <!-- <Col v-if="curMenuText === '家列表'" span="12" offset="0" class="TextAlignR PaddingR_16"><Button type="error" icon="md-add" @click="addHome">添加家</Button></Col> -->
-                <Col v-if="curMenuText === '所有设备'" span="12" offset="0" class="TextAlignR PaddingR_16"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备</Button></Col>
+                <Col v-if="curMenuText === '所有设备'" span="12" offset="0" class="TextAlignR PaddingR_16"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备12</Button></Col>
               </Row>
-              <CONTENT :curHomeId="curHome.home_id"/>
+              <CONTENT :curHomeId="curHome.home_id" ref="content"/>
             </Content>
           </Layout>
         </div>
@@ -29,7 +60,7 @@
     <Col span="24">
       <TAB/>
     </Col>
-  </Row>
+  </Row> -->
 </template>
 
 <script>
@@ -51,8 +82,8 @@ export default {
   created () {
     this.windowHeight = window.innerHeight
     this.checkIfHasHome()
-    console.log('this.curHome----------------')
-    console.log(this.curHome)
+    // console.log('this.curHome----------------')
+    // console.log(this.curHome)
   },
   computed: {
     ...mapState({
@@ -93,7 +124,7 @@ export default {
       this.updateCurHome(this.homeList[IDX])
     },
     updateCurHome (HomeInfo) {
-      console.log(HomeInfo)
+      // console.log(HomeInfo)
       send({
         name: '/home?isdefault=1&id=' + HomeInfo.home_id + '&home_name=' + HomeInfo.home_name + '&faddress=' + HomeInfo.faddress + '&register_id=' + this.$store.state.register_id,
         method: 'PUT',
@@ -135,7 +166,6 @@ export default {
             item.isCreater = item.register_id === this.$store.state.register_id
             if (item.isdefault === '1') {
               this.changeCurHome(item)
-              console.log(item)
               this.getAllRoom(item.home_id)
             }
           })
@@ -144,7 +174,7 @@ export default {
           this.$router.push({name: 'Guide'})
         }
       }).catch((res) => {
-        this.$Message.error('Interface Error111!')
+        this.$Message.error('Interface Error!')
       })
     },
     // 当前家下房间
@@ -168,10 +198,12 @@ export default {
       })
     },
     addEQ () {
-      console.log('this.curHome=======================')
-      console.log(this.curHome)
-      // this.getMasterControl()
+      // console.log('this.curHome=======================')
+      // console.log(this.curHome)
+      this.getMasterControl()
       this.changeModalShow('EQ')
+      // console.log(this)
+      this.$refs.content.getMasterControl()
     },
     addHome () {
       this.$router.push({name: 'CreateHome'})
@@ -253,7 +285,7 @@ export default {
 }
 .mainContent{
   background: #2d8cf0 !important;
-  margin-left: 34px;
+  /*margin-left: 34px;*/
 }
 .mainContent h1 {
   color: #fff;

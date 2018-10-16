@@ -1,5 +1,5 @@
 <template>
-  <div class="com-app">
+  <div class="com-app" style="height: 100%;">
     <transition>
         <router-view class="child-view"></router-view>
     </transition>

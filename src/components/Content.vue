@@ -2,8 +2,8 @@
   <div>
     <HomeManage v-if="curMenuText === '家列表'"/>
     <AllEquipment v-on:listenSpin="toggleSpin" :AddList="AddList" :deviceTypeList="deviceTypeList" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="curMenuText === '所有设备'"/>
-    <EquipmentByRoom :curHomeId="curHomeId" v-if="curMenuText === '房间'"/>
-    <EquipmentByKind :curHomeId="curHomeId" v-if="curMenuText === '类别'"/>
+    <EquipmentByRoom :curHomeId="curHomeId" v-if="curMenuText === '按房间分类'"/>
+    <EquipmentByKind :curHomeId="curHomeId" v-if="curMenuText === '按类别分类'"/>
     <FeedBack v-if="curMenuText === '意见反馈'"/>
     <Problem v-if="curMenuText === '常见问题'"/>
     <SPIN v-if="ifSpin"/>
@@ -112,8 +112,6 @@ export default {
         switch (_res.data.code) {
           case 1:
             this.deviceTypeList = _res.data.deviceTypeList
-            console.log('deviceTypeList------------------')
-            console.log(this.deviceTypeList)
             break
           default:
             this.$Message.error(_res.data.message)

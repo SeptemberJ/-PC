@@ -25,17 +25,17 @@
     <Modal v-model="ifAddMaster" width="360">
       <p slot="header" style="color:#333;text-align:left">
           <!-- <Icon type="ios-information-circle"></Icon> -->
-          <span>添加主控</span>
+          <span>添加{{addName}}产品</span>
       </p>
       <div style="text-align:left">
           <Form :model="formMaster" ref="formMaster" :rules="ruleValidate" label-position="left" :label-width="100">
-            <FormItem label="选择主控" prop="selectName">
+            <!-- <FormItem label="选择主控" prop="selectName">
               <Select v-model="formMaster.selectName">
                 <Option v-for="item in addMasterList" :value="item.deviceDescibe" :key="item.id">{{ item.deviceDescibe }}</Option>
               </Select>
-            </FormItem>
+            </FormItem> -->
             <FormItem label="主控名称" prop="masterName">
-              <Input v-model="formMaster.masterName" placeholder="可输入自定义名称" style="" />
+              <Input v-model="formMaster.masterName" placeholder="请输入主控名称" style="" />
             </FormItem>
             <FormItem label="主控码" prop="masterCode">
               <Input v-model="formMaster.masterCode" placeholder="请输入主控码" style="" />
@@ -59,7 +59,7 @@ import {send} from '../../util/send'
 import NoData from '../NoData.vue'
 export default {
   name: 'AllEquipment',
-  props: ['curHomeId', 'AddList'],
+  props: ['curHomeId', 'addName', 'addKind'],
   data () {
     return {
       btLoading: false,
@@ -68,15 +68,15 @@ export default {
       addMasterList: [],
       formMaster: {
         masterCode: '',
-        masterName: '',
-        selectName: ''
+        masterName: ''
+        // selectName: ''
       },
       ruleValidate: {
-        selectName: [
-          { required: true, message: '请选择主控！', trigger: 'change' }
+        masterName: [
+          { required: true, message: '请填写主控名称！', trigger: 'change' }
         ],
         masterCode: [
-          { required: true, message: '主控码不能为空！', trigger: 'blur' }
+          { required: true, message: '主控码不能为空！', trigger: 'change' }
         ]
       }
     }
@@ -104,7 +104,8 @@ export default {
   },
   created () {
     this.getMasterControl()
-    this.filterMasterControl()
+    // this.filterMasterControl()
+    this.formMaster.masterName = this.addName
   },
   methods: {
     ...mapActions([
@@ -204,8 +205,28 @@ export default {
         this.$Message.error('Interface Error!')
       })
     },
-    // 所有主控
+    // 分类下该类所有主控
     getMasterControl () {
+      send({
+        name: '/mainControlByType?home_id=' + this.curHomeId + '&mainControl_Type=' + this.addKind,
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            this.MasterControlList = _res.data.mainControlList
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.$Message.error('Interface Error!')
+      })
+    },
+    // 所有主控
+    getMasterControl2 () {
       send({
         name: '/mainControl?home_id=' + this.curHomeId + '&register_id=' + this.$store.state.register_id,
         method: 'GET',
@@ -239,6 +260,7 @@ export default {
         if (valid) {
           this.addMaster()
         } else {
+          this.$Message.warning('请将信息填写完成!')
         }
       })
     },
@@ -250,7 +272,7 @@ export default {
       // this.toggleSpin(true)
       this.btLoading = true
       send({
-        name: '/mainControl?home_id=' + this.curHomeId + '&main_control_name=' + (this.formMaster.masterName.trim() !== '' ? this.formMaster.masterName.trim() : this.formMaster.selectName) + '&main_control_code=' + this.formMaster.masterCode,
+        name: '/mainControl?home_id=' + this.curHomeId + '&main_control_name=' + this.formMaster.masterName + '&main_control_code=' + this.formMaster.masterCode + '&main_control_type=' + this.addKind,
         method: 'POST',
         data: {
           // home_id: this.curHomeId,

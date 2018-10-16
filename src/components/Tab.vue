@@ -31,7 +31,7 @@
         <Card style="width:90%;margin: 20px auto 50px auto;background: cadetblue;color: #fff;cursor: pointer;">
           <div style="text-align:center">
             <img style="height: 50px;" src="../../static/img/icons/tab_set.png">
-            <h3>设置</h3>
+            <h3>个人中心</h3>
           </div>
         </Card>
       </span>

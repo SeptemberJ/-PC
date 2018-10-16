@@ -1,5 +1,6 @@
 <template>
   <Menu :active-name="curMenu" theme="primary" width="auto" :class="menuitemClasses" @on-select="changeMenu">
+    <MenuItem><img class="logo" src="../../static/img/Logo.png"></MenuItem>
     <MenuItem :name="idx" v-for="(menu, idx) in menuList[curTab].menu" :key="idx">
       <Icon :type="menu.icon"></Icon>
       <span>{{menu.text}}</span>
@@ -39,9 +40,15 @@ export default {
 }
 </script>
 <style scoped>
+.logo{
+  height: 50px;
+}
 .ivu-menu-light.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu){
   font-size: 18px;
   background: #fff;
 }
-.ivu-menu-light.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu)
+.ivu-menu-item{
+  text-align: center;
+  /*padding-right: 30px*/
+}
 </style>

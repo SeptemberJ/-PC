@@ -126,7 +126,8 @@ export default {
   },
   methods: {
     ...mapActions([
-      'toggleSpin'
+      'toggleSpin',
+      'changeRoomList'
     ]),
     back () {
       this.locationIdex = -1
@@ -217,10 +218,8 @@ export default {
         switch (_res.data.code) {
           case 1:
             this.getAllRoom()
-            setTimeout(() => {
-              this.toggleSpin(false)
-              this.$Message.success('删除成功!')
-            }, 1500)
+            this.toggleSpin(false)
+            this.$Message.success('删除成功!')
             break
           default:
             this.toggleSpin(false)
@@ -254,12 +253,9 @@ export default {
         switch (_res.data.code) {
           case 1:
             this.getAllRoom()
-            setTimeout(() => {
-              // this.toggleSpin(false)
-              this.ifAdd = false
-              this.btLoading = false
-              this.$Message.success('添加成功!')
-            }, 1500)
+            this.ifAdd = false
+            this.btLoading = false
+            this.$Message.success('添加成功!')
             break
           default:
             // this.toggleSpin(false)
@@ -288,6 +284,7 @@ export default {
         switch (_res.data.code) {
           case 1:
             this.HouseList = _res.data.houseList
+            this.changeRoomList(_res.data.houseList)
             break
           default:
             this.$Message.error(_res.data.message)

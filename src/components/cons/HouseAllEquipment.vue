@@ -6,15 +6,14 @@
           <Card style="width: 90%;margin:0 auto 30px auto;">
             <div style="text-align:left">
               <Row>
-                <Col span="8"><img :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'"></Col>
+                <Col span="8" class="CursorPointer"><img @click="showCharts(EQ)" :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'"></Col>
                 <Col span="16">
-                  <h4>{{EQ.device_name}}</h4>
+                  <h4 class="CursorPointer" @click="showCharts(EQ)">{{EQ.device_name}}</h4>
                   <p>状态: {{EQ.device_status == 0 ? '在线' : '离线'}}</p>
                   <p>位置: {{choosedHouseName}}</p>
                   <Row class="operationIcon">
                     <Col span="24">
-                      <img v-if="curHome.isCreater" class="iconImg" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
-                      <img v-if="!curHome.isCreater" class="iconImg" src="../../../static/img/icons/move-up_gray.png" @click="moveEq(EQ)">
+                      <img class="iconImg" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
                       <img v-if="EQ.default_device_type == 'HAir(有线)'" class="iconImg" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts(EQ)">
                       <!-- <i-switch style="float:right;margin-top:5px;" size="small" @on-change="setConfig(EQ)"/> -->
                     </Col>

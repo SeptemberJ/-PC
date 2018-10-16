@@ -177,8 +177,8 @@ const actions = {
     commit('setSpin', STATUS)
   },
   changeCurHome ({commit, state}, CURHOME) {
-    console.log('CURHOME-----------------')
-    console.log(CURHOME)
+    // console.log('CURHOME-----------------')
+    // console.log(CURHOME)
     commit('setCurHome', CURHOME)
   },
   changeHomeList ({commit, state}, HOMELIST) {

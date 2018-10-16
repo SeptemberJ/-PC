@@ -3,8 +3,8 @@ import axios from 'axios'
 // import * as CryptoJS from 'crypto-js'
 // import _ from 'underscore'
 
-const URL_PREFIX = 'http://www.smart-hox.com:8081/hoxJK'
-// const URL_PREFIX = 'http://205.168.1.106:8081/hoxJK'
+// const URL_PREFIX = 'http://www.smart-hox.com:8081/hoxJK'
+const URL_PREFIX = 'http://205.168.1.112:8081/hoxJK'
 
 let registerId = localStorage['registerId']
 let account = localStorage['account']

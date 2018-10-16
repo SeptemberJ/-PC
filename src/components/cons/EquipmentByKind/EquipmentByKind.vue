@@ -5,21 +5,36 @@
         <Breadcrumb>
           <span @click="back">
             <BreadcrumbItem to="/Home">
-              <Icon type="md-bookmark"></Icon> 类别
+              <Icon type="md-bookmark"></Icon> 所有类别
             </BreadcrumbItem>
           </span>
-          <BreadcrumbItem v-if="locationIdex != -1">
-              <Icon type="logo-buffer"></Icon>{{modules[locationIdex].name}}
+          <BreadcrumbItem v-if="addType != -1">
+              <Icon type="logo-buffer"></Icon>{{addName}}
           </BreadcrumbItem>
         </Breadcrumb>
       </Col>
       <Col span="12" class="TextAlignR PaddingR_16">
-        <Button v-if="locationIdex == 0" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addMasterControl">添加主控</Button>
-        <Button v-if="locationIdex == 1" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addSecondControl">添加从控</Button>
-        <Button v-if="locationIdex == 2" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备</Button>
+        <Button v-if="addType == 0" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addMasterControl">添加</Button>
+        <Button v-if="addType == 1 || addType == 3" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addSecondControl">添加</Button>
+        <Button v-if="addType == 2" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加</Button>
       </Col>
     </Row>
-    <div class="modules">
+    <Row type="flex" justify="start" class="code-row-bg" v-if="addType == -1">
+      <Col span="8"  v-for="(item, idx) in kindList" :key="idx">
+        <Card class="CursorPointer" style="width: 90%;margin:0 auto 30px auto;">
+            <div style="text-align:left" @click="toKindList(item.devcieType, item.deviceTypeName, item.deviceDescibe)">
+              <Row>
+                <!-- <Col span="8"><img :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'"></Col> -->
+                <Col span="16">
+                  <h4>{{item.deviceDescibe}}{{item.devcieType}}</h4>
+                  <p>类型: {{item.devcieType == 0 ? '主控' : (item.devcieType == 2 ? '单品' : (item.devcieType == 4 ? '三级设备' : '从控'))}}</p>
+                </Col>
+              </Row>
+            </div>
+          </Card>
+      </Col>
+    </Row>
+   <!--  <div class="modules">
       <Row type="flex" justify="start" class="code-row-bg" v-if="locationIdex == -1">
         <Col span="8" v-for="(Module, idx) in modules" :key="idx">
           <Card :style="{width: '80%', margin: '0 auto 30px 0', background: Module.bgColor, cursor: 'pointer'}">
@@ -30,11 +45,12 @@
           </Card>
         </Col>
       </Row>
-    </div>
-    <!-- 列表 -->
-    <MasterControl :AddList="AddList" :curHomeId="curHomeId" v-if="locationIdex == 0"/>
-    <SecondControl :AddList="AddList" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="locationIdex == 1"/>
-    <AllEquipment :AddList="AddList" :deviceTypeList="deviceTypeList" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="locationIdex == 2"/>
+    </div> -->
+
+    <MasterControl :addName="addName" :addKind="addKind" :curHomeId="curHomeId" v-if="addType == 0"/>
+    <SecondControl @watchBack="back" :addName="addName" :addKind="addKind" :addType="addType" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="addType == 1 || addType == 3"/>
+    <SingleProduct @watchBack="back" :addName="addName" :addKind="addKind" :curHomeId="curHomeId" v-if="addType == 2"/>
+    <!-- <AllEquipment :AddList="AddList" :deviceTypeList="deviceTypeList" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="locationIdex == 2"/> -->
 
   </div>
 </template>
@@ -44,6 +60,7 @@ import {mapState, mapActions} from 'vuex'
 import {send} from '../../../util/send'
 import MasterControl from '../MasterControl.vue'
 import SecondControl from '../SecondControl.vue'
+import SingleProduct from '../SingleProduct.vue'
 import AllEquipment from '../AllEquipment.vue'
 export default {
   name: 'EquipmentByKind',
@@ -68,6 +85,10 @@ export default {
           bgColor: 'olivedrab'
         }
       ],
+      kindList: [],
+      addType: -1,
+      addName: '',
+      addKind: '',
       AddList: [],
       MasterControlList: [],
       deviceTypeList: []
@@ -90,21 +111,59 @@ export default {
   components: {
     MasterControl,
     SecondControl,
+    SingleProduct,
     AllEquipment
   },
   created () {
-    this.getAddList()
+    this.getKindList()
+    // this.getAddList()
     this.getEQType()
   },
   methods: {
     ...mapActions([
       'changeModalShow'
     ]),
+    getKindList () {
+      send({
+        name: '/deviceType',
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            this.kindList = _res.data.deviceTypeList.data
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.$Message.error('Interface Error!')
+      })
+    },
+    toKindList (type, deviceTypeName, deviceDescibe) {
+      this.addType = type
+      this.addKind = deviceTypeName
+      this.addName = deviceDescibe
+      // switch (type) {
+      //   case 0:
+      //     break
+      //   case 1:
+      //     break
+      //   case 3:
+      //     break
+      //   case 2:
+      //   break
+      //   case 4:
+      //     break
+      // }
+    },
     toModule (Idx) {
       this.locationIdex = Idx
     },
     back () {
-      this.locationIdex = -1
+      this.addType = -1
     },
     addMasterControl () {
       this.changeModalShow('Master')

@@ -33,7 +33,7 @@ export function setCookie (cname, cvalue, exdays) {
   d.setTime(d.getTime() + (exdays * 60 * 60 * 1000))
   // d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000))
   var expires = 'expires=' + d.toUTCString()
-  console.info(cname + '=' + cvalue + '; ' + expires)
+  // console.info(cname + '=' + cvalue + '; ' + expires)
   document.cookie = cname + '=' + cvalue + '; ' + expires
 }
 

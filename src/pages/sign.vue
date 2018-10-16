@@ -25,13 +25,13 @@
 		<Col v-if="curStep == 1" span="24" class="ItemBar bgColorPink">
 			<Row class="ItemBarInner code-row-bg" type="flex" justify="space-between">
 				<Col span="4"><div class="CircleIcon"><Icon type="md-lock" size="28" style="margin-left:5px;"/></div></Col>
-				<Col span="20"><Input class="bgColorPink" v-model="psd" placeholder="请输入密码..." style="width: 200px;" /></Col>
+				<Col span="20"><Input type="password" class="bgColorPink" v-model="psd" placeholder="请输入密码..." style="width: 200px;" /></Col>
 			</Row>
 		</Col>
 		<Col v-if="curStep == 1" span="24" class="ItemBar bgColorBlue">
 			<Row class="ItemBarInner code-row-bg" type="flex" justify="space-between">
 				<Col span="4"><div class="CircleIcon"><Icon type="md-unlock" size="28" style="margin-left:5px;"/></div></Col>
-				<Col span="20"><Input class="bgColorBlue" v-model="psdAgain" placeholder="请再次输入密码..." style="width: 200px" /></Col>
+				<Col span="20"><Input type="password" class="bgColorBlue" v-model="psdAgain" placeholder="请再次输入密码..." style="width: 200px" /></Col>
 			</Row>
 		</Col>
 		<Col v-if="curStep == 2" span="24" class="ItemBar">

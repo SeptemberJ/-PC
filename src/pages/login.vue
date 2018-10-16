@@ -5,7 +5,7 @@
 			<Input v-model="phone" placeholder="请输入手机号..." @on-blur="checkPhoneNumber" style="width: 300px" />
 		</div>
 		<div class="loginItem">
-			<Input v-model="psd" placeholder="请输入密码..." style="width: 300px" />
+			<Input type="password" v-model="psd" placeholder="请输入密码..." style="width: 300px" />
 		</div>
 		<div class="loginItem">
 			<div class="loginBt"><Button style="background: yellow;width: 100%; font-weight: bold;" shape="circle" @click="goLogin">登陆</Button></div>

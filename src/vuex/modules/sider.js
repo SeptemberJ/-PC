@@ -15,8 +15,8 @@ const state = {
       'tit': '设备管理',
       'menu': [
         {'icon': 'md-cube', 'text': '所有设备'},
-        {'icon': 'md-home', 'text': '房间'},
-        {'icon': 'md-list', 'text': '类别'}
+        {'icon': 'md-home', 'text': '按房间分类'},
+        {'icon': 'md-list', 'text': '按类别分类'}
       ]
     },
     {

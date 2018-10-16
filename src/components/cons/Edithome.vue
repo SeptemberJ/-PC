@@ -206,18 +206,19 @@
         @on-cancel="cancel">
         <div>
             <template>
-                <div v-for="(item, idx) in temp" :key="item.name">
-                    <div style="border-bottom: 1px solid #e9e9e9;padding-bottom:6px;margin-bottom:6px;">
-                        <Checkbox
-                            :indeterminate="indeterminate"
-                            :value="item.choosedAll"
-                            @click.prevent.native="handleCheckAll(idx)">{{item.name}}</Checkbox>
-                        <CheckboxGroup v-model="item.choosedEQ" @on-change="checkAllGroupChange(idx, item)">
-                            <Checkbox :label="house.device_name" v-for="house in item.houseList" :key="house.id"></Checkbox>
-                    </CheckboxGroup>
-                    </div>
-               </div>
-            </template>
+              <div v-for="(item, idx) in temp" :key="item.name" v-if="item.houseList.length > 0">
+                  <div style="border-bottom: 1px solid #e9e9e9;padding-bottom:6px;margin-bottom:6px;">
+                      <Checkbox
+                          :indeterminate="indeterminate"
+                          :value="item.choosedAll"
+                          @click.prevent.native="handleCheckAll(idx)">{{item.name}}</Checkbox>
+                      <CheckboxGroup style="margin-left: 20px;margin-top: 5px;" v-model="item.choosedEQ" @on-change="checkAllGroupChange(idx, item)">
+                          <Checkbox :label="house.device_name" v-for="house in item.houseList" :key="house.id"></Checkbox>
+                  </CheckboxGroup>
+                  </div>
+             </div>
+            <p style="font-size: 12px;color:#999;margin-top:10px;">(注意：若房间下无任何设备，则该房间不在授权范围内。)</p>
+          </template>
         </div>
     </Modal>
   </div>
@@ -361,125 +362,37 @@ export default {
     //   成员授权
     authorize1 (id,ismanager) {
       this.authorizeedit = true
-      this.temp = []
       this.memberid = {id}.id
-      this.ismanager = {ismanager}.ismanager
-      console.log(this.memberid)
-      console.log('点击授权的时候拿到的成员id========')
-      axios.get(this.$store.state.home.app_URL + 'house?home_id=' + this.homeid
-            ).then((res) => {
-              console.log(res)
-              console.log('输出houselist')
-              this.edithouseList = res.data.houseList
-              console.log(this.edithouseList)
-              //房间列表，循环房间列表 ，根据房间id 加载 设备接口 ， 获取每个房间的设备
-              var newroomid = ''
-              var obj = {}
-              for (let i = 0, lenI = this.edithouseList.length; i < lenI; ++i) {
-                  let name = this.edithouseList[i].house_name
-                  newroomid = this.edithouseList[i].id
-                  // this.name = this.edithouseList[i].house_name
-                  console.log(name)
-                  axios.get(this.$store.state.home.app_URL + 'device?house_id=' + newroomid
-            ).then((res) => {
-                  this.checkdevice = res.data.deviceHouseList
-                  console.log(name)
-                  console.log('=====name=====')
-                  let obj = {
-                      name : name,
-                      choosedAll: false,
-                      toggle: false,
-                      choosedEQ : [],
-                      houseList : this.checkdevice
-                  }
-                  console.log(obj)
-                  this.temp.push(obj)
-                  console.log('this.temp=====')
-                  console.log(this.temp)
-                  console.log('this.temp=====')
-                    // let temp = [
-                    //     {
-                    //         name: '房间名称',
-                    //         choosedEQ: [], //kongde
-                    //         houseList: [] //设备list
-                    //     },
-                    //     {
-                    //         name: '房间名称',
-                    //         choosedEQ: [],
-                    //         houseList: [] //设备list
-                    //     }
-                    // ]
-            })
-          }//循环结束
-        })//获取temp重组@1
-        //加载授权情况
-      axios.get(this.$store.state.home.app_URL + 'authorizationEdit?home_id=' + this.homeid + '&register_id=' + this.newregister_id + '&member_id=' + this.memberid
-            ).then((res) => {
-              if (res.data.code == 1){
-                  console.log(res.data.houseList)
-                  this.$Message.success('授权信息加载成功!')
-                  this.authorizationlist = res.data.houseList
-                  console.log(this.authorizationlist)
-                  var tempauthorization = []
-                  for (let i = 0, lenI = this.authorizationlist.length; i < lenI; ++i) {
-                    console.log('==this.authorizationlist[i].deviceList==')
-                    console.log(this.authorizationlist[i].deviceList)
-                    var newdeviceList = this.authorizationlist[i].deviceList
-                    console.log('==this.authorizationlist[i].deviceList==')
-                    for (let j = 0, lenJ = newdeviceList.length; j < lenJ; ++j) {
-                         if (newdeviceList[j].ifCheck){
-                            console.log('youyouoyouuouuuoyyyy')//房间里的设备是选中的 输出设备的名字和id
-                            console.log(newdeviceList[j].device_name)
-                            console.log(newdeviceList[j].id)
-                            console.log('设备输出名字=====')
-                            // tempauthorization[i].choosedEQ.push(newdeviceList[j].device_name)
-                            // 循环temp里的设备， 当id相同时 ， 把name   push 进temp里面的choosedEQ
-                            for (let n = 0, lenN = this.temp.length; n < lenN; ++n) {
-                                console.log(this.temp[n].houseList)
-                                for (let m = 0, lenM = this.temp[n].houseList.length; m < lenM; ++m) {
-                                    console.log(this.temp[n].houseList[m].id == newdeviceList[j].id)
-                                    console.log('=======判断如果一样========')
-                                    if (this.temp[n].houseList[m].id == newdeviceList[j].id) {
-                                        console.log('一样的一样的一样的++++++++++++++++=')
-                                        // console.log(this.temp[n].houseList[m].id)
-                                        // console.log(this.temp[n].houseList[m].device_name)
-                                        // console.log(newdeviceList[j].device_name)
-                                        this.temp[n].choosedEQ.push(newdeviceList[j].device_name)
-                                        console.log('this.temp[n].houseList[m].length == this.temp[n].choosedEQ')
-                                        console.log(this.temp[n].choosedEQ)
-                                        console.log(this.temp[n].houseList)
-                                        console.log(this.temp[n].houseList.length == this.temp[n].choosedEQ.length)
-                                        if (this.temp[n].houseList.length == this.temp[n].choosedEQ.length){
-                                            this.temp[n].choosedAll = true
-                                        }
-                                        console.log('this.temp[n].houseList[m].length == this.temp[n].choosedEQ')
-                                    }
-                                    // if (this.temp[n].houseList[m].length == this.temp[n].choosedEQ){
-                                    //     this.temp[n].choosedAll = true
-                                    // }
-                                }
-                            }
-                        }else{
-                            console.log('plplplplplpl')//房间里的设备是没有选中的
-                        }
-                    }
-                    //   for (let j = 0, lenJ = newdeviceList.length; j < lenJ; ++j) {
-                    //      if (newdeviceList[j].contains('ifCheck') == true){
-                    //         console.log('youyouoyouuouuuoyyyy')
-                    //     }else{
-                    //         console.log('plplplplplpl')
-                    //     }
-                    // }
-                    // if (this.authorizationlist[i].deviceList.ifCheck){
-                    //     console.log('youyouoyouuouuuoyyyy')
-                    // }else{
-                    //     console.log('plplplplplpl')
-                    // }
-                  }
-              }
-            })
+      //加载授权情况
+      axios.get(this.$store.state.home.app_URL + 'authorizationEdit?home_id=' + this.homeid + '&register_id=' + this.newregister_id + '&member_id=' + id
+      ).then((res) => {
+        if (res.data.code == 1){
+          let tempArray = []
+          res.data.houseList.map((house, idx) => {
+            let obj = {
+              name: house.house_name,
+              choosedAll: false,
+              choosedEQ: [],
+              houseList: house.deviceList
+            }
+            if (house.ifCheck === 1) {
+              obj.choosedAll = true
+              house.deviceList.map((device, idx) => {
+                if (device.ifCheck) {
+                  obj.choosedEQ.push(device.device_name)
+                } else{
+                  obj.choosedAll = false
+                }
+              })
+            }
+            tempArray.push(obj)
+          })
+          this.temp = tempArray
+        }
+      })
     },
     sureauthorize () {
+      let ifHasDevice = false
         // 组一下home的数组 全选的 把temp里面的checkdevice全给， 不是全选的循环出选择的
         var tempArray = []
         var obja = {}
@@ -492,56 +405,57 @@ export default {
             }
             let obj_device = {}
             if (this.temp[i].houseList.length != 0){
-                if (this.temp[i].choosedAll == true){
-                    // debugger
-                    for (let j = 0, lenJ = this.temp[i].houseList.length; j < lenJ; ++j) {
-                        obj_item.home_id = this.temp[i].houseList[j].home_id
-                        obj_item.house_id = this.temp[i].houseList[j].house_id
-                        obj_device = {
-                            'second_control_id':this.temp[i].houseList[j].second_control_id,
-                            'main_control_code':this.temp[i].houseList[j].main_control_code,
-                            'register_id':this.register_id,
-                            'second_control_device_id':this.temp[i].houseList[j].id,
-                            'home_id':this.temp[i].houseList[j].home_id,
-                            'house_id':this.temp[i].houseList[j].house_id
-                        }
-                        obj_item.device_member.push(obj_device)
+              ifHasDevice = true
+              if (this.temp[i].choosedAll == true){
+                for (let j = 0, lenJ = this.temp[i].houseList.length; j < lenJ; ++j) {
+                    obj_item.home_id = this.temp[i].houseList[j].home_id
+                    obj_item.house_id = this.temp[i].houseList[j].house_id
+                    obj_device = {
+                        'second_control_id':this.temp[i].houseList[j].second_control_id,
+                        'main_control_code':this.temp[i].houseList[j].main_control_code,
+                        'register_id':this.register_id,
+                        'second_control_device_id':this.temp[i].houseList[j].id,
+                        'home_id':this.temp[i].houseList[j].home_id,
+                        'house_id':this.temp[i].houseList[j].house_id
                     }
-                tempArray.push(obj_item)
-                }else if (this.temp[i].choosedAll == false){
-                    this.temp[i].choosedEQ.map((item) => {
-                        this.temp[i].houseList.map((EQ, idx) => {
-                            if (item === EQ.device_name) {
-                                obj_item.home_id = this.temp[i].houseList[idx].home_id
-                                obj_item.house_id = this.temp[i].houseList[idx].house_id
-                                obj_device = {
-                                    'second_control_id':this.temp[i].houseList[idx].second_control_id,
-                                    'main_control_code':this.temp[i].houseList[idx].main_control_code,
-                                    'register_id':this.register_id,
-                                    'second_control_device_id':this.temp[i].houseList[idx].id,
-                                    'home_id':this.temp[i].houseList[idx].home_id,
-                                    'house_id':this.temp[i].houseList[idx].house_id
-                                }
-                                obj_item.device_member.push(obj_device)
-                            }
-                        })
-                    })
-                    if (this.temp[i].choosedEQ.length > 0) {
-                        tempArray.push(obj_item)
-                    }
+                    obj_item.device_member.push(obj_device)
                 }
+                tempArray.push(obj_item)
+              }else if (this.temp[i].choosedAll == false){
+                  this.temp[i].choosedEQ.map((item) => {
+                      this.temp[i].houseList.map((EQ, idx) => {
+                          if (item === EQ.device_name) {
+                              obj_item.home_id = this.temp[i].houseList[idx].home_id
+                              obj_item.house_id = this.temp[i].houseList[idx].house_id
+                              obj_device = {
+                                  'second_control_id':this.temp[i].houseList[idx].second_control_id,
+                                  'main_control_code':this.temp[i].houseList[idx].main_control_code,
+                                  'register_id':this.register_id,
+                                  'second_control_device_id':this.temp[i].houseList[idx].id,
+                                  'home_id':this.temp[i].houseList[idx].home_id,
+                                  'house_id':this.temp[i].houseList[idx].house_id
+                              }
+                              obj_item.device_member.push(obj_device)
+                          }
+                      })
+                  })
+                  if (this.temp[i].choosedEQ.length > 0) {
+                      tempArray.push(obj_item)
+                  }
+              }
             }
         }
-        console.log('tempArray-----------------------------------------')
-        console.log(tempArray)
+        if (!ifHasDevice) {
+          console.log('无任何数据---')
+          return false
+        }
         // 调用授权的接口
-        var objData = {'home':tempArray}
+        // var objData = {'home':tempArray}
         let DATA = {'home':tempArray}
-        console.log(this.memberid)
-        console.log('this.memberid=====')
+        console.log(DATA)
+        console.log(tempArray)
         axios.post(this.$store.state.home.app_URL + 'authorization?home_id_member=' + this.homeid +'&register_id_member=' + this.memberid,DATA
             ).then((res)=> {
-            console.log(res)
             if (res.data.code == 1){
                 this.$Message.success('授权成功!')
             }else{
@@ -582,17 +496,17 @@ export default {
         }
       })
     },
-    gethomedetail () {
-      axios.delete(this.$store.state.home.app_URL + 'homeDetail?id=' + this.home_id
-            ).then((res) => {
-              console.log(res)
-            })
-    },
+    // gethomedetail () {
+    //   axios.delete(this.$store.state.home.app_URL + 'homeDetail?id=' + this.home_id
+    //   ).then((res) => {
+    //     console.log(res)
+    //   })
+    // },
     housedel (home_id,register_id) {
       this.modal4 = true
       this.home_id = {home_id}.home_id
       this.register_id = {register_id}.register_id
-      console.log(this.home_id)
+      // console.log(this.home_id)
     },
     deletehousemember (id,ismanager) {
       this.memberid = {id}.id
@@ -600,77 +514,76 @@ export default {
       this.modal8 = true
     },
     surehousedelall () {
-        axios.delete(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id + '&home_id=' + this.home_id
-            ).then((res) => {
-              console.log(res)
-              axios.get(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid
-            ).then((res) => {
-                if (res.data.code ==1 ){
-                    if (res.data.homeList.length == 0){
-                        this.$Message.warning('暂无数据!')//here
-                    }else{
-                        this.fnamelist = res.data.homeList
-                        this.adminid = this.fnamelist[0].id
-                        // this.$Message.success('加载成功!')
-                    }
-                }else{
-                this.$Message.error('加载失败!')
-                }
-            })
-            })
+      axios.delete(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id + '&home_id=' + this.home_id
+      ).then((res) => {
+        axios.get(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid
+      ).then((res) => {
+          if (res.data.code ==1 ){
+              if (res.data.homeList.length == 0){
+                  this.$Message.warning('暂无数据!')//here
+              }else{
+                  this.fnamelist = res.data.homeList
+                  this.adminid = this.fnamelist[0].id
+                  // this.$Message.success('加载成功!')
+              }
+          }else{
+          this.$Message.error('加载失败!')
+          }
+      })
+      })
     },
     // 删除家或家庭成员
     surehousedel () {
       axios.delete(this.$store.state.home.app_URL + 'home?register_id=' + this.memberid + '&home_id=' + this.home_id
-            ).then((res) => {
-              console.log(res)
-              axios.get(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid
-            ).then((res) => {
-                if (res.data.code ==1 ){
-                    if (res.data.homeList.length == 0){
-                        this.$Message.warning('暂无数据!')//here
-                    }else{
-                        this.fnamelist = res.data.homeList
-                        this.adminid = this.fnamelist[0].id
-                        this.$Message.success('加载成功!')
-                    }
-                }else{
-                this.$Message.error('加载失败!')
-                }
-            })
-            })
+      ).then((res) => {
+        console.log(res)
+        axios.get(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid
+      ).then((res) => {
+          if (res.data.code ==1 ){
+              if (res.data.homeList.length == 0){
+                  this.$Message.warning('暂无数据!')//here
+              }else{
+                  this.fnamelist = res.data.homeList
+                  this.adminid = this.fnamelist[0].id
+                  this.$Message.success('加载成功!')
+              }
+          }else{
+          this.$Message.error('加载失败!')
+          }
+      })
+      })
     },
     setDataFomatM () {
-         return new Promise((resolve, reject) => {
-            axios.get(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id
-                ).then((res) => {
-                let temp = []
-                if (res.data.code ==1 ){
-                    if (res.data.homeList == 0){
-                        this.$Message.warning('暂无数据!')
-                    }else{
-                        temp = res.data.homeList.slice(0)
-                        // this.$Message.success('加载成功!')
-                        // 循环Homelist 取id ，
-                        for (let j = 0, lenJ = temp.length; j < lenJ; ++j) {
-                            axios.get(this.$store.state.home.app_URL + 'homeMember?home_id=' + temp[j].home_id
-                            ).then((_res) => {
-                                if (res.data.code ==1 ){
-                                    temp[j].menberListcount = _res.data.homeList.length
-                                    if (j === lenJ - 1) {
-                                        resolve(temp)
-                                    }
-                                }else{
-                                this.$Message.error('加载成员失败!')
-                                }
-                            })
-                        }
-                    }
-                }else{
-                    this.$Message.error('加载失败!')
-                }
-                })
-            } )
+      return new Promise((resolve, reject) => {
+        axios.get(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id
+        ).then((res) => {
+        let temp = []
+        if (res.data.code ==1 ){
+          if (res.data.homeList == 0){
+            this.$Message.warning('暂无数据!')
+          }else{
+            temp = res.data.homeList.slice(0)
+            // this.$Message.success('加载成功!')
+            // 循环Homelist 取id ，
+            for (let j = 0, lenJ = temp.length; j < lenJ; ++j) {
+              axios.get(this.$store.state.home.app_URL + 'homeMember?home_id=' + temp[j].home_id
+              ).then((_res) => {
+                  if (res.data.code ==1 ){
+                      temp[j].menberListcount = _res.data.homeList.length
+                      if (j === lenJ - 1) {
+                          resolve(temp)
+                      }
+                  }else{
+                  this.$Message.error('加载成员失败!')
+                  }
+              })
+            }
+          }
+        }else{
+          this.$Message.error('加载失败!')
+        }
+        })
+      })
     },
     setDataFomatR () {
          return new Promise((resolve, reject) => {
@@ -710,6 +623,8 @@ export default {
       dataM.map((item, idx) => {
           dataR[idx].menberListcount = item.menberListcount
       })
+      console.log('dataR------------------')
+      console.log(dataR)
       this.homelist = dataR
     },
     edit () {
@@ -757,6 +672,19 @@ export default {
                     console.log(res)
                     if (res.data.code ==1 ){
                         this.$Message.success('添加成功!')
+                        axios.get(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid
+                        ).then((res) => {
+                            if (res.data.code ==1 ){
+                                if (res.data.homeList.length == 0){
+                                    this.$Message.warning('暂无数据!')//here
+                                }else{
+                                    this.fnamelist = res.data.homeList
+                                    this.adminid = this.fnamelist[0].id
+                                }
+                            }else{
+                            this.$Message.error('加载失败!')
+                            }
+                        })
                     }else if (res.data.code == 0 ){
                         this.$Message.error('该成员还未注册或已经添加！')
                     }else {

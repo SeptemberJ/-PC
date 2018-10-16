@@ -10,7 +10,8 @@
                 <Col span="16">
                   <h4>{{SecondControl.second_control_name}}</h4>
                   <Row class="MarginT_20">
-                    <Col span="12"><img class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editSecondControl(SecondControl.id, SecondControl.second_control_name)">编辑</span></Col>
+                    <Col span="12"><img class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editSecondControl(SecondControl.id
+, SecondControl.second_control_name)">编辑</span></Col>
                     <Col span="12" class="TextAlignR"><img class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteSecondControl(SecondControl)">删除</span></Col>
                   </Row>
                 </Col>
@@ -25,24 +26,30 @@
     <Modal v-model="ifAddSecond" width="360">
       <p slot="header" style="color:#333;text-align:left">
           <!-- <Icon type="ios-information-circle"></Icon> -->
-          <span>添加主控</span>
+          <span>添加{{addName}}产品</span>
       </p>
       <div style="text-align:left">
           <Form :model="formSecond" ref="formSecond" :rules="ruleValidate" label-position="left" :label-width="100">
-            <FormItem label="选择主控" prop="selectMasterId">
+            <FormItem label="选择主控" prop="selectMasterId" v-if="MasterControlList.length > 0">
               <Select v-model="formSecond.selectMasterId" @on-change="selectChangeMaster">
                 <Option v-for="item in MasterControlList" :value="item.id" :key="item.id">{{ item.main_control_name }}</Option>
               </Select>
             </FormItem>
-            <FormItem label="选择从控" prop="selectSecondId">
+            <FormItem label="选择主控" prop="selectMasterId" v-if="MasterControlList.length == 0">
+              <Button size="small" type="text" @click="toAddMS">还未添加主控，点击去添加</Button>
+            </FormItem>
+            <!-- <FormItem label="选择从控" prop="selectSecondId">
               <Select v-model="formSecond.selectSecondId" @on-change="selectChangeSecond">
                 <Option v-for="item in addSecondControlList" :value="item.id" :key="item.id">{{ item.deviceDescibe }}</Option>
               </Select>
-            </FormItem>
-            <FormItem label="选择房间" prop="selectRoomId" v-if="choosedSecond.length > 0 && choosedSecond[0].devcieType == '1'">
+            </FormItem> -->
+            <FormItem label="选择房间" prop="selectRoomId" v-if="addType == '1' && roomList.length > 0">
               <Select v-model="formSecond.selectRoomId">
                 <Option v-for="item in roomList" :value="item.id" :key="item.id">{{ item.house_name }}</Option>
               </Select>
+            </FormItem>
+            <FormItem label="选择房间" prop="selectMasterId" v-if="addType == '1' && roomList.length == 0">
+              <Button size="small" type="text" @click="toAddRoom">还未添加房间，点击去添加</Button>
             </FormItem>
             <FormItem label="从控名称" prop="secondName">
               <Input v-model="formSecond.secondName" placeholder="可输入自定义名称" style="" />
@@ -69,10 +76,10 @@ import {send} from '../../util/send'
 import NoData from '../NoData.vue'
 export default {
   name: 'AllEquipment',
-  props: ['curHomeId', 'AddList', 'MasterControlList'],
+  props: ['curHomeId', 'addKind', 'addType', 'addName', 'MasterControlList'],
   data () {
     const validateRoom = (rule, value, callback) => {
-      if (this.choosedSecond[0].devcieType === '1') {
+      if (this.addType === '1') {
         if (value === '') {
           callback(new Error('请选择所属房间!'))
         } else {
@@ -86,26 +93,29 @@ export default {
       btLoading: false,
       SecondControlList: [],
       newSecondControlName: '',
-      addSecondList: [],
+      // addSecondList: [],
       choosedMaster: {},
-      choosedSecond: {},
+      // choosedSecond: {},
       addSecondControlList: [],
       formSecond: {
         secondCode: '',
         secondName: '',
         selectMasterId: '',
-        selectSecondId: '',
+        // selectSecondId: '',
         selectRoomId: ''
       },
       ruleValidate: {
         selectMasterId: [
           { required: true, message: '请选择主控！', trigger: 'change' }
         ],
-        selectSecondId: [
-          { required: true, message: '请选择从控！', trigger: 'change' }
+        secondName: [
+          { required: true, message: '请输入从控名称！', trigger: 'change' }
         ],
+        // selectSecondId: [
+        //   { required: true, message: '请选择从控！', trigger: 'change' }
+        // ],
         secondCode: [
-          { required: true, message: '从控码不能为空！', trigger: 'blur' }
+          { required: true, message: '从控码不能为空！', trigger: 'change' }
         ],
         selectRoomId: [
           { validator: validateRoom, trigger: 'change' }
@@ -130,6 +140,14 @@ export default {
   watch: {
     curHomeId: function (val) {
       this.getSecondControl()
+    },
+    MasterControlList: function (val) {
+      console.log('new val-----------------')
+      this.initialSelect(val)
+    },
+    roomList: function (val) {
+      console.log('new roomlist val-----------------')
+      this.initialSelectRoom()
     }
   },
   components: {
@@ -137,13 +155,45 @@ export default {
   },
   created () {
     this.getSecondControl()
-    this.filterSecondControl()
+    this.formSecond.secondName = this.addName
+    this.initialSelectRoom()
+    // this.filterSecondControl()
   },
   methods: {
     ...mapActions([
       'toggleSpin',
       'changeModalShow'
     ]),
+    ...mapActions('sider', [
+      'changeCurMenu'
+    ]),
+    // 去添加主控或从控
+    toAddMS () {
+      this.changeModalShow('Second')
+      this.$emit('watchBack')
+      // this.changeCurMenu(2)
+    },
+    // 去添加房间
+    toAddRoom () {
+      this.changeModalShow('Second')
+      this.changeCurMenu(1)
+    },
+    // 初始化select选项
+    initialSelect (Master) {
+      if (Master[0]) {
+        this.formSecond.selectMasterId = Master[0].id
+        this.choosedMaster = Master[0]
+      } else {
+        this.formSecond.selectMasterId = ''
+        this.choosedMaster = {}
+      }
+    },
+    // 初始化房间
+    initialSelectRoom () {
+      if (this.roomList[0]) {
+        this.formSecond.selectRoomId = this.roomList[0].id
+      }
+    },
     editSecondControl (SecondControlId, SecondControlName) {
       if (!this.curHome.isCreater) {
         this.$Message.warning('您不是管理员不能进行该操作！')
@@ -222,10 +272,8 @@ export default {
         switch (_res.data.code) {
           case 1:
             this.getSecondControl()
-            setTimeout(() => {
-              this.toggleSpin(false)
-              this.$Message.success('删除成功!')
-            }, 1000)
+            this.toggleSpin(false)
+            this.$Message.success('删除成功!')
             break
           default:
             this.toggleSpin(false)
@@ -237,8 +285,28 @@ export default {
         this.$Message.error('Interface Error!')
       })
     },
-    // 所有从控
+    // 分类该类下所有从控
     getSecondControl () {
+      send({
+        name: '/secondcontrolByType?home_id=' + this.curHomeId + '&device_type=' + this.addKind,
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            this.SecondControlList = _res.data.deviceList
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.$Message.error('Interface Error!')
+      })
+    },
+    // 所有从控
+    getSecondControl2 () {
       send({
         name: '/secondControl?home_id=' + this.curHomeId,
         method: 'GET',
@@ -274,51 +342,52 @@ export default {
           return master
         }
       })
-      this.choosedMaster = Master
+      this.choosedMaster = Master[0]
     },
     // 切换从控
-    selectChangeSecond (SecondId) {
-      let Second = this.addSecondControlList.filter(second => {
-        if (second.id === SecondId) {
-          return second
-        }
-      })
-      this.choosedSecond = Second
-      console.log(Second)
-    },
+    // selectChangeSecond (SecondId) {
+    //   let Second = this.addSecondControlList.filter(second => {
+    //     if (second.id === SecondId) {
+    //       return second
+    //     }
+    //   })
+    //   this.choosedSecond = Second
+    //   console.log(Second)
+    // },
     // 提交
     handleSubmit (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
           this.addSecond()
         } else {
-          this.$Message.error('Fail!')
+          this.$Message.warning('请将信息填写完成!')
         }
       })
     },
-    // 添加主控
+    // 添加从控
     addSecond () {
       if (this.btLoading) {
         return false
       }
       // this.toggleSpin(true)
+      console.log(this.choosedMaster)
       this.btLoading = true
       send({
-        name: '/secondControl?home_id=' + this.curHomeId + '&main_control_code=' + this.choosedMaster[0].main_control_code + '&main_control_id=' + this.choosedMaster[0].id + '&second_control_name=' + (this.formSecond.secondName.trim() !== '' ? this.formSecond.secondName.trim() : this.choosedSecond[0].deviceDescibe) + '&second_contrl_code=' + this.formSecond.secondCode + '&second_control_category=' + this.choosedSecond[0].deviceTypeName + '&deviceType=' + this.choosedSecond[0].devcieType,
+        name: '/secondControl?home_id=' + this.curHomeId + '&main_control_code=' + this.choosedMaster.main_control_code + '&main_control_id=' + this.choosedMaster.id + '&second_control_name=' + this.formSecond.secondName + '&second_contrl_code=' + this.formSecond.secondCode + '&second_control_category=' + this.addKind + '&deviceType=' + this.addType,
         method: 'POST',
         data: {
         }
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
-            // this.toggleSpin(false)
             this.changeModalShow('Second')
             this.$Message.success('添加成功！')
             this.btLoading = false
             // 1-无下挂自动添加下级设备
-            if (this.choosedSecond[0].devcieType === '1') {
+            if (this.addType === '1') {
               this.addAutoEq(_res.data.id, this.formSecond.secondCode)
             }
+            this.$refs['formSecond'].resetFields()
             this.getSecondControl()
             break
           default:
@@ -342,16 +411,16 @@ export default {
           register_id: this.$store.state.register_id,
           home_id: this.curHomeId,
           house_id: this.formSecond.selectRoomId,
-          main_control_code: this.choosedMaster[0].main_control_code,
-          main_control_id: this.choosedMaster[0].id,
+          main_control_code: this.choosedMaster.main_control_code,
+          main_control_id: this.choosedMaster.id,
           second_control_id: SecondId,
           second_contrl_code: secondControlCode,
-          device_name: (this.formSecond.secondName.trim() !== '' ? this.formSecond.secondName.trim() : this.choosedSecond[0].deviceDescibe),
+          device_name: this.formSecond.secondName,
           device_code: secondControlCode,
-          default_device_type: this.choosedSecond[0].deviceTypeName,
+          default_device_type: this.addKind,
           device_img: '',
           device_status: 0,
-          deviceType: this.choosedSecond[0].devcieType,
+          deviceType: this.addType,
           device_config: 99
         }
       }).then(_res => {
