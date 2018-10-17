@@ -1,24 +1,26 @@
 <template>
   <Row>
-    <Col span="24" style="height: 70%">
-      <div class="home" style="height: 100%;background: #2d8cf0;overflow: hidden">
+    <Col span="24" :style="{height: CurHeight + '%'}">
+      <!-- <div class="home" style="height: 100%;background: #2d8cf0;overflow: hidden"> -->
+      <div class="home" style="height: 100%;overflow: hidden">
         <Row style="width: 100%;height: 100%;">
-          <Col span="6" style="height: 100%;borderRight: 2px solid #fff;">
+          <Col span="6" :style="{height: '100%',background:curTab == 0 ? '#d17a3c': (curTab == 1 ? '#9a4de2': '#469bf4'), borderRight:curTab == 0 ? '2px solid #d17a3c': (curTab == 1 ? '2px solid #9a4de2': '2px solid #469bf4')}">
             <SIDER/>
           </Col>
-          <Col span="18" style="height: 100%;">
+          <Col span="18" :style="{height: '100%',background:curTab == 0 ? '#d2691e': (curTab == 1 ? '#8a2be2': '#2b85e4')}">
             <div style="position:absolute;top:0;left:34px;padding-right: 0;width: 100%;height:100% !important;overflow-x:hidden;overflow-y:scroll">
               <Layout class="mainContent">
-                <Content :style="{margin: '0', background: '#2d8cf0', overflowX: 'hidden', overflowY: 'scroll'}">
+                <!-- <Content :style="{margin: '0', background: '#2d8cf0', overflowX: 'hidden', overflowY: 'scroll'}"> -->
+                <Content :style="{margin: '0', overflowX: 'hidden', overflowY: 'scroll',background:curTab == 0 ? '#d2691e': (curTab == 1 ? '#8a2be2': '#2b85e4')}">
                   <p @click="ToLogout" class='ColorWhite CursorPointer TextAlignR PaddingTB_10 PaddingR_16'>{{accountPhone}} | 退出</p>
-                  <Row type="flex" justify="start" class="code-row-bg">
+                  <Row type="flex" justify="start" class="code-row-bg" style="width: 100%;height: 60px;">
                     <Col span="4"><h1 v-if="curTab == 1">当前家</h1></Col>
                     <Col span="8">
                       <Select v-if="curTab == 1" :value="curHomeIdx" style="width:100%;height:50px;" @on-change="selectChangeCurHome">
                         <Option v-for="(home, idx) in homeList" :value="idx" :key="idx">{{home.home_name}}</Option>
                       </Select>
                     </Col>
-                    <Col v-if="curMenuText === '所有设备'" span="12" offset="0" class="TextAlignR PaddingR_16"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备12</Button></Col>
+                    <Col v-if="curMenuText === '所有设备'" span="12" offset="0" class="TextAlignR PaddingR_16"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备</Button></Col>
                   </Row>
                   <CONTENT :curHomeId="curHome.home_id" ref="content"/>
                 </Content>
@@ -76,7 +78,8 @@ export default {
   data () {
     return {
       isCollapsed: false,
-      windowHeight: 0
+      windowHeight: 0,
+      CurHeight: 75
     }
   },
   created () {
@@ -91,7 +94,8 @@ export default {
       curHome: state => state.curHome,
       curTab: state => state.sider.curTab,
       curMenuText: state => state.sider.curMenuText,
-      homeList: state => state.homeList
+      homeList: state => state.homeList,
+      ifShowTabBar: state => state.ifShowTabBar
     }),
     curHomeIdx () {
       let curIdx = null
@@ -101,6 +105,12 @@ export default {
         }
       })
       return curIdx
+    }
+  },
+  watch: {
+    ifShowTabBar: function (val) {
+      this.CurHeight = val ? 75 : 90
+      document.body.style.height = val ? window.innerHeight + 200 + 'px' : window.innerHeight + 'px'
     }
   },
   components: {
@@ -202,7 +212,6 @@ export default {
       // console.log(this.curHome)
       this.getMasterControl()
       this.changeModalShow('EQ')
-      // console.log(this)
       this.$refs.content.getMasterControl()
     },
     addHome () {
@@ -237,6 +246,7 @@ export default {
 }
 .layout{
   border: 0px solid #d7dde4;
+  background: transparent !important;
   /*background: #2d8cf0;*/
   position: relative;
   overflow: hidden;
@@ -284,7 +294,7 @@ export default {
   font-size: 22px;
 }
 .mainContent{
-  background: #2d8cf0 !important;
+  /*background: #2d8cf0 !important;*/
   /*margin-left: 34px;*/
 }
 .mainContent h1 {

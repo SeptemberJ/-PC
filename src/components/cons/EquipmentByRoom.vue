@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Row style="margin: 20px 20px;">
+    <Row style="margin: 20px 0px;">
       <Col span="12" class="">
         <Breadcrumb>
           <span @click="back">
@@ -9,16 +9,18 @@
             </BreadcrumbItem>
           </span>
           <BreadcrumbItem v-if="locationIdex != -1">
-              <Icon type="logo-buffer"></Icon>{{HouseList[locationIdex].house_name}}
+            <Icon type="logo-buffer"></Icon>{{HouseList[locationIdex].house_name}}
+            <!-- <span @click="back" class="CursorPointer" v-if="locationIdex != -1"><Icon type="ios-undo" /></span> -->
           </BreadcrumbItem>
         </Breadcrumb>
       </Col>
       <Col span="12" class="TextAlignR PaddingR_16">
-        <Col span="24" v-if="locationIdex == -1" class="TextAlignR PaddingR_16">
+        <Col span="24" v-if="locationIdex == -1" class="TextAlignR">
           <Button type="error" icon="md-add" :disabled="!curHome.isCreater" @click="addNewRoom">添加房间</Button>
         </Col>
-        <Col span="24" v-if="locationIdex != -1" class="TextAlignR PaddingR_16">
-          <!-- <Button type="primary" icon="md-add" @click="addEQ">添加设备</Button> -->
+        <Col span="24" v-if="locationIdex != -1" class="TextAlignR">
+          <Button v-if="locationIdex != -1" type="primary" icon="ios-undo" @click="back" class="MarginR_10">返回上级</Button>
+          <Button type="error" icon="md-add" @click="addEQ">添加设备</Button>
         </Col>
       </Col>
     </Row>
@@ -45,7 +47,8 @@
     </div>
     <NoData v-if="HouseList.length == 0"/>
 
-    <HouseAllEquipment :locationIdex="locationIdex" :choosedHouseName="choosedHouseName" :choosedHouseId="choosedHouseId" :AddList="AddList" :deviceTypeList="deviceTypeList" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-show="locationIdex != -1"/>
+    <HouseAllEquipment ref="content" :locationIdex="locationIdex" :choosedHouseName="choosedHouseName" :choosedHouseId="choosedHouseId" :AddList="AddList" :deviceTypeList="deviceTypeList" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="locationIdex != -1"/>
+    <!-- <AllEquipment v-on:listenSpin="toggleSpin" :AddList="AddList" :deviceTypeList="deviceTypeList" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="curMenuText === '所有设备'"/> -->
 
     <!-- 移动 -->
     <Modal v-model="ifAdd" width="360">
@@ -127,11 +130,15 @@ export default {
   methods: {
     ...mapActions([
       'toggleSpin',
-      'changeRoomList'
+      'changeRoomList',
+      'changeModalShow'
     ]),
     back () {
       this.locationIdex = -1
       this.getAllRoom()
+    },
+    addEQ () {
+      this.changeModalShow('EQ')
     },
     SeeEqList (Idx, HouseId, HouseName) {
       this.locationIdex = Idx

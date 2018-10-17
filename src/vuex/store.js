@@ -22,6 +22,7 @@ const state = {
   ifAddSecond: false,
   ifAddEQ: false,
   ifShowChart: false,
+  ifShowTabBar: true,
   LimitRange: {
     'PM2.5': [{
       gt: 0,
@@ -167,6 +168,9 @@ const state = {
 }
 // actions
 const actions = {
+  changeTabStatus ({commit, state}) {
+    commit('setTabStatus')
+  },
   changeCurRegisterId ({commit, state}, ID) {
     commit('setCurRegisterId', ID)
   },
@@ -194,6 +198,9 @@ const actions = {
 
 // mutations
 const mutations = {
+  setTabStatus (state) {
+    state.ifShowTabBar = !state.ifShowTabBar
+  },
   setCurRegisterId (state, ID) {
     state.register_id = ID
   },

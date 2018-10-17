@@ -1,16 +1,21 @@
 <template>
 <div class="footerTab">
-  <Row style="height: 20px;background: #2d8cf0;">
+  <Row style="height: 20px;overflow: hidden;" v-if="ifShowTabBar">
+    <Col span="6"><div :class="[curTab == 0 ? 'triangle_active triangle_active_0' : 'triangle_normal']" style=""></div></Col>
+    <Col span="6"><div :class="[curTab == 1 ? 'triangle_active triangle_active_1' : 'triangle_normal']" style=""></div></Col>
+    <Col span="6"><div :class="[curTab == 2? 'triangle_active triangle_active_2' : 'triangle_normal']" style=""></div></Col>
+  </Row>
+  <!-- <Row style="height: 20px;background: #2d8cf0;">
     <Col span="6"><div :class="[curTab == 0 ? 'triangle_active' : 'triangle_normal']" style=""></div></Col>
     <Col span="6"><div :class="[curTab == 1 ? 'triangle_active' : 'triangle_normal']" style=""></div></Col>
     <Col span="6"><div :class="[curTab == 2? 'triangle_active' : 'triangle_normal']" style=""></div></Col>
-  </Row>
-  <Row>
+  </Row> -->
+  <Row v-if="ifShowTabBar" style="height: 130px;">
     <Col span="6">
       <span @click="changeTab(0)">
-        <Card style="width:90%;margin: 20px auto 50px auto;background: chocolate;color: #fff;cursor: pointer;">
+        <Card style="width:90%;margin: 0px auto 0px auto;background: #d2691e;color: #fff;cursor: pointer;">
           <div style="text-align:center">
-            <img style="height: 50px;" src="../../static/img/icons/tab_home.png">
+            <img class="tabIcon" src="../../static/img/icons/tab_home.png">
             <h3>家管理</h3>
           </div>
         </Card>
@@ -18,9 +23,9 @@
     </Col>
     <Col span="6">
       <span @click="changeTab(1)">
-        <Card style="width:90%;margin: 20px auto 50px auto;background: blueviolet;color: #fff;cursor: pointer;">
+        <Card style="width:90%;margin: 0px auto 0px auto;background: #8a2be2;color: #fff;cursor: pointer;">
           <div style="text-align:center">
-            <img style="height: 50px;" src="../../static/img/icons/tab_eq.png">
+            <img class="tabIcon" src="../../static/img/icons/tab_eq.png">
             <h3>设备管理</h3>
           </div>
         </Card>
@@ -28,17 +33,26 @@
     </Col>
     <Col span="6">
       <span @click="changeTab(2)">
-        <Card style="width:90%;margin: 20px auto 50px auto;background: cadetblue;color: #fff;cursor: pointer;">
+        <Card style="width:90%;margin: 0px auto 0px auto;background: #2b85e4;color: #fff;cursor: pointer;">
           <div style="text-align:center">
-            <img style="height: 50px;" src="../../static/img/icons/tab_set.png">
+            <img class="tabIcon" src="../../static/img/icons/tab_set.png">
             <h3>个人中心</h3>
           </div>
         </Card>
       </span>
     </Col>
     <Col span="6">
-      <p></p>
+      <Card :bordered="false" dis-hover style="width:90%;margin: 0px auto 0px auto;">
+        <div style="text-align:center">
+          <img class="weixinPic" src="../../static/img/weixin-icon.jpg">
+          <h5>微信公众号</h5>
+        </div>
+      </Card>
     </Col>
+  </Row>
+  <Row style="height: 50px;text-align: center">
+      <img class="togglePic toggle_close CursorPointer" v-if="ifShowTabBar" @click="toggleTabBar" src="../../static/img/icons/tabBarClose.png">
+      <img class="togglePic toggle_open CursorPointer" v-if="!ifShowTabBar" @click="toggleTabBar" src="../../static/img/icons/tabBarOpen.png">
   </Row>
 </div>
 <!--   <div>
@@ -60,14 +74,14 @@ export default {
   name: 'HelloWorld',
   data () {
     return {
-      ifShowTab: true
     }
   },
   computed: {
     ...mapState({
       menuList: state => state.sider.menuList,
       curTab: state => state.sider.curTab,
-      curMenu: state => state.sider.curMenu
+      curMenu: state => state.sider.curMenu,
+      ifShowTabBar: state => state.ifShowTabBar
     }),
     menuitemClasses () {
       return [
@@ -76,16 +90,27 @@ export default {
       ]
     }
   },
+  // watch: {
+  //   ifShowTabBar: function (val) {
+  //     document.body.style.height = val ? window.innerHeight + 200 +'px' : window.innerHeight + 'px'
+  //   }
+  // },
   methods: {
+    ...mapActions('sider', [
+      'changeCurTab'
+    ]),
+    ...mapActions([
+      'changeTabStatus'
+    ]),
     changeTab (idx) {
       this.changeCurTab(idx)
     },
     toggleTabBar () {
-      this.ifShowTab = !this.ifShowTab
-    },
-    ...mapActions('sider', [
-      'changeCurTab'
-    ])
+      this.changeTabStatus()
+    }
+    // closeTab () {
+    //   this.ifShowTab = !this.ifShowTab
+    // }
   }
 }
 </script>
@@ -94,7 +119,62 @@ export default {
   width: 100%;
   height: 200px;
   background: #fff;
+  position: relative;
+  .weixinPic{
+    width: 30%;
+    height:30%;
+  }
+  .tabIcon{
+    width: 50px;
+    height: 50px;
+  }
+  .togglePic{
+    width: 40px;
+    height: 40px;
+    margin: 5px auto;
+  }
+  .toggle_close{
+    animation:Toggle_bigger 2s infinite forwards;
+    -webkit-animation:Toggle_bigger 2s infinite forwards;
+  }
+  .toggle_open{
+    animation:Toggle_down 1.5s infinite forwards;
+    -webkit-animation:Toggle_down 1.5s infinite forwards;
+  }
 }
+@keyframes Toggle_bigger
+  {
+    0%{
+      width: 40px;
+      height: 40px;
+      opacity: 0.8;
+    }
+    50%{
+      width: 36px;
+      height: 36px;
+      opacity: 0.3;
+    }
+    100%{
+      width: 40px;
+      height: 40px;
+      opacity: 0.8;
+    }
+  }
+@keyframes Toggle_down
+  {
+    0%{
+      margin-top: 5px;
+      opacity: 0.8;
+    }
+    50%{
+      margin-top: 15px;
+      opacity: 0.8;
+    }
+    100%{
+      margin-top: 5px;
+      opacity: 0.8;
+    }
+  }
 .ll{
   position: absolute;
   left: 0;
@@ -197,12 +277,24 @@ export default {
   height: 20px;
   margin: 0 auto;
   background: #2d8cf0;
-  transform:rotate(45deg) translateY(50%);
+  z-index: 9;
+  transform: rotate(45deg) translateY(-65%);
+}
+.triangle_active_0{
+  background: #d17a3c;
+}
+.triangle_active_1{
+  background: #8a2be2;
+}
+.triangle_active_2{
+  background: #2b85e4;
+}
+.triangle_active_3{
+  background: #5f9ea0;
 }
 .triangle_normal{
   width: 10px;
   height: 10px;
   margin: 0 auto;
-  background: #2d8cf0;
 }
 </style>

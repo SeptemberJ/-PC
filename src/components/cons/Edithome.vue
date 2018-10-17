@@ -24,7 +24,10 @@
       </template>
       </Col>
       <Col v-show = "show" span="12" class="TextAlignR PaddingR_16"><Button type="error" icon="md-add" @click="addHome">添加家</Button></Col>
-      <Col v-show = "menbers" span="12" class="TextAlignR PaddingR_16"><Button type="error" icon="md-add" @click="addmenbers">添加成员</Button></Col>
+      <Col v-show = "menbers" span="12" class="TextAlignR PaddingR_16">
+        <Button type="primary" icon="ios-undo" @click="returnback" class="MarginR_10">返回上级</Button>
+        <Button type="error" icon="md-add" @click="addmenbers">添加成员</Button>
+      </Col>
     </Row>
     <div class="HomeList" v-if="homelist.length > 0">
       <Row  v-show = "show">
@@ -364,7 +367,7 @@ export default {
       this.authorizeedit = true
       this.memberid = {id}.id
       //加载授权情况
-      axios.get(this.$store.state.home.app_URL + 'authorizationEdit?home_id=' + this.homeid + '&register_id=' + this.newregister_id + '&member_id=' + id
+      axios.get(encodeURI(this.$store.state.home.app_URL + 'authorizationEdit?home_id=' + this.homeid + '&register_id=' + this.newregister_id + '&member_id=' + id + '&timestamp=' + Date.now())
       ).then((res) => {
         if (res.data.code == 1){
           let tempArray = []
@@ -454,7 +457,7 @@ export default {
         let DATA = {'home':tempArray}
         console.log(DATA)
         console.log(tempArray)
-        axios.post(this.$store.state.home.app_URL + 'authorization?home_id_member=' + this.homeid +'&register_id_member=' + this.memberid,DATA
+        axios.post(encodeURI(this.$store.state.home.app_URL + 'authorization?home_id_member=' + this.homeid +'&register_id_member=' + this.memberid + '&timestamp=' + Date.now()),DATA
             ).then((res)=> {
             if (res.data.code == 1){
                 this.$Message.success('授权成功!')
@@ -472,7 +475,7 @@ export default {
       this.isdefault = {isdefault}.isdefault
       console.log(this.isdefault)
       console.log('输出this.isdefault')
-      axios.get(this.$store.state.home.app_URL + 'homeDetail?id=' + this.home_id
+      axios.get(encodeURI(this.$store.state.home.app_URL + 'homeDetail?id=' + this.home_id + '&timestamp=' + Date.now())
             ).then((res) => {
               console.log(res)
               this.form.fname = res.data.home.home_name;
@@ -481,12 +484,11 @@ export default {
     },
     // xiugai jia xinxi
     sureedithouse () {
-      console.log(this.form.fname)
-      axios.put(this.$store.state.home.app_URL + 'home?id=' + this.home_id + '&home_name=' + this.form.fname + '&faddress=' + this.form.faddress + '&isdefault=' + this.isdefault + '&register_id=' + this.register_id
+      axios.put(encodeURI(this.$store.state.home.app_URL + 'home?id=' + this.home_id + '&home_name=' + this.form.fname + '&faddress=' + this.form.faddress + '&isdefault=' + this.isdefault + '&register_id=' + this.register_id + '&timestamp=' + Date.now())
       ).then((res) => {
         if (res.data.code == 1){
           this.$Message.success('修改成功!')
-          axios.get(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id
+          axios.get(encodeURI(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id + '&timestamp=' + Date.now())
           ).then((res) => {
               if (res.data.code ==1 ){
                   this.homelist = res.data.homeList
@@ -514,9 +516,9 @@ export default {
       this.modal8 = true
     },
     surehousedelall () {
-      axios.delete(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id + '&home_id=' + this.home_id
+      axios.delete(encodeURI(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id + '&home_id=' + this.home_id + '&timestamp=' + Date.now())
       ).then((res) => {
-        axios.get(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid
+        axios.get(encodeURI(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid + '&timestamp=' + Date.now())
       ).then((res) => {
           if (res.data.code ==1 ){
               if (res.data.homeList.length == 0){
@@ -534,10 +536,10 @@ export default {
     },
     // 删除家或家庭成员
     surehousedel () {
-      axios.delete(this.$store.state.home.app_URL + 'home?register_id=' + this.memberid + '&home_id=' + this.home_id
+      axios.delete(encodeURI(this.$store.state.home.app_URL + 'home?register_id=' + this.memberid + '&home_id=' + this.home_id + '&timestamp=' + Date.now())
       ).then((res) => {
         console.log(res)
-        axios.get(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid
+        axios.get(encodeURI(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid + '&timestamp=' + Date.now())
       ).then((res) => {
           if (res.data.code ==1 ){
               if (res.data.homeList.length == 0){
@@ -555,7 +557,7 @@ export default {
     },
     setDataFomatM () {
       return new Promise((resolve, reject) => {
-        axios.get(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id
+        axios.get(encodeURI(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id + '&timestamp=' + Date.now())
         ).then((res) => {
         let temp = []
         if (res.data.code ==1 ){
@@ -566,7 +568,7 @@ export default {
             // this.$Message.success('加载成功!')
             // 循环Homelist 取id ，
             for (let j = 0, lenJ = temp.length; j < lenJ; ++j) {
-              axios.get(this.$store.state.home.app_URL + 'homeMember?home_id=' + temp[j].home_id
+              axios.get(encodeURI(this.$store.state.home.app_URL + 'homeMember?home_id=' + temp[j].home_id + '&timestamp=' + Date.now())
               ).then((_res) => {
                   if (res.data.code ==1 ){
                       temp[j].menberListcount = _res.data.homeList.length
@@ -587,7 +589,7 @@ export default {
     },
     setDataFomatR () {
          return new Promise((resolve, reject) => {
-            axios.get(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id
+            axios.get(encodeURI(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id + '&timestamp=' + Date.now())
                 ).then((res) => {
                 let temp = []
                 if (res.data.code ==1 ){
@@ -598,7 +600,7 @@ export default {
                         // this.$Message.success('加载成功!')
                         // 循环Homelist 取id
                         for (let j = 0, lenJ = temp.length; j < lenJ; ++j) {
-                            axios.get(this.$store.state.home.app_URL + 'house?home_id=' + temp[j].home_id
+                            axios.get(encodeURI(this.$store.state.home.app_URL + 'house?home_id=' + temp[j].home_id + '&timestamp=' + Date.now())
                             ).then((res) => {
                                 if (res.data.code ==1 ){
                                     temp[j].houseListcount = res.data.houseList.length
@@ -645,7 +647,7 @@ export default {
       console.log(this.newregister_id)
       console.log('this.newregister_id=====')
       console.log(this.homeid)
-      axios.get(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid
+      axios.get(encodeURI(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid + '&timestamp=' + Date.now())
             ).then((res) => {
                 if (res.data.code ==1 ){
                     if (res.data.homeList.length == 0){
@@ -667,12 +669,12 @@ export default {
     sureaddmenber (menbername) {
         this.$refs.menbername.validate((valid) => {
             if (valid) {
-                axios.post(this.$store.state.home.app_URL + 'homeMember?mobile=' + this.menbername.mobile + '&home_id=' + this.homeid
+                axios.post(encodeURI(this.$store.state.home.app_URL + 'homeMember?mobile=' + this.menbername.mobile + '&home_id=' + this.homeid + '&timestamp=' + Date.now())
                 ).then((res) => {
                     console.log(res)
                     if (res.data.code ==1 ){
                         this.$Message.success('添加成功!')
-                        axios.get(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid
+                        axios.get(encodeURI(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid + '&timestamp=' + Date.now())
                         ).then((res) => {
                             if (res.data.code ==1 ){
                                 if (res.data.homeList.length == 0){
@@ -701,7 +703,7 @@ export default {
       console.log({home_id})
       this.homeid = {home_id}.home_id
       console.log(this.homeid)
-      axios.get(this.$store.state.home.app_URL + 'house?home_id=' + this.homeid
+      axios.get(encodeURI(this.$store.state.home.app_URL + 'house?home_id=' + this.homeid + '&timestamp=' + Date.now())
             ).then((res) => {
                 if (res.data.code ==1 ){
                     if (res.data.houseList.length == 0){
@@ -724,11 +726,11 @@ export default {
       console.log(this.id)
     },
     suredelete () {
-      axios.delete(this.$store.state.home.app_URL + 'house?register_id=' + this.register_id + '&house_id=' + this.id
+      axios.delete(encodeURI(this.$store.state.home.app_URL + 'house?register_id=' + this.register_id + '&house_id=' + this.id + '&timestamp=' + Date.now())
             ).then((res) => {
                 if (res.data.code ==1 ){
                 this.$Message.success('删除成功!')//删除成功重新加载房间列表
-                axios.get(this.$store.state.home.app_URL + 'house?home_id=' + this.homeid
+                axios.get(encodeURI(this.$store.state.home.app_URL + 'house?home_id=' + this.homeid + '&timestamp=' + Date.now())
                     ).then((res) => {
                         if (res.data.code ==1 ){
                             if (res.data.houseList.length == 0){
@@ -752,10 +754,10 @@ export default {
       this.formLogin.name = {house_name}.house_name
     },
     surechange () {
-        axios.put(this.$store.state.home.app_URL + 'house?id=' + this.id + '&house_name=' + this.formLogin.name + '&home_id=' + this.homeid
+        axios.put(encodeURI(this.$store.state.home.app_URL + 'house?id=' + this.id + '&house_name=' + this.formLogin.name + '&home_id=' + this.homeid + '&timestamp=' + Date.now())
         ).then((res) => {
             if (res.data.code ==1 ){//删除成功重新加载数据
-                axios.get(this.$store.state.home.app_URL + 'house?home_id=' + this.homeid
+                axios.get(encodeURI(this.$store.state.home.app_URL + 'house?home_id=' + this.homeid + '&timestamp=' + Date.now())
                     ).then((res) => {
                         if (res.data.code ==1 ){
                             if (res.data.houseList.length == 0){
@@ -779,12 +781,12 @@ export default {
       obj.house_name = this.roomform.roomname
       house_member.push(obj)
       let DATA = {'home_id':this.homeid,'register_id':this.register_id,'house_member':house_member}
-      axios.post(this.$store.state.home.app_URL + 'house',DATA
+      axios.post(encodeURI(this.$store.state.home.app_URL + 'house' + '?timestamp=' + Date.now()),DATA
         ).then((res)=> {
            console.log(res)
            if (res.data.code == 1){
                 this.$Message.success('增加成功!')
-                axios.get(this.$store.state.home.app_URL + 'house?home_id=' + this.homeid
+                axios.get(encodeURI(this.$store.state.home.app_URL + 'house?home_id=' + this.homeid + '&timestamp=' + Date.now())
                     ).then((res) => {
                         if (res.data.code ==1 ){
                             this.roomlist = res.data.houseList

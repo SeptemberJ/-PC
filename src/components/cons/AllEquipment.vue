@@ -82,7 +82,7 @@
           <Form v-show="EqType == '单品'" :model="formSingle" ref="formSingle" :rules="ruleValidateSingle" label-position="left" :label-width="100">
             <FormItem label="选择单品类型" prop="SingleSelectName">
               <!-- <Select v-model="formSingle.SingleSelectName" @on-change="changeSingle"> -->
-              <Select @on-change="changeSingle">
+              <Select v-model="formSingle.SingleSelectName" @on-change="changeSingle">
                 <Option v-for="item in SingleList" :value="item.id" :key="item.id">{{ item.deviceDescibe }}</Option>
               </Select>
             </FormItem>
@@ -135,7 +135,7 @@
             <FormItem label="设备名称" prop="SingleName">
               <Input v-model="formEQNormal.EQName" placeholder="可输入自定义名称" style="" />
             </FormItem>
-            <FormItem label="设码" prop="SingleCode">
+            <FormItem label="设备码" prop="SingleCode">
               <Input v-model="formEQNormal.EQCode" placeholder="请输入设备码" style="" />
             </FormItem>
           </Form>
@@ -247,8 +247,11 @@ export default {
         selectSecondId: [
           { required: true, message: '请选择从控！', trigger: 'change' }
         ],
+        EQName: [
+          { required: true, message: '设备名称不能为空！', trigger: 'change' }
+        ],
         EQCode: [
-          { required: true, message: '单品码不能为空！', trigger: 'change' }
+          { required: true, message: '设备码不能为空！', trigger: 'change' }
         ],
         selectRoomId: [
           { required: true, message: '请选择所在房间！', trigger: 'change' }
@@ -847,7 +850,7 @@ export default {
     changeSingle (SingleId) {
       this.SingleList.map((item, idx) => {
         if (item.id === SingleId) {
-          this.formSingle.SingleSelectName = item.deviceDescibe
+          this.formSingle.SingleName = item.deviceDescibe
           this.formSingle.SingleType = item.deviceTypeName
         }
       })
@@ -870,7 +873,7 @@ export default {
           main_control_id: '',
           second_control_id: '',
           second_contrl_code: '',
-          device_name: this.formSingle.SingleName.trim() === '' ? this.formSingle.SingleSelectName : this.formSingle.SingleName,
+          device_name: this.formSingle.SingleName,
           device_code: this.formSingle.SingleCode,
           default_device_type: this.formSingle.SingleType,
           device_img: '',
@@ -886,6 +889,10 @@ export default {
             this.$Message.success('添加成功!')
             this.getAllEq()
             this.btLoading = false
+            // 清空之前输入
+            // this.formSingle.SingleSelectName = ''
+            this.formSingle.SingleName = ''
+            this.formSingle.SingleCode = ''
             // 清除输入
             this.EqType = '无线设备'
             this.formSingle = {
@@ -1000,6 +1007,9 @@ export default {
             this.$Message.success('添加成功!')
             this.getAllEq()
             this.btLoading = false
+            // 清空之前输入
+            this.formEQNormal.EQName = ''
+            this.formEQNormal.EQCode = ''
             // 清除输入
             this.EqType = '无线设备'
             this.formSingle = {
@@ -1059,6 +1069,8 @@ export default {
 <style lang="less">
 .ListBox{
   margin: 40px 0;
+  h4{
+  }
   img{
     width: 60px;
     height: 60px;

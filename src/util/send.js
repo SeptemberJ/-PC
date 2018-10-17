@@ -3,8 +3,8 @@ import axios from 'axios'
 // import * as CryptoJS from 'crypto-js'
 // import _ from 'underscore'
 
-// const URL_PREFIX = 'http://www.smart-hox.com:8081/hoxJK'
-const URL_PREFIX = 'http://205.168.1.112:8081/hoxJK'
+const URL_PREFIX = 'http://www.smart-hox.com:8081/hoxJK'
+// const URL_PREFIX = 'http://192.168.10.112:8081/hoxJK'
 
 let registerId = localStorage['registerId']
 let account = localStorage['account']
@@ -58,12 +58,17 @@ export function logout () {
 }
 
 export function send (options) {
-  options.url = URL_PREFIX + options.name
+  const timestamp = Date.now()
+  // alert((URL_PREFIX + options.name))
+  // alert((URL_PREFIX + options.name).indexOf('?') == '-1')
+  // debugger
+  options.url = (URL_PREFIX + options.name).indexOf('?') == '-1' ? (URL_PREFIX + options.name + '?timestamp=' + timestamp) : (URL_PREFIX + options.name + '&timestamp=' + timestamp)
+  // options.url = URL_PREFIX + options.name  + '?&timestamp=' + timestamp
   delete options.name
   return new Promise(function (resolve, reject) {
     switch (options.method) {
       case 'POST':
-        axios.post(options.url, options.data
+        axios.post(encodeURI(options.url), options.data
         ).then((res) => {
           resolve(res)
         }).catch((error) => {
@@ -72,7 +77,7 @@ export function send (options) {
         })
         break
       case 'GET':
-        axios.get(options.url
+        axios.get(encodeURI(options.url), {headers: {'X-Timestamp': timestamp}}
         ).then((res) => {
           resolve(res)
         }).catch((error) => {
@@ -81,7 +86,7 @@ export function send (options) {
         })
         break
       case 'DELETE':
-        axios.delete(options.url
+        axios.delete(encodeURI(options.url)
         ).then((res) => {
           resolve(res)
         }).catch((error) => {
@@ -90,7 +95,7 @@ export function send (options) {
         })
         break
       case 'PUT':
-        axios.put(options.url
+        axios.put(encodeURI(options.url)
         ).then((res) => {
           resolve(res)
         }).catch((error) => {

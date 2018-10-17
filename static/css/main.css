@@ -56,6 +56,9 @@ html, body{
 .MarginT_30{
 	margin-top: 30px !important;
 }
+.MarginR_10{
+	margin-right: 10px;
+}
 .BorderT_gray{
 	border-top: 1px solid #dcdee2;
 }
@@ -80,7 +83,7 @@ html, body{
 	color: #fff !important;
 }
 .ivu-menu-light{
-	background: #2d8cf0 !important;
+	background: transparent !important;
 }
 .ivu-menu{
 	color: #fff !important;
@@ -97,6 +100,7 @@ html, body{
 .ivu-layout{
 	width: 100% !important;
 	height: 100vh !important;
+  background: transparent !important;
 	/*background: #2d8cf0 !important;*/
 }
 /*card*/

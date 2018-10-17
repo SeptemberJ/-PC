@@ -98,7 +98,7 @@ export default {
           case 1:
             this.$Message.success('登陆成功！')
             let cookieStr = this.phone.toString() + this.psd.toString()
-			      setCookie('btznkz', Encrypt(cookieStr), 6)
+			      setCookie('btznkz', Encrypt(cookieStr), 2)
 			      this.changeCurRegisterId(_res.data.memberInfo.id)
             this.changeCurAccountPhone(_res.data.memberInfo.ftelephone)
 			      this.checkIfHasHome(_res.data.memberInfo.id)

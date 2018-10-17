@@ -1,6 +1,6 @@
 <template>
   <div class="eqByKind">
-    <Row style="margin: 20px 20px;">
+    <Row style="margin: 20px 0px;">
       <Col span="12" class="">
         <Breadcrumb>
           <span @click="back">
@@ -14,6 +14,7 @@
         </Breadcrumb>
       </Col>
       <Col span="12" class="TextAlignR PaddingR_16">
+        <Button v-if="addType != -1" type="primary" icon="ios-undo" @click="back" class="MarginR_10">返回上级</Button>
         <Button v-if="addType == 0" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addMasterControl">添加</Button>
         <Button v-if="addType == 1 || addType == 3" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addSecondControl">添加</Button>
         <Button v-if="addType == 2" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加</Button>
@@ -25,8 +26,8 @@
             <div style="text-align:left" @click="toKindList(item.devcieType, item.deviceTypeName, item.deviceDescibe)">
               <Row>
                 <!-- <Col span="8"><img :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'"></Col> -->
-                <Col span="16">
-                  <h4>{{item.deviceDescibe}}{{item.devcieType}}</h4>
+                <Col span="24">
+                  <h4>{{item.deviceDescibe}}</h4>
                   <p>类型: {{item.devcieType == 0 ? '主控' : (item.devcieType == 2 ? '单品' : (item.devcieType == 4 ? '三级设备' : '从控'))}}</p>
                 </Col>
               </Row>

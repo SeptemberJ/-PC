@@ -385,7 +385,7 @@ export default {
             this.btLoading = false
             // 1-无下挂自动添加下级设备
             if (this.addType === '1') {
-              this.addAutoEq(_res.data.id, this.formSecond.secondCode)
+              this.addAutoEq(_res.data.id, this.formSecond.secondCode, _res.data.device_code)
             }
             this.$refs['formSecond'].resetFields()
             this.getSecondControl()
@@ -403,7 +403,7 @@ export default {
       })
     },
     // 自动添加下级设备
-    addAutoEq (SecondId, secondControlCode) {
+    addAutoEq (SecondId, secondControlCode, deviceCode) {
       send({
         name: '/device',
         method: 'POST',
@@ -416,7 +416,7 @@ export default {
           second_control_id: SecondId,
           second_contrl_code: secondControlCode,
           device_name: this.formSecond.secondName,
-          device_code: secondControlCode,
+          device_code: deviceCode,
           default_device_type: this.addKind,
           device_img: '',
           device_status: 0,
