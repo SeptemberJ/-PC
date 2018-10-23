@@ -23,12 +23,12 @@
     <Row type="flex" justify="start" class="code-row-bg" v-if="addType == -1">
       <Col span="8"  v-for="(item, idx) in kindList" :key="idx">
         <Card class="CursorPointer" style="width: 90%;margin:0 auto 30px auto;">
-            <div style="text-align:left" @click="toKindList(item.devcieType, item.deviceTypeName, item.deviceDescibe)">
+            <div style="text-align:left" @click="toKindList(item.devcieType, item.deviceTypeName, item.deviceDescibe, item.id)">
               <Row>
-                <!-- <Col span="8"><img :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'"></Col> -->
-                <Col span="24">
-                  <h4>{{item.deviceDescibe}}</h4>
-                  <p>类型: {{item.devcieType == 0 ? '主控' : (item.devcieType == 2 ? '单品' : (item.devcieType == 4 ? '三级设备' : '从控'))}}</p>
+                <Col span="8"><img :src="item.devcieTypePic ? 'http://112.90.178.68:8083/upFiles/' + item.devcieTypePic : '../../../static/img/icons/eqNormalIcon.png'"></Col>
+                <Col span="16">
+                  <h4 style="padding-top:2px;">{{item.deviceDescibe}}</h4>
+                  <p style="padding-top:5px;">类型: {{item.devcieType == 0 ? '主控' : (item.devcieType == 2 ? '单品' : (item.devcieType == 4 ? '三级设备' : '从控'))}}</p>
                 </Col>
               </Row>
             </div>
@@ -48,9 +48,9 @@
       </Row>
     </div> -->
 
-    <MasterControl :addName="addName" :addKind="addKind" :curHomeId="curHomeId" v-if="addType == 0"/>
-    <SecondControl @watchBack="back" :addName="addName" :addKind="addKind" :addType="addType" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="addType == 1 || addType == 3"/>
-    <SingleProduct @watchBack="back" :addName="addName" :addKind="addKind" :curHomeId="curHomeId" v-if="addType == 2"/>
+    <MasterControl :addName="addName" :addKind="addKind" :addKindId="addKindId" :curHomeId="curHomeId" v-if="addType == 0"/>
+    <SecondControl @watchBack="back" :addName="addName" :addKind="addKind" :addKindId="addKindId" :addType="addType" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="addType == 1 || addType == 3"/>
+    <SingleProduct @watchBack="back" :addName="addName" :addKind="addKind" :addKindId="addKindId" :curHomeId="curHomeId" v-if="addType == 2"/>
     <!-- <AllEquipment :AddList="AddList" :deviceTypeList="deviceTypeList" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="locationIdex == 2"/> -->
 
   </div>
@@ -90,6 +90,7 @@ export default {
       addType: -1,
       addName: '',
       addKind: '',
+      addKindId: '',
       AddList: [],
       MasterControlList: [],
       deviceTypeList: []
@@ -117,7 +118,6 @@ export default {
   },
   created () {
     this.getKindList()
-    // this.getAddList()
     this.getEQType()
   },
   methods: {
@@ -143,22 +143,11 @@ export default {
         this.$Message.error('Interface Error!')
       })
     },
-    toKindList (type, deviceTypeName, deviceDescibe) {
+    toKindList (type, deviceTypeName, deviceDescibe, id) {
       this.addType = type
       this.addKind = deviceTypeName
       this.addName = deviceDescibe
-      // switch (type) {
-      //   case 0:
-      //     break
-      //   case 1:
-      //     break
-      //   case 3:
-      //     break
-      //   case 2:
-      //   break
-      //   case 4:
-      //     break
-      // }
+      this.addKindId = id
     },
     toModule (Idx) {
       this.locationIdex = Idx
@@ -176,25 +165,6 @@ export default {
     addEQ () {
       this.getMasterControl()
       this.changeModalShow('EQ')
-    },
-    getAddList () {
-      send({
-        name: '/deviceType',
-        method: 'GET',
-        data: {
-        }
-      }).then(_res => {
-        switch (_res.data.code) {
-          case 1:
-            this.AddList = _res.data.deviceTypeList.data
-            break
-          default:
-            this.$Message.error(_res.data.message)
-        }
-      }).catch((_res) => {
-        console.log(_res)
-        this.$Message.error('Interface Error!')
-      })
     },
     // 所有主控
     getMasterControl () {
@@ -244,6 +214,11 @@ export default {
 <style lang="less" scoped>
 .eqByKind{
   margin: 40px 0px;
+  img{
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+  }
   .modules{
     margin: 40px 20px;
     color: #fff;

@@ -8,6 +8,7 @@
             <SIDER/>
           </Col>
           <Col span="18" :style="{height: '100%',background:curTab == 0 ? '#d2691e': (curTab == 1 ? '#8a2be2': '#2b85e4')}">
+            <Spin/>
             <div style="position:absolute;top:0;left:34px;padding-right: 0;width: 100%;height:100% !important;overflow-x:hidden;overflow-y:scroll">
               <Layout class="mainContent">
                 <!-- <Content :style="{margin: '0', background: '#2d8cf0', overflowX: 'hidden', overflowY: 'scroll'}"> -->
@@ -20,7 +21,9 @@
                         <Option v-for="(home, idx) in homeList" :value="idx" :key="idx">{{home.home_name}}</Option>
                       </Select>
                     </Col>
-                    <Col v-if="curMenuText === '所有设备'" span="12" offset="0" class="TextAlignR PaddingR_16"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备</Button></Col>
+                  </Row>
+                  <Row type="flex" justify="start" class="code-row-bg" style="width: 100%;margin: 20px 0px;">
+                    <Col v-if="curMenuText === '所有设备'" span="24" offset="0" class="TextAlignR PaddingR_16"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备</Button></Col>
                   </Row>
                   <CONTENT :curHomeId="curHome.home_id" ref="content"/>
                 </Content>
@@ -72,6 +75,7 @@ import {clearCookie} from '../util/util'
 import SIDER from '../components/Sider.vue'
 import TAB from '../components/Tab.vue'
 import CONTENT from '../components/Content.vue'
+import Spin from '../components/Spin.vue'
 
 export default {
   name: 'Home',
@@ -116,7 +120,8 @@ export default {
   components: {
     SIDER,
     TAB,
-    CONTENT
+    CONTENT,
+    Spin
   },
   methods: {
     ...mapActions([

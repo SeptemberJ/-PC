@@ -1,6 +1,6 @@
 <template>
 	<div class="createHome" :style="{minHeight: windowHeight + 'px'}">
-    <div class="glass"></div>
+    <div class="glass" :style="{minHeight: windowHeight + 'px'}"></div>
 	  <div class="homeBox">
 			<div class="formBox">
 				<Form :model="homeinfo" label-position="left" :label-width="100">
@@ -58,7 +58,8 @@ export default {
     }
   },
   created () {
-    this.windowHeight = window.innerHeight
+    this.windowHeight = document.body.clientHeight
+    // this.windowHeight = window.innerHeight
     this.getDefaultRooms()
   },
   computed: {
@@ -187,7 +188,6 @@ export default {
 	width: 100%;
   .glass{
     width: 100%;
-    height: 100%;
     position: absolute;
     top: 0;
     left: 0;
@@ -198,9 +198,9 @@ export default {
 	.homeBox{
     width: 500px;
     position: relative;
-    top: 0;
+    top: 50px;
     left: 0;
-    z-index:9999;
+    z-index:9;
 		margin: 0px auto;
 		transform: translateY(30px);
 		.triangle_border_up{

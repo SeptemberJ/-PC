@@ -1,17 +1,17 @@
 <template>
-  <Row type="flex" justify="center" class="code-row-bg" style="background: pink;opacity:.7;position: fixed;top:0;left:200px;margin-left:-200px;z-index:99999;width:100%;height:100%;">
+  <Row v-if="ifSpin" type="flex" justify="center" class="code-row-bg" style="background: #eee;opacity:.5;position: fixed;top:0;left:200px;margin-left:-200px;z-index:99999;width:100%;height:100%;">
+ <!--  <Row  v-if="ifSpin" type="flex" justify="center" class="code-row-bg" style="background: #fff;opacity:.3;position: fixed;top:80px;left:25%;z-index:99999999;width:100%;height:90%;"> -->
     <Col class="demo-spin-col" span="24">
-      <Spin fix>
+      <Spin fix style="">
         <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-        <div>Loading</div>
+        <div>加载中...</div>
       </Spin>
     </Col>
   </Row>
-
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapState, mapActions} from 'vuex'
 export default {
   name: 'Problem',
   data () {
@@ -20,29 +20,22 @@ export default {
   },
   computed: {
     ...mapState({
-      curMenu: state => state.sider.curMenu
+      curMenu: state => state.sider.curMenu,
+      ifSpin: state => state.ifSpin,
+      ifShowChart: state => state.ifShowChart
     })
   },
-  methods: {
-    handleSpinCustom () {
-      this.$Spin.show({
-        render: (h) => {
-          return h('div', [
-            h('Icon', {
-              'class': 'demo-spin-icon-load',
-              props: {
-                type: 'ios-loading',
-                size: 18
-              }
-            }),
-            h('div', 'Loading')
-          ])
-        }
-      })
-      setTimeout(() => {
-        this.$Spin.hide()
-      }, 3000)
+  watch: {
+    ifShowChart: function (val) {
+      if (!val) {
+        this.toggleSpin(false)
+      }
     }
+  },
+  methods: {
+    ...mapActions([
+      'toggleSpin'
+    ])
   }
 }
 </script>

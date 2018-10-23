@@ -6,23 +6,27 @@
           <Card style="width: 90%;margin:0 auto 30px auto;">
             <div style="text-align:left">
               <Row>
-                <Col span="8" class="CursorPointer"><img @click="showCharts(EQ)" :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'"></Col>
+                <Col span="8" class="CursorPointer eqIcon"><img @click="showCharts(EQ)" :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'"></Col>
                 <Col span="16">
                   <h4 class="CursorPointer" @click="showCharts(EQ)">{{EQ.device_name}}</h4>
-                  <p>状态: {{EQ.on_off_status == 0 ? '在线' : '离线'}}</p>
+                  <p>状态: {{EQ.type == 0 ? '离线' : '在线'}}</p>
                   <p>位置: {{EQ.house_name}} </p>
                   <Row class="operationIcon">
                     <Col span="24">
                       <img class="iconImg" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
                       <img v-if="EQ.default_device_type == 'HAir(有线)'" class="iconImg" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts(EQ)">
+                      <i-switch v-if="EQ.default_device_type== 'lamp'" style="float:right;margin-top:0px;" :value="EQ.device_status == 1? true: false" @on-change="OperationToggle(EQ, idx)">
+                        <span slot="open">ON</span>
+                        <span slot="close">OFF</span>
+                      </i-switch>
                       <!-- <i-switch style="float:right;margin-top:5px;" size="small" @on-change="setConfig(EQ)"/> -->
                     </Col>
                   </Row>
                 </Col>
               </Row>
               <Row class="MarginT_10 PaddingT_16 BorderT_gray">
-                <Col span="12"><img class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editEqInfo(EQ.id, EQ.device_name)">编辑</span></Col>
-                <Col span="12" class="TextAlignR"><img class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteEq(EQ)">删除</span></Col>
+                <Col span="12"><img class="iconImg" src="../../../static/img/icons/editor-line.png" @click="editEqInfo(EQ.id, EQ.device_name)"><span @click="editEqInfo(EQ.id, EQ.device_name)">编辑</span></Col>
+                <Col span="12" class="TextAlignR"><img @click="deleteEq(EQ)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteEq(EQ)">删除</span></Col>
               </Row>
             </div>
           </Card>
@@ -31,7 +35,7 @@
     </div>
     <NoData v-if="EqList.length == 0"/>
     <!-- 移动 -->
-    <Modal v-model="ifMove" width="360">
+    <Modal v-model="ifMove" width="460">
       <p slot="header" style="color:#333;text-align:left">
           <span>设备移动</span>
       </p>
@@ -63,7 +67,7 @@
       </div>
     </Modal>
     <!-- 添加设备 -->
-    <Modal v-model="ifAddEQ" scrollable width="360">
+    <Modal v-model="ifAddEQ" scrollable width="460">
       <p slot="header" style="color:#333;text-align:left">
           <!-- <Icon type="ios-information-circle"></Icon> -->
           <span>添加设备</span>
@@ -91,8 +95,8 @@
                 <Option v-for="item in HouseList" :value="item.id" :key="item.id">{{ item.house_name }}</Option>
               </Select>
             </FormItem>
-            <FormItem label="选择房间" prop="selectMasterId" v-if="HouseList.length == 0">
-              <Button size="small" type="text" @click="toAddRoom">还未添加房间，点击去添加</Button>
+            <FormItem label="选择房间" prop="selectRoomId" v-if="HouseList.length == 0">
+              <Button class="ColorRed" size="small" type="text" @click="toAddRoom">还未添加房间，点击去添加</Button>
             </FormItem>
             <FormItem label="单品名称" prop="SingleName">
               <Input v-model="formSingle.SingleName" placeholder="可输入自定义名称" style="" />
@@ -109,33 +113,33 @@
               </Select>
             </FormItem>
             <FormItem label="选择主控" prop="selectMasterId" v-if="MasterControlList.length == 0">
-              <Button size="small" type="text" @click="toAddMS">还未添加主控，点击去添加</Button>
+              <Button class="ColorRed" size="small" type="text" @click="toAddMS">还未添加主控，点击去添加</Button>
             </FormItem>
             <FormItem label="选择从控" prop="selectSecondId" v-if="SecondControlList.length > 0">
               <Select v-model="formEQNormal.selectSecondId" @on-change="selectChangeSecond">
                 <Option v-for="item in SecondControlList" :value="item.id" :key="item.id">{{ item.second_control_name }}</Option>
               </Select>
             </FormItem>
-            <FormItem label="选择从控" prop="selectMasterId" v-if="SecondControlList.length == 0">
-              <Button size="small" type="text" @click="toAddMS">改主控下还未添加从控，点击去添加</Button>
+            <FormItem label="选择从控" prop="selectSecondId" v-if="SecondControlList.length == 0">
+              <Button class="ColorRed" size="small" type="text" @click="toAddMS">该主控下还未添加从控，点击去添加</Button>
             </FormItem>
             <FormItem label="选择房间" prop="selectRoomId" v-if="HouseList.length > 0">
               <Select v-model="formEQNormal.selectRoomId">
                 <Option v-for="item in HouseList" :value="item.id" :key="item.id">{{ item.house_name }}</Option>
               </Select>
             </FormItem>
-            <FormItem label="选择房间" prop="selectMasterId" v-if="HouseList.length == 0">
-              <Button size="small" type="text" @click="toAddRoom">还未添加房间，点击去添加</Button>
+            <FormItem label="选择房间" prop="selectRoomId" v-if="HouseList.length == 0">
+              <Button class="ColorRed" size="small" type="text" @click="toAddRoom">还未添加房间，点击去添加</Button>
             </FormItem>
             <FormItem label="选择设备类型" prop="eqType">
               <Select v-model="formEQNormal.eqType">
                 <Option v-for="item in deviceTypeList" :value="item.device_type_code" :key="item.id">{{ item.device_type_name }}</Option>
               </Select>
             </FormItem>
-            <FormItem label="设备名称" prop="SingleName">
+            <FormItem label="设备名称" prop="EQName">
               <Input v-model="formEQNormal.EQName" placeholder="可输入自定义名称" style="" />
             </FormItem>
-            <FormItem label="设备码" prop="SingleCode">
+            <FormItem label="设备码" prop="EQCode">
               <Input v-model="formEQNormal.EQCode" placeholder="请输入设备码" style="" />
             </FormItem>
           </Form>
@@ -154,7 +158,7 @@
       </div>
     </Modal>
     <!-- chart -->
-    <Modal v-model="ifShowChart" fullscreen title="数据详情">
+    <Modal v-model="ifShowChart" fullscreen title="数据详情" footer-hide cancel-text="关闭">
         <!-- <div class="MarginB_10">选择类型</div> -->
         <div class="kindBar" style="text-align:left">
           <Row>
@@ -402,18 +406,26 @@ export default {
           this.sureModify(EqId)
         },
         render: (h) => {
-          return h('Input', {
-            props: {
-              value: this.newEqName === '' ? EqName : this.newEqName,
-              autofocus: true,
-              placeholder: '请输入新的设备名称...'
-            },
-            on: {
-              input: (val) => {
-                this.newEqName = val
+          return h('div', [
+            h('h4', {
+              style: {
+                marginBottom: '10px'
               }
-            }
-          })
+
+            }, '新名称'),
+            h('Input', {
+              props: {
+                value: this.newEqName === '' ? EqName : this.newEqName,
+                autofocus: true,
+                placeholder: '请输入新的设备名称...'
+              },
+              on: {
+                input: (val) => {
+                  this.newEqName = val
+                }
+              }
+            })
+          ])
         }
       })
     },
@@ -475,7 +487,7 @@ export default {
     showCharts (EQ) {
       // 没配置过先配置
       if (EQ.device_config !== '1') {
-        this.setConfig(EQ)
+        this.setConfig('chart', EQ)
       } else {
         this.changeModalShow('Chart')
         this.drawLine()
@@ -503,16 +515,16 @@ export default {
         data: {
         }
       }).then(_res => {
-        if (_res.data.result.hairList.length === 0) {
+        if (_res.data.hairList.length === 0) {
           _THIS.hasData = false
           this.toggleSpin(false)
           return false
         } else {
           _THIS.hasData = true
         }
-        switch (_res.data.result.code) {
+        switch (_res.data.code) {
           case 1:
-            let tempData = _res.data.result.hairList
+            let tempData = _res.data.hairList
             let option = {
               title: {
                 text: ''
@@ -612,21 +624,31 @@ export default {
         })
       })
     },
-    setConfig (EQ) {
-      this.EqConfig(EQ)
+    setConfig (type, EQ) {
+      this.EqConfig(type, EQ)
     },
-    async EqConfig (eqItem) {
+    // 开关
+    OperationToggle (eqItem, eqIdx) {
+      if (eqItem.device_config === '1') {
+        this.toggleSpin(true)
+        this.SwitchConfig(eqItem, eqIdx)
+      } else {
+        this.EqConfig('switch', eqItem, eqIdx)
+      }
+    },
+    async EqConfig (type, eqItem, eqIdx) {
+      this.toggleSpin(true)
       var sendCurCns = await this.getCurCNS(eqItem.master_control)
       send({
-        name: '/deviceConfig?main_control_id=' + eqItem.master_control + '&second_control_id=00123456' + '&sequence_number=' + sendCurCns + '&measure_point=08&control_point=00&qty=01',
+        name: '/deviceConfig?main_control_id=' + eqItem.master_control + '&sequence_number=' + sendCurCns + '&home_id=' + this.curHomeId,
+        // name: '/deviceConfig?main_control_id=' + eqItem.master_control + '&second_control_id=00123456' + '&sequence_number=' + sendCurCns + '&measure_point=08&control_point=00&qty=01',
         method: 'GET',
         data: {
         }
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
-            // this.EqPlay(eqItem, sendCurCns)
-            this.UpdateConfigStatus(eqItem.id, eqItem.master_control)
+            setTimeout(() => { this.EqPlay(type, eqItem, sendCurCns, 'ConfigAck', '', eqIdx) }, 3000)
             break
           case 0:
             this.$Message.error(_res.data.message)
@@ -639,70 +661,65 @@ export default {
         this.$Message.error('Interface Error!')
       })
     },
-    // async EqPlay (eqItem, sendCurCns) {
-    //   // var sendCurCns = await this.getCurCNS(eqItem.main_control_code)
-    //   wepy.showLoading({
-    //     title: '加载中'
-    //   })
-    //   return new Promise((resolve, reject) => {
-    //     wepy.request({
-    //       url: this.urlPre + '/payload?topic=' + eqItem.main_control_code + '/ConfigAck&sequence_number=' + sendCurCns,
-    //       method: 'GET'
-    //     }).then((res) => {
-    //       console.log(res)
-    //       switch (res.data.result.code) {
-    //         case 1:
-    //           wepy.hideLoading()
-    //           // console.log(res.data.result.payload.payload)
-    //           // console.log(res.data.result.payload.payload === 'sendCurCns')
-    //           // if (res.data.result.payload.payload === 'sendCurCns') {
-    //           //   wepy.showToast({
-    //           //     title: '指令匹配!',
-    //           //     icon: 'success'
-    //           //   })
-    //           // } else {
-    //           //   this.$invoke('toast', 'show', {
-    //           //     title: '指令不匹配!',
-    //           //     img: '../../images/icons/attention.png'
-    //           //   })
-    //           // }
-    //           this.UpdateConfigStatus(eqItem.id, eqItem.main_control_code)
-    //           resolve(res)
-    //           break
-    //         case 0:
-    //           wepy.hideLoading()
-    //           this.$invoke('toast', 'show', {
-    //             title: res.data.result.message,
-    //             img: '../images/icons/attention.png'
-    //           })
-    //           break
-    //         default:
-    //           wepy.hideLoading()
-    //           this.$invoke('toast', 'show', {
-    //             title: '服务器繁忙！',
-    //             img: '../images/icons/attention.png'
-    //           })
-    //       }
-    //     }).catch((res) => {
-    //       console.log(res)
-    //       wepy.hideLoading()
-    //       this.$invoke('toast', 'show', {
-    //         title: '服务器繁忙！',
-    //         img: '../images/icons/attention.png'
-    //       })
-    //     })
-    //   })
-    // }
-    UpdateConfigStatus (EQID, MasterCode) {
+    async EqPlay (type, eqItem, sendCurCns, topic, switchStatus, eqIdx) {
       send({
-        name: '/deviceConfig?id=' + EQID + '&device_config=1' + '&main_control_code=' + MasterCode,
+        name: '/payload?topic=' + eqItem.master_control + '/' + topic + '&sequence_number=' + sendCurCns + '&device_status=' + switchStatus + '&id=' + eqItem.id,
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.result.code) {
+          case 1:
+            if (switchStatus === '') { // 配置完去更新
+              this.UpdateConfigStatus(type, eqItem, eqIdx)
+            } else { // 开关操作
+              // 页面上更新开关状态
+              if (_res.data.result.payload === '00') {
+                this.getAllEq('', eqItem, eqIdx)
+                // console.log(this.EqList[eqIdx].device_status)
+                // console.log(switchStatus)
+                // debugger
+                // this.EqList[eqIdx].device_status = switchStatus
+                // debugger
+                // console.log(this.EqList[eqIdx].device_status)
+              } else {
+                this.$invoke('toast', 'show', {
+                  title: _res.data.result.result,
+                  img: '../images/icons/attention.png'
+                })
+              }
+              this.toggleSpin(false)
+            }
+            break
+          case 0:
+            this.$Message.error(_res.data.message)
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.$Message.error('Interface Error2222!')
+      })
+    },
+    UpdateConfigStatus (type, eqItem, eqIdx) {
+      send({
+        name: '/deviceConfig?id=' + eqItem.id + '&device_config=1' + '&main_control_code=' + eqItem.master_control,
         method: 'PUT',
         data: {
         }
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
-            this.getAllEq()
+            // 图表类配置成功跳转图表
+            if (type === 'chart') {
+              this.changeModalShow('Chart')
+              this.drawLine()
+              this.getAllEq('chart', eqItem, eqIdx)
+            }
+            if (type === 'switch') {
+              this.getAllEq('switch', eqItem, eqIdx)
+            }
             break
           case 0:
             this.$Message.error('Interface Error!')
@@ -713,6 +730,30 @@ export default {
       }).catch((_res) => {
         console.log(_res)
         this.$Message.error('Interface Error!')
+      })
+    },
+    // 开关
+    async SwitchConfig (eqItem, eqIdx) {
+      var sendCurCns = await this.getCurCNS(eqItem.master_control)
+      send({
+        name: '/deviceControl?main_control_code=' + eqItem.master_control + '&sequence_number=' + sendCurCns + '&deivce_code=' + eqItem.device_code + '&control_type=01' + '&control_number=01' + '&control_data=' + (eqItem.device_status === '0' ? '00000000' : '447a0000'),
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            setTimeout(() => { this.EqPlay('switch', eqItem, sendCurCns, 'ControlAck', eqItem.device_status === '0' ? 1 : 0, eqIdx) }, 3000)
+            break
+          case 0:
+            this.$Message.error('Interface Error1!')
+            break
+          default:
+            this.$Message.error('Interface Error!2')
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.$Message.error('Interface Error3!')
       })
     },
     // 获取目标房间ID
@@ -739,12 +780,9 @@ export default {
         switch (_res.data.code) {
           case 1:
             this.getAllEq()
-            setTimeout(() => {
-              // this.toggleSpin(false)
-              this.ifMove = false
-              this.btLoading = false
-              this.$Message.success('修改成功!')
-            }, 1500)
+            this.ifMove = false
+            this.btLoading = false
+            this.$Message.success('移动成功!')
             break
           default:
             // this.toggleSpin(false)
@@ -781,7 +819,8 @@ export default {
       })
     },
     // 所有设备
-    getAllEq () {
+    getAllEq (type, eqItem, eqIdx) {
+      this.toggleSpin(true)
       send({
         name: '/selecteqlist?home_id=' + this.curHomeId,
         method: 'GET',
@@ -791,17 +830,24 @@ export default {
         switch (_res.data.code) {
           case 1:
             this.EqList = _res.data.deviceHomeList
+            if (type === 'switch') {
+              this.SwitchConfig(eqItem, eqIdx)
+            }
+            this.toggleSpin(false)
             break
           default:
+            this.toggleSpin(false)
             this.$Message.error(_res.data.message)
         }
       }).catch((_res) => {
         console.log(_res)
+        this.toggleSpin(false)
         this.$Message.error('Interface Error!')
       })
     },
     // 当前家下房间
     getAllRoom () {
+      this.toggleSpin(true)
       send({
         name: '/house?home_id=' + this.curHomeId,
         method: 'GET',
@@ -811,12 +857,15 @@ export default {
         switch (_res.data.code) {
           case 1:
             this.HouseList = _res.data.houseList
+            this.toggleSpin(false)
             break
           default:
+            this.toggleSpin(false)
             this.$Message.error(_res.data.message)
         }
       }).catch((_res) => {
         console.log(_res)
+        this.toggleSpin(false)
         this.$Message.error('Interface Error!')
       })
     },
@@ -835,6 +884,7 @@ export default {
         if (valid) {
           this.addSingleProduct()
         } else {
+          this.$Message.warning('请将信息填写完成!')
         }
       })
     },
@@ -843,6 +893,7 @@ export default {
         if (valid) {
           this.addEQProduct()
         } else {
+          this.$Message.warning('请将信息填写完成!')
         }
       })
     },
@@ -861,6 +912,10 @@ export default {
       if (this.btLoading) {
         return false
       }
+      // if (!this.formSingle.selectRoomId) {
+      //   this.$Message.warning('请先添加房间!')
+      //   return false
+      // }
       this.btLoading = true
       send({
         name: '/device',
@@ -979,6 +1034,18 @@ export default {
       if (this.btLoading) {
         return false
       }
+      // if (!this.choosedMaster.id) {
+      //   this.$Message.warning('请先添加主控!')
+      //   return false
+      // }
+      // if (!this.choosedSecond.id) {
+      //   this.$Message.warning('请先添加从控!')
+      //   return false
+      // }
+      // if (!this.formEQNormal.selectRoomId) {
+      //   this.$Message.warning('请先添加房间!')
+      //   return false
+      // }
       this.btLoading = true
       send({
         name: '/device',
@@ -1066,16 +1133,16 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style scoped lang="less">
 .ListBox{
   margin: 40px 0;
   h4{
   }
-  img{
+  .eqIcon img{
     width: 60px;
     height: 60px;
   }
-  p, span{
+  p{
     color: #333;
   }
   span{

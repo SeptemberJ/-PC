@@ -59,7 +59,7 @@
       <div style="text-align:left">
           <Form label-position="left" :label-width="100">
             <FormItem label="房间名称" style="margin-bottom: 10px;">
-              <Input v-model="addRoomName"></Input>
+              <Input v-model="addRoomName" placeholder="请输入房间名称"></Input>
             </FormItem>
             <FormItem label="推荐" style="margin-bottom: 10px;">
             </FormItem>
@@ -156,18 +156,26 @@ export default {
           this.sureModify(Room)
         },
         render: (h) => {
-          return h('Input', {
-            props: {
-              value: this.newRoomName === '' ? Room.house_name : this.newRoomName,
-              autofocus: true,
-              placeholder: '请输入新的房间名称...'
-            },
-            on: {
-              input: (val) => {
-                this.newRoomName = val
+          return h('div', [
+            h('h4', {
+              style: {
+                marginBottom: '10px'
               }
-            }
-          })
+
+            }, '新名称'),
+            h('Input', {
+              props: {
+                value: this.newRoomName === '' ? Room.house_name : this.newRoomName,
+                autofocus: true,
+                placeholder: '请输入新的房间名称...'
+              },
+              on: {
+                input: (val) => {
+                  this.newRoomName = val
+                }
+              }
+            })
+          ])
         }
       })
     },
@@ -244,6 +252,10 @@ export default {
     },
     sureAdd () {
       if (this.btLoading) {
+        return false
+      }
+      if (this.addRoomName.trim() === '') {
+        this.$Message.warning('房间名称不能为空!')
         return false
       }
       // this.toggleSpin(true)

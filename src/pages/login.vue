@@ -59,7 +59,7 @@ export default {
 	      }).then(_res => {
 	      	switch (_res.data.code) {
 	      		case 0:
-	      		this.goSign(0)
+	      		// this.goSign(0)
 	      		break
 	      		case 2:
 	      			this.goSign(1)

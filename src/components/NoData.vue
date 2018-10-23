@@ -24,9 +24,10 @@ export default {
 </script>
 <style lang="less" scoped>
 .NoData{
-  margin-top: 150px;
+  margin-top: 100px;
+  margin-left: -34px;
   img{
-    width: 150px;
+    width: 80px;
   }
   p{
     font-size: 22px;

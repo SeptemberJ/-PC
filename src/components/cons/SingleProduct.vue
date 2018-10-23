@@ -22,7 +22,7 @@
     </div>
     <NoData v-if="SingleProductList.length == 0"/>
     <!-- 添加主控 -->
-    <Modal v-model="ifAddEQ" width="360">
+    <Modal v-model="ifAddEQ" width="460">
       <p slot="header" style="color:#333;text-align:left">
           <!-- <Icon type="ios-information-circle"></Icon> -->
           <span>添加{{addName}}产品</span>
@@ -34,8 +34,8 @@
                 <Option v-for="item in HouseList" :value="item.id" :key="item.id">{{ item.house_name }}</Option>
               </Select>
             </FormItem>
-            <FormItem label="选择房间" prop="selectMasterId" v-if="HouseList.length == 0">
-              <Button size="small" type="text" @click="toAddRoom">还未添加房间，点击去添加</Button>
+            <FormItem label="选择房间" prop="selectRoomId" v-if="HouseList.length == 0">
+              <Button class="ColorRed" size="small" type="text" @click="toAddRoom">还未添加房间，点击去添加</Button>
             </FormItem>
             <FormItem label="单品名称" prop="SingleName">
               <Input v-model="formSingle.SingleName" placeholder="请输入主控名称" style="" />
@@ -151,18 +151,26 @@ export default {
           this.sureModify(SingleId)
         },
         render: (h) => {
-          return h('Input', {
-            props: {
-              value: this.newEqName === '' ? SingleName : this.newEqName,
-              autofocus: true,
-              placeholder: '请输入新的主控名称...'
-            },
-            on: {
-              input: (val) => {
-                this.newEqName = val
+          return h('div', [
+            h('h4', {
+              style: {
+                marginBottom: '10px'
               }
-            }
-          })
+
+            }, '新名称'),
+            h('Input', {
+              props: {
+                value: this.newEqName === '' ? SingleName : this.newEqName,
+                autofocus: true,
+                placeholder: '请输入新的主控名称...'
+              },
+              on: {
+                input: (val) => {
+                  this.newEqName = val
+                }
+              }
+            })
+          ])
         }
       })
     },
@@ -320,7 +328,7 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style scoped lang="less">
 .ListBox{
   margin: 40px 0;
   img{

@@ -10,9 +10,8 @@
                 <Col span="16">
                   <h4>{{SecondControl.second_control_name}}</h4>
                   <Row class="MarginT_20">
-                    <Col span="12"><img class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editSecondControl(SecondControl.id
-, SecondControl.second_control_name)">编辑</span></Col>
-                    <Col span="12" class="TextAlignR"><img class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteSecondControl(SecondControl)">删除</span></Col>
+                    <Col span="12"><img @click="editSecondControl(SecondControl.id, SecondControl.second_control_name)" class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editSecondControl(SecondControl.id, SecondControl.second_control_name)">编辑</span></Col>
+                    <Col span="12" class="TextAlignR"><img @click="deleteSecondControl(SecondControl)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteSecondControl(SecondControl)">删除</span></Col>
                   </Row>
                 </Col>
               </Row>
@@ -23,7 +22,7 @@
     </div>
     <NoData v-if="SecondControlList.length == 0"/>
     <!-- 添加主控 -->
-    <Modal v-model="ifAddSecond" width="360">
+    <Modal v-model="ifAddSecond" width="460">
       <p slot="header" style="color:#333;text-align:left">
           <!-- <Icon type="ios-information-circle"></Icon> -->
           <span>添加{{addName}}产品</span>
@@ -36,7 +35,7 @@
               </Select>
             </FormItem>
             <FormItem label="选择主控" prop="selectMasterId" v-if="MasterControlList.length == 0">
-              <Button size="small" type="text" @click="toAddMS">还未添加主控，点击去添加</Button>
+              <Button class="ColorRed" size="small" type="text" @click="toAddMS">还未添加主控，点击去添加</Button>
             </FormItem>
             <!-- <FormItem label="选择从控" prop="selectSecondId">
               <Select v-model="formSecond.selectSecondId" @on-change="selectChangeSecond">
@@ -48,14 +47,17 @@
                 <Option v-for="item in roomList" :value="item.id" :key="item.id">{{ item.house_name }}</Option>
               </Select>
             </FormItem>
-            <FormItem label="选择房间" prop="selectMasterId" v-if="addType == '1' && roomList.length == 0">
-              <Button size="small" type="text" @click="toAddRoom">还未添加房间，点击去添加</Button>
+            <FormItem label="选择房间" prop="selectRoomId" v-if="addType == '1' && roomList.length == 0">
+              <Button class="ColorRed" size="small" type="text" @click="toAddRoom">还未添加房间，点击去添加</Button>
             </FormItem>
             <FormItem label="从控名称" prop="secondName">
               <Input v-model="formSecond.secondName" placeholder="可输入自定义名称" style="" />
             </FormItem>
             <FormItem label="从控码" prop="secondCode">
               <Input v-model="formSecond.secondCode" placeholder="请输入从控码" style="" />
+            </FormItem>
+            <FormItem label="验证码" prop="randomCode">
+              <Input v-model="formSecond.randomCode" placeholder="请输入验证码" style="" />
             </FormItem>
           </Form>
       </div>
@@ -76,7 +78,7 @@ import {send} from '../../util/send'
 import NoData from '../NoData.vue'
 export default {
   name: 'AllEquipment',
-  props: ['curHomeId', 'addKind', 'addType', 'addName', 'MasterControlList'],
+  props: ['curHomeId', 'addKind', 'addType', 'addName', 'addKindId', 'MasterControlList'],
   data () {
     const validateRoom = (rule, value, callback) => {
       if (this.addType === '1') {
@@ -101,6 +103,7 @@ export default {
         secondCode: '',
         secondName: '',
         selectMasterId: '',
+        randomCode: '',
         // selectSecondId: '',
         selectRoomId: ''
       },
@@ -110,6 +113,9 @@ export default {
         ],
         secondName: [
           { required: true, message: '请输入从控名称！', trigger: 'change' }
+        ],
+        randomCode: [
+          { required: true, message: '请输入验证码！', trigger: 'change' }
         ],
         // selectSecondId: [
         //   { required: true, message: '请选择从控！', trigger: 'change' }
@@ -138,6 +144,11 @@ export default {
     }
   },
   watch: {
+    ifAddSecond: function (val) {
+      if (!val) {
+        this.btLoading = true
+      }
+    },
     curHomeId: function (val) {
       this.getSecondControl()
     },
@@ -208,18 +219,26 @@ export default {
           this.sureModify(SecondControlId)
         },
         render: (h) => {
-          return h('Input', {
-            props: {
-              value: this.newSecondControlName === '' ? SecondControlName : this.newSecondControlName,
-              autofocus: true,
-              placeholder: '请输入新的从控名称...'
-            },
-            on: {
-              input: (val) => {
-                this.newSecondControlName = val
+          return h('div', [
+            h('h4', {
+              style: {
+                marginBottom: '10px'
               }
-            }
-          })
+
+            }, '新名称'),
+            h('Input', {
+              props: {
+                value: this.newSecondControlName === '' ? SecondControlName : this.newSecondControlName,
+                autofocus: true,
+                placeholder: '请输入新的从控名称...'
+              },
+              on: {
+                input: (val) => {
+                  this.newSecondControlName = val
+                }
+              }
+            })
+          ])
         }
       })
     },
@@ -373,7 +392,7 @@ export default {
       console.log(this.choosedMaster)
       this.btLoading = true
       send({
-        name: '/secondControl?home_id=' + this.curHomeId + '&main_control_code=' + this.choosedMaster.main_control_code + '&main_control_id=' + this.choosedMaster.id + '&second_control_name=' + this.formSecond.secondName + '&second_contrl_code=' + this.formSecond.secondCode + '&second_control_category=' + this.addKind + '&deviceType=' + this.addType,
+        name: '/secondControl?home_id=' + this.curHomeId + '&main_control_code=' + this.choosedMaster.main_control_code + '&main_control_id=' + this.choosedMaster.id + '&second_control_name=' + this.formSecond.secondName + '&second_contrl_code=' + this.formSecond.secondCode + '&second_control_category=' + this.addKind + '&deviceType=' + this.addType + '&device_type_id=' + this.addKindId + '&randomCode=' + this.formSecond.randomCode,
         method: 'POST',
         data: {
         }
@@ -438,7 +457,7 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style scoped lang="less">
 .ListBox{
   margin: 40px 0;
   img{

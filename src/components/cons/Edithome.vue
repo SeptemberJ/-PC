@@ -64,10 +64,10 @@
       <div style="text-align:left">
         <Form :model="homeinfo" label-position="left" :label-width="100">
           <FormItem label="家庭名称">
-            <Input v-model="homeinfo.name"></Input>
+            <Input v-model="homeinfo.name" placeholder="请输入家的名称"></Input>
           </FormItem>
           <FormItem label="家庭地址">
-              <Input v-model="homeinfo.address"></Input>
+              <Input v-model="homeinfo.address" placeholder="请输入家的地址"></Input>
           </FormItem>
           <Row class="tipsTit">
             <Col span="8">在哪些房间有智能设备</Col>

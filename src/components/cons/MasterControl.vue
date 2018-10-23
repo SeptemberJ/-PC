@@ -10,8 +10,8 @@
                 <Col span="16">
                   <h4>{{MasterControl.main_control_name}}</h4>
                   <Row class="MarginT_20">
-                    <Col span="12"><img class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editMasterInfo(MasterControl.id, MasterControl.main_control_name)">编辑</span></Col>
-                    <Col span="12" class="TextAlignR"><img class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteMaster(MasterControl)">删除</span></Col>
+                    <Col span="12"><img @click="editMasterInfo(MasterControl.id, MasterControl.main_control_name)" class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editMasterInfo(MasterControl.id, MasterControl.main_control_name)">编辑</span></Col>
+                    <Col span="12" class="TextAlignR"><img @click="deleteMaster(MasterControl)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteMaster(MasterControl)">删除</span></Col>
                   </Row>
                 </Col>
               </Row>
@@ -22,7 +22,7 @@
     </div>
     <NoData v-if="MasterControlList.length == 0"/>
     <!-- 添加主控 -->
-    <Modal v-model="ifAddMaster" width="360">
+    <Modal v-model="ifAddMaster" width="460">
       <p slot="header" style="color:#333;text-align:left">
           <!-- <Icon type="ios-information-circle"></Icon> -->
           <span>添加{{addName}}产品</span>
@@ -39,6 +39,9 @@
             </FormItem>
             <FormItem label="主控码" prop="masterCode">
               <Input v-model="formMaster.masterCode" placeholder="请输入主控码" style="" />
+            </FormItem>
+            <FormItem label="验证码" prop="randomCode">
+              <Input v-model="formMaster.randomCode" placeholder="请输入验证码" style="" />
             </FormItem>
           </Form>
       </div>
@@ -59,7 +62,7 @@ import {send} from '../../util/send'
 import NoData from '../NoData.vue'
 export default {
   name: 'AllEquipment',
-  props: ['curHomeId', 'addName', 'addKind'],
+  props: ['curHomeId', 'addName', 'addKind', 'addKindId'],
   data () {
     return {
       btLoading: false,
@@ -68,7 +71,8 @@ export default {
       addMasterList: [],
       formMaster: {
         masterCode: '',
-        masterName: ''
+        masterName: '',
+        randomCode: ''
         // selectName: ''
       },
       ruleValidate: {
@@ -77,6 +81,9 @@ export default {
         ],
         masterCode: [
           { required: true, message: '主控码不能为空！', trigger: 'change' }
+        ],
+        randomCode: [
+          { required: true, message: '验证码不能为空！', trigger: 'change' }
         ]
       }
     }
@@ -126,18 +133,26 @@ export default {
           this.sureModify(MasterControlId)
         },
         render: (h) => {
-          return h('Input', {
-            props: {
-              value: this.newMasterControlName === '' ? MasterControlName : this.newMasterControlName,
-              autofocus: true,
-              placeholder: '请输入新的主控名称...'
-            },
-            on: {
-              input: (val) => {
-                this.newMasterControlName = val
+          return h('div', [
+            h('h4', {
+              style: {
+                marginBottom: '10px'
               }
-            }
-          })
+
+            }, '新名称'),
+            h('Input', {
+              props: {
+                value: this.newMasterControlName === '' ? MasterControlName : this.newMasterControlName,
+                autofocus: true,
+                placeholder: '请输入新的主控名称...'
+              },
+              on: {
+                input: (val) => {
+                  this.newMasterControlName = val
+                }
+              }
+            })
+          ])
         }
       })
     },
@@ -272,7 +287,7 @@ export default {
       // this.toggleSpin(true)
       this.btLoading = true
       send({
-        name: '/mainControl?home_id=' + this.curHomeId + '&main_control_name=' + this.formMaster.masterName + '&main_control_code=' + this.formMaster.masterCode + '&main_control_type=' + this.addKind,
+        name: '/mainControl?home_id=' + this.curHomeId + '&main_control_name=' + this.formMaster.masterName + '&main_control_code=' + this.formMaster.masterCode + '&main_control_type=' + this.addKind + '&device_type_id=' + this.addKindId + '&randomCode=' + this.formMaster.randomCode,
         method: 'POST',
         data: {
           // home_id: this.curHomeId,
@@ -303,7 +318,7 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style scoped lang="less">
 .ListBox{
   margin: 40px 0;
   img{
