@@ -13,7 +13,7 @@
               <Layout class="mainContent">
                 <!-- <Content :style="{margin: '0', background: '#2d8cf0', overflowX: 'hidden', overflowY: 'scroll'}"> -->
                 <Content :style="{margin: '0', overflowX: 'hidden', overflowY: 'scroll',background:curTab == 0 ? '#d2691e': (curTab == 1 ? '#8a2be2': '#2b85e4')}">
-                  <p @click="ToLogout" class='ColorWhite CursorPointer TextAlignR PaddingTB_10 PaddingR_16'>{{accountPhone}} | 退出</p>
+                  <p class='ColorWhite TextAlignR PaddingTB_10 PaddingR_16'>{{accountPhone}} | <span class="CursorPointer" @click="ToLogout">退出</span></p>
                   <Row type="flex" justify="start" class="code-row-bg" style="width: 100%;height: 60px;">
                     <Col span="4"><h1 v-if="curTab == 1">当前家</h1></Col>
                     <Col span="8">

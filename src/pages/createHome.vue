@@ -3,12 +3,25 @@
     <div class="glass" :style="{minHeight: windowHeight + 'px'}"></div>
 	  <div class="homeBox">
 			<div class="formBox">
-				<Form :model="homeinfo" label-position="left" :label-width="100">
+				<Form :model="homeinfo" label-position="left" :label-width="80">
 	        <FormItem label="家庭名称">
 	          <Input v-model="homeinfo.name"></Input>
 	        </FormItem>
 	        <FormItem label="家庭地址">
-	            <Input v-model="homeinfo.address"></Input>
+	            <!-- <Input v-model="homeinfo.address"></Input> -->
+              <!-- <Cascader :data="data4" :load-data="loadData"></Cascader> -->
+              <span style="padding-right: 5px;">省</span>
+              <Select v-model="provinceId" size="small" style="width:100px" @on-change="changeProvince">
+                <Option v-for="item in provinceList" :value="item.provinceId" :key="item.provinceId">{{ item.provinceName }}</Option>
+              </Select>
+              <span style="padding: 0 5px;">市</span>
+              <Select v-model="cityId" size="small" style="width:100px" @on-change="changeCity">
+                <Option v-for="item in cityList" :value="item.cityId" :key="item.cityName">{{ item.cityName }}</Option>
+              </Select>
+              <span v-if="hasDistrict" style="padding: 0 5px;">区</span>
+              <Select v-if="hasDistrict" v-model="district" size="small" style="width:100px" @on-change="changeDistrict">
+                <Option v-for="item in districtList" :value="item.districtName" :key="item.districtName">{{ item.districtName }}</Option>
+              </Select>
 	        </FormItem>
 	        <Row class="tipsTit">
 		        <Col span="8">在哪些房间有智能设备</Col>
@@ -45,7 +58,16 @@ export default {
       newRommName: '',
   		defaultRoomList: [],
   		choosedRoom: [],
-  		roomsFormat: []
+  		roomsFormat: [],
+      hasDistrict: true,
+      province: '',
+      provinceId: '',
+      provinceList: [],
+      city: '',
+      cityId: '',
+      cityList: [],
+      district: '',
+      districtList: []
   	}
   },
   watch: {
@@ -61,6 +83,7 @@ export default {
     this.windowHeight = document.body.clientHeight
     // this.windowHeight = window.innerHeight
     this.getDefaultRooms()
+    this.getProvinceList()
   },
   computed: {
     ...mapState({
@@ -71,6 +94,72 @@ export default {
     ...mapActions([
       'changeCurHome'
     ]),
+    changeProvince (ID) {
+      this.provinceList.filter(item => {
+        if (item.provinceId === ID) {
+          this.province = item.provinceName
+          this.homeinfo.address = item.provinceName
+        }
+      })
+      this.cityId = ''
+      this.city = ''
+      this.district = ''
+      this.getCityList(ID)
+    },
+    changeCity (ID) {
+      this.cityList.filter(item => {
+        if (item.cityId === ID) {
+          this.city = item.cityName
+          this.homeinfo.address = this.province + item.cityName
+        }
+      })
+      this.district = ''
+      this.getDistrictList(ID)
+    },
+    changeDistrict (District) {
+      this.homeinfo.address = this.province + this.city + District
+    },
+    getProvinceList () {
+      send({
+        name: '/provinceList',
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        this.provinceList = _res.data.provinceList
+      }).catch((res) => {
+        this.$Message.error('Interface Error!')
+      })
+    },
+    getCityList (provinceId) {
+      send({
+        name: '/cityList?provinceId=' + provinceId,
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        this.cityList = _res.data.cityList
+      }).catch((res) => {
+        this.$Message.error('Interface Error!')
+      })
+    },
+    getDistrictList (cityId) {
+      send({
+        name: '/districtList?cityId=' + cityId,
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        this.districtList = _res.data.districtList
+        if (_res.data.districtList.length === 0) {
+          this.hasDistrict = false
+        } else {
+          this.hasDistrict = true
+        }
+      }).catch((res) => {
+        this.$Message.error('Interface Error!')
+      })
+    },
   	getDefaultRooms () {
   		send({
         name: '/house_default',
@@ -90,15 +179,19 @@ export default {
   	},
   	createHome () {
   		if (!this.homeinfo.name || this.homeinfo.name.trim() === '') {
-  			this.$Message.error('家庭名称不能为空')
+  			this.$Message.error('家庭名称不能为空！')
   			return false
   		}
-  		if (!this.homeinfo.address || this.homeinfo.address.trim() === '') {
-  			this.$Message.error('家庭地址不能为空')
+  		if (this.provinceId === '' || this.cityId === '' || this.homeinfo.address.trim() === '') {
+  			this.$Message.error('家庭地址不完整！')
   			return false
   		}
+      if (this.districtList.length > 0 && this.district.trim() === '') {
+        this.$Message.error('家庭地址不完整！')
+        return false
+      }
   		if (this.roomsFormat.length === 0) {
-  			this.$Message.error('至少选择一个房间')
+  			this.$Message.error('至少选择一个房间！')
   			return false
   		}
   		send({
@@ -164,18 +257,26 @@ export default {
         	this.choosedRoom = [...this.choosedRoom, this.newRommName]
         },
         render: (h) => {
-          return h('Input', {
-            props: {
-              value: this.newRommName,
-              autofocus: true,
-              placeholder: '请输入房间名称...'
-            },
-            on: {
-              input: (val) => {
-                this.newRommName = val
+          return h('div', [
+            h('h4', {
+              style: {
+                marginBottom: '10px'
               }
-            }
-          })
+
+            }, '房间名称'),
+            h('Input', {
+              props: {
+                value: this.newRommName,
+                autofocus: true,
+                placeholder: '请输入房间名称...'
+              },
+              on: {
+                input: (val) => {
+                  this.newRommName = val
+                }
+              }
+            })
+          ])
         }
       })
     }
@@ -196,7 +297,7 @@ export default {
     -webkit-filter: blur(2px);
   }
 	.homeBox{
-    width: 500px;
+    width: 550px;
     position: relative;
     top: 50px;
     left: 0;
@@ -224,9 +325,9 @@ export default {
 	    left:0px;
 		}
 		.formBox{
-			width: 450px;
-			height: 400px;
-			padding: 80px 20px 0 20px;
+			width: 500px;
+			height: 444px;
+			padding: 100px 20px 0 20px;
 			margin: 0 auto;
 			box-shadow: 0px 0px 10px #ccc;
 			background: #fff;

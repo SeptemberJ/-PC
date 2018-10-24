@@ -24,7 +24,7 @@ html, body{
 	text-align: right;
 }
 .ColorRed{
-	color: red !important;
+	color: #f16643 !important;
 }
 .ColorGray{
 	color: #ccc;
@@ -52,6 +52,12 @@ html, body{
 }
 .MarginB_10{
 	margin-bottom: 10px !important;
+}
+.MarginL_10{
+	margin-left: 10px !important;
+}
+.MarginB_20{
+	margin-bottom: 20px !important;
 }
 .MarginT_30{
 	margin-top: 30px !important;
@@ -117,6 +123,9 @@ html, body{
 .ivu-breadcrumb>span:last-child{
   color: #fff !important;
 }
+.ivu-radio-large .ivu-radio-wrapper, .ivu-radio-large.ivu-radio-wrapper{
+	font-size: 14px !important;
+}
 /*spin*/
 .ivu-spin-fix{
 	background: transparent!important;
@@ -129,4 +138,14 @@ html, body{
 }
 .ivu-spin-fix .ivu-spin-main i{
 	font-size: 20px !important;
+}
+/*modal*/
+.ivu-modal-body{
+	padding: 16px 30px !important;
+}
+.ivu-modal-header p{
+	font-size: 18px !important;
+}
+.ivu-form .ivu-form-item-label{
+	font-weight: bold !important;
 }

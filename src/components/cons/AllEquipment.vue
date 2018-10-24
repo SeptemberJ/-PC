@@ -6,11 +6,16 @@
           <Card style="width: 90%;margin:0 auto 30px auto;">
             <div style="text-align:left">
               <Row>
-                <Col span="8" class="CursorPointer eqIcon"><img @click="showCharts(EQ)" :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'"></Col>
+                <Col span="8" class="eqIcon">
+                  <img v-if="EQ.default_device_type != 'HAir(有线)'" :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'">
+                  <img v-if="EQ.default_device_type == 'HAir(有线)'" class="CursorPointer"  @click="showCharts(EQ)" :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'">
+                </Col>
                 <Col span="16">
-                  <h4 class="CursorPointer" @click="showCharts(EQ)">{{EQ.device_name}}</h4>
-                  <p>状态: {{EQ.type == 0 ? '离线' : '在线'}}</p>
+                  <h4 v-if="EQ.default_device_type == 'HAir(有线)'" class="CursorPointer" @click="showCharts(EQ)">{{EQ.device_name}}</h4>
+                  <h4 v-if="EQ.default_device_type != 'HAir(有线)'">{{EQ.device_name}}</h4>
                   <p>位置: {{EQ.house_name}} </p>
+                  <p v-if="EQ.default_device_type == 'HAir(有线)'">状态: {{EQ.type == 0 ? '离线' : '在线'}}</p>
+                  <p v-if="EQ.default_device_type != 'HAir(有线)'"></p>
                   <Row class="operationIcon">
                     <Col span="24">
                       <img class="iconImg" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
@@ -73,7 +78,7 @@
           <span>添加设备</span>
       </p>
       <div style="text-align:left">
-         <Row  class="MarginB_10">
+         <Row  class="MarginB_20">
           <Col span="24">
             <RadioGroup v-model="EqType">
               <Radio label="无线设备"></Radio>
@@ -198,6 +203,7 @@ export default {
   props: ['curHomeId', 'AddList', 'MasterControlList', 'deviceTypeList'],
   data () {
     return {
+      timer: '',
       btLoading: false,
       moveDestination: '',
       moveDestinationId: '',
@@ -675,6 +681,7 @@ export default {
             } else { // 开关操作
               // 页面上更新开关状态
               if (_res.data.result.payload === '00') {
+                clearInterval(this.timer)
                 this.getAllEq('', eqItem, eqIdx)
                 // console.log(this.EqList[eqIdx].device_status)
                 // console.log(switchStatus)
@@ -743,7 +750,10 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
-            setTimeout(() => { this.EqPlay('switch', eqItem, sendCurCns, 'ControlAck', eqItem.device_status === '0' ? 1 : 0, eqIdx) }, 3000)
+            this.timer = setInterval(() => {
+              this.EqPlay('switch', eqItem, sendCurCns, 'ControlAck', eqItem.device_status === '0' ? 1 : 0, eqIdx)
+            }, 1000)
+            // setTimeout(() => { this.EqPlay('switch', eqItem, sendCurCns, 'ControlAck', eqItem.device_status === '0' ? 1 : 0, eqIdx) }, 3000)
             break
           case 0:
             this.$Message.error('Interface Error1!')
@@ -1143,6 +1153,8 @@ export default {
     height: 60px;
   }
   p{
+    height: 25px;
+    line-height: 25px;
     color: #333;
   }
   span{

@@ -39,14 +39,16 @@
                 <Col span="11">
                     <div class="nametext">
                         <p class="name"><b>{{item.home_name}}</b></p>
-                        <p class="printroom" style="margin-top:5px;" @click="editroom(item.home_id)">房间&nbsp;{{item.houseListcount}}</p>
-                        <p class="printroom" @click="editmenbers(item.home_id,item.register_id,item.ismanager)">成员&nbsp;{{item.menberListcount}}</p>
+                        <p class="printroom CursorPointer" v-if="item.isCreater" style="margin-top:5px;" @click="editroom(item.home_id, item.isCreater)">房间&nbsp;{{item.houseListcount}}</p>
+                        <p class="printroom2" v-if="!item.isCreater" style="margin-top:5px;">房间&nbsp;{{item.houseListcount}}</p>
+                        <p class="printroom CursorPointer" v-if="item.isCreater" @click="editmenbers(item.home_id, item.register_id, item.ismanager, item.isCreater)">成员&nbsp;{{item.menberListcount}}</p>
+                         <p class="printroom2" v-if="!item.isCreater">成员&nbsp;{{item.menberListcount}}</p>
                     </div>
                 </Col>
                 <Col span="6">
                     <div class="buttonlist" style="">
-                        <Button type="primary" class="button1"  @click="houseedit(item.home_id,item.isdefault)">编辑</Button>
-                        <Button type="primary" ghost class="button1" @click="housedel(item.home_id,item.register_id)">删除</Button>
+                        <Button :disabled="!item.isCreater" type="primary" class="button1"  @click="houseedit(item.home_id,item.isdefault)">编辑</Button>
+                        <Button :disabled="!item.isCreater" type="primary" ghost class="button1" @click="housedel(item.home_id,item.register_id)">删除</Button>
                     </div>
                 </Col>
             </div>
@@ -56,22 +58,34 @@
     <NoData v-if="homelist.length == 0"/>
     <!-- 列表结束 -->
     <!-- 添加家 -->
-    <Modal v-model="ifAddHome" scrollable width="460">
+    <Modal v-model="ifAddHome" scrollable width="520">
       <p slot="header" style="color:#333;text-align:left">
           <!-- <Icon type="ios-information-circle"></Icon> -->
           <span>添加家</span>
       </p>
       <div style="text-align:left">
-        <Form :model="homeinfo" label-position="left" :label-width="100">
+        <Form :model="homeinfo" label-position="left" :label-width="80">
           <FormItem label="家庭名称">
             <Input v-model="homeinfo.name" placeholder="请输入家的名称"></Input>
           </FormItem>
           <FormItem label="家庭地址">
-              <Input v-model="homeinfo.address" placeholder="请输入家的地址"></Input>
+              <!-- <Input v-model="homeinfo.address" placeholder="请输入家的地址"></Input> -->
+              <span style="padding-right: 5px;">省</span>
+              <Select v-model="provinceId" size="small" style="width:100px" @on-change="changeProvince">
+                <Option v-for="item in provinceList" :value="item.provinceId" :key="item.provinceId">{{ item.provinceName }}</Option>
+              </Select>
+              <span style="padding: 0 5px;">市</span>
+              <Select v-model="cityId" size="small" style="width:100px" @on-change="changeCity">
+                <Option v-for="item in cityList" :value="item.cityId" :key="item.cityName">{{ item.cityName }}</Option>
+              </Select>
+              <span v-if="hasDistrict" style="padding: 0 5px;">区</span>
+              <Select v-if="hasDistrict" v-model="district" size="small" style="width:100px" @on-change="changeDistrict">
+                <Option v-for="item in districtList" :value="item.districtName" :key="item.districtName">{{ item.districtName }}</Option>
+              </Select>
           </FormItem>
           <Row class="tipsTit">
             <Col span="8">在哪些房间有智能设备</Col>
-            <Col span="8" offset="8" class="TextAlignR CursorPointer"><span @click="addOtherRoom">添加其他房间</span></Col>
+            <Col span="8" offset="8" class="TextAlignR CursorPointer ColorRed"><span @click="addOtherRoom"><Icon type="md-add-circle" />添加其他房间</span></Col>
           </Row>
           <Row>
             <Col span="24">
@@ -135,7 +149,7 @@
         title="删除家"
         @on-ok="surehousedelall"
         @on-cancel="cancel">
-        <p>改操作会将该家下面的房间、设备以及成员信息都删除，确认删除？</p>
+        <p>该操作会将该家下面的房间、设备以及成员信息都删除，确认删除？</p>
     </Modal>
     <Modal
         v-model="modal8"
@@ -148,14 +162,33 @@
         v-model="homename"
         title="家信息"
         @on-ok="sureedithouse"
-        @on-cancel="cancel">
+        @on-cancel="cancel"
+        width="550"
+        >
         <div>
             <Form ref="form" :model="form">
                 <FormItem prop="fname" label="家名字">
                     <Input style="width:60%" type="text" v-model="form.fname" placeholder="家名"></Input>
                 </FormItem>
                 <FormItem prop="faddress" label="家地址">
-                    <Input style="width:60%" type="text" v-model="form.faddress" placeholder="家地址"></Input>
+                  <span>{{form.faddress}}</span>
+                  <span @click="toChangeAddress" class="MarginL_10 CursorPointer ColorRed Bold" >编辑</span>
+                </FormItem>
+                <FormItem v-if="ifChangeAddress"  prop="faddress" label="新地址">
+                  <span style="padding-right: 5px;">省</span>
+                  <Select v-model="provinceId" size="small" style="width:100px" @on-change="changeProvince">
+                    <Option v-for="item in provinceList" :value="item.provinceId" :key="item.provinceId">{{ item.provinceName }}</Option>
+                  </Select>
+                  <span style="padding: 0 5px;">市</span>
+                  <Select v-model="cityId" size="small" style="width:100px" @on-change="changeCity">
+                    <Option v-for="item in cityList" :value="item.cityId" :key="item.cityName">{{ item.cityName }}</Option>
+                  </Select>
+                  <span v-if="hasDistrict" style="padding: 0 5px;">区</span>
+                  <Select v-if="hasDistrict" v-model="district" size="small" style="width:100px" @on-change="changeDistrict">
+                    <Option v-for="item in districtList" :value="item.districtName" :key="item.districtName">{{ item.districtName }}</Option>
+                  </Select>
+                  <span @click="cancelChangeAddress" class="MarginL_10 CursorPointer ColorRed Bold">取消</span>
+                   <!--  <Input style="width:60%" type="text" v-model="form.faddress" placeholder="家地址"></Input> -->
                 </FormItem>
             </Form>
         </div>
@@ -306,7 +339,18 @@ export default {
       newRommName: '',
       defaultRoomList: [],
       choosedRoom: [],
-      roomsFormat: []
+      roomsFormat: [],
+      hasDistrict: true,
+      province: '',
+      provinceId: '',
+      provinceList: [],
+      city: '',
+      cityId: '',
+      cityList: [],
+      district: '',
+      districtList: [],
+      // edit
+      ifChangeAddress: false
     }
   },
   computed: {
@@ -319,6 +363,7 @@ export default {
   created: function () {
     this.gethomelistinfo()
     this.getDefaultRooms()
+    this.getProvinceList()
   },
   watch: {
     choosedRoom (curVal, oldVal) {
@@ -327,6 +372,11 @@ export default {
         temp.push({'house_name': name})
       })
       this.roomsFormat = temp
+    },
+    homename (curVal, oldVal) {
+      if (!curVal) {
+        this.ifChangeAddress = false
+      }
     }
   },
   components: {
@@ -484,10 +534,30 @@ export default {
     },
     // xiugai jia xinxi
     sureedithouse () {
-      axios.put(encodeURI(this.$store.state.home.app_URL + 'home?id=' + this.home_id + '&home_name=' + this.form.fname + '&faddress=' + this.form.faddress + '&isdefault=' + this.isdefault + '&register_id=' + this.register_id + '&timestamp=' + Date.now())
+      if (this.form.fname.trim() === '') {
+        this.$Message.error('请输入家名称！')
+        return false
+      }
+      if (this.ifChangeAddress) {
+        if (this.provinceId == '' || this.cityId == '' || this.homeinfo.address.trim() === '') {
+          this.$Message.error('家庭地址不完整！')
+          return false
+        }
+        if (this.districtList.length >0 && this.district.trim() === '') {
+          this.$Message.error('家庭地址不完整！')
+          return false
+        }
+      }
+      axios.put(encodeURI(this.$store.state.home.app_URL + 'home?id=' + this.home_id + '&home_name=' + this.form.fname + '&faddress=' + (this.ifChangeAddress ? this.homeinfo.address : this.form.faddress) + '&isdefault=' + this.isdefault + '&register_id=' + this.register_id + '&timestamp=' + Date.now())
       ).then((res) => {
         if (res.data.code == 1){
           this.$Message.success('修改成功!')
+          this.hasDistrict = true
+          this.province = ''
+          this.provinceId = ''
+          this.city = ''
+          this.cityId = ''
+          this.district = ''
           axios.get(encodeURI(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id + '&timestamp=' + Date.now())
           ).then((res) => {
               if (res.data.code ==1 ){
@@ -507,7 +577,7 @@ export default {
     housedel (home_id,register_id) {
       this.modal4 = true
       this.home_id = {home_id}.home_id
-      this.register_id = {register_id}.register_id
+      // this.register_id = {register_id}.register_id
       // console.log(this.home_id)
     },
     deletehousemember (id,ismanager) {
@@ -516,27 +586,30 @@ export default {
       this.modal8 = true
     },
     surehousedelall () {
-      axios.delete(encodeURI(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id + '&home_id=' + this.home_id + '&timestamp=' + Date.now())
+      axios.delete(encodeURI(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id + '&home_id=' + this.home_id
+ + '&timestamp=' + Date.now())
       ).then((res) => {
-        axios.get(encodeURI(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid + '&timestamp=' + Date.now())
-      ).then((res) => {
-          if (res.data.code ==1 ){
-              if (res.data.homeList.length == 0){
-                  this.$Message.warning('暂无数据!')//here
-              }else{
-                  this.fnamelist = res.data.homeList
-                  this.adminid = this.fnamelist[0].id
-                  // this.$Message.success('加载成功!')
-              }
-          }else{
-          this.$Message.error('加载失败!')
-          }
-      })
+        this.gethomelistinfo()
+      //   axios.get(encodeURI(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid + '&timestamp=' + Date.now())
+      // ).then((res) => {
+      //     if (res.data.code ==1 ){
+      //         if (res.data.homeList.length == 0){
+      //             this.$Message.warning('暂无数据!')//here
+      //         }else{
+      //             this.fnamelist = res.data.homeList
+      //             this.adminid = this.fnamelist[0].id
+      //             // this.$Message.success('加载成功!')
+      //         }
+      //     }else{
+      //     this.$Message.error('加载失败!')
+      //     }
+      // })
       })
     },
     // 删除家或家庭成员
     surehousedel () {
-      axios.delete(encodeURI(this.$store.state.home.app_URL + 'home?register_id=' + this.memberid + '&home_id=' + this.home_id + '&timestamp=' + Date.now())
+      axios.delete(encodeURI(this.$store.state.home.app_URL + 'home?register_id=' + this.memberid + '&home_id=' + this.homeid
+ + '&timestamp=' + Date.now())
       ).then((res) => {
         console.log(res)
         axios.get(encodeURI(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid + '&timestamp=' + Date.now())
@@ -600,17 +673,22 @@ export default {
                         // this.$Message.success('加载成功!')
                         // 循环Homelist 取id
                         for (let j = 0, lenJ = temp.length; j < lenJ; ++j) {
-                            axios.get(encodeURI(this.$store.state.home.app_URL + 'house?home_id=' + temp[j].home_id + '&timestamp=' + Date.now())
-                            ).then((res) => {
-                                if (res.data.code ==1 ){
-                                    temp[j].houseListcount = res.data.houseList.length
-                                    if (j === lenJ - 1) {
-                                        resolve(temp)
-                                    }
-                                }else{
-                                this.$Message.error('加载房间失败!')
-                                }
-                            })
+                          if (temp[j].register_id === this.register_id) {
+                            temp[j].isCreater = true
+                          } else {
+                            temp[j].isCreater = false
+                          }
+                          axios.get(encodeURI(this.$store.state.home.app_URL + 'house?home_id=' + temp[j].home_id + '&timestamp=' + Date.now())
+                          ).then((res) => {
+                              if (res.data.code ==1 ){
+                                  temp[j].houseListcount = res.data.houseList.length
+                                  if (j === lenJ - 1) {
+                                      resolve(temp)
+                                  }
+                              }else{
+                              this.$Message.error('加载房间失败!')
+                              }
+                          })
                         }
                     }
                 }else{
@@ -625,9 +703,10 @@ export default {
       dataM.map((item, idx) => {
           dataR[idx].menberListcount = item.menberListcount
       })
-      console.log('dataR------------------')
-      console.log(dataR)
+      console.log('dataM------------------')
+      console.log(dataM)
       this.homelist = dataR
+      console.log(this.homelist)
     },
     edit () {
       console.log(2222111)
@@ -697,7 +776,7 @@ export default {
         })
     },
     // 获取房间列表
-    editroom (home_id) {
+    editroom (home_id, isCreater) {
       this.show = false
       this.cardshow = true
       console.log({home_id})
@@ -847,17 +926,87 @@ export default {
         this.$Message.error('Interface Error!')
       })
     },
+    changeProvince (ID) {
+      this.provinceList.filter(item => {
+        if (item.provinceId === ID) {
+          this.province = item.provinceName
+          this.homeinfo.address = item.provinceName
+        }
+      })
+      this.cityId = ''
+      this.city = ''
+      this.district = ''
+      this.getCityList(ID)
+    },
+    changeCity (ID) {
+      this.cityList.filter(item => {
+        if (item.cityId === ID) {
+          this.city = item.cityName
+          this.homeinfo.address = this.province + item.cityName
+        }
+      })
+      this.district = ''
+      this.getDistrictList(ID)
+    },
+    changeDistrict (District) {
+      this.homeinfo.address = this.province + this.city + District
+    },
+    getProvinceList () {
+      send({
+        name: '/provinceList',
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        this.provinceList = _res.data.provinceList
+      }).catch((res) => {
+        this.$Message.error('Interface Error!')
+      })
+    },
+    getCityList (provinceId) {
+      send({
+        name: '/cityList?provinceId=' + provinceId,
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        this.cityList = _res.data.cityList
+      }).catch((res) => {
+        this.$Message.error('Interface Error!')
+      })
+    },
+    getDistrictList (cityId) {
+      send({
+        name: '/districtList?cityId=' + cityId,
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        this.districtList = _res.data.districtList
+        if (_res.data.districtList.length === 0) {
+          this.hasDistrict = false
+        } else {
+          this.hasDistrict = true
+        }
+      }).catch((res) => {
+        this.$Message.error('Interface Error!')
+      })
+    },
     createHome () {
       if (!this.homeinfo.name || this.homeinfo.name.trim() === '') {
-        this.$Message.error('家庭名称不能为空')
+        this.$Message.error('家庭名称不能为空！')
         return false
       }
-      if (!this.homeinfo.address || this.homeinfo.address.trim() === '') {
-        this.$Message.error('家庭地址不能为空')
+      if (this.provinceId == '' || this.cityId == '' || this.homeinfo.address.trim() === '') {
+        this.$Message.error('家庭地址不完整！')
+        return false
+      }
+      if (this.districtList.length >0 && this.district.trim() === '') {
+        this.$Message.error('家庭地址不完整！')
         return false
       }
       if (this.roomsFormat.length === 0) {
-        this.$Message.error('至少选择一个房间')
+        this.$Message.error('至少选择一个房间！')
         return false
       }
       send({
@@ -876,6 +1025,12 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
+            this.hasDistrict = true
+            this.province = ''
+            this.provinceId = ''
+            this.city = ''
+            this.cityId = ''
+            this.district = ''
             this.gethomelistinfo()
             this.ifAddHome = false
             // this.updateCurHome(_res.data.home_id)
@@ -923,33 +1078,48 @@ export default {
           this.choosedRoom = [...this.choosedRoom, this.newRommName]
         },
         render: (h) => {
-          return h('Input', {
-            props: {
-              value: this.newRommName,
-              autofocus: true,
-              placeholder: '请输入房间名称...'
-            },
-            on: {
-              input: (val) => {
-                this.newRommName = val
+          return h('div', [
+            h('h4', {
+              style: {
+                marginBottom: '10px'
               }
-            }
-          })
+
+            }, '房间名称'),
+            h('Input', {
+              props: {
+                value: this.newRommName,
+                autofocus: true,
+                placeholder: '请输入房间名称...'
+              },
+              on: {
+                input: (val) => {
+                  this.newRommName = val
+                }
+              }
+            })
+          ])
         }
       })
+    },
+    toChangeAddress () {
+      this.ifChangeAddress = true
+    },
+    cancelChangeAddress () {
+      this.ifChangeAddress = false
     }
   }
 }
 </script>
 <style scoped>
 .homeManage{
-  margin: 20px 0;
+  margin: -30px 0 0 20px;
 }
 .homeManage h1{
   color: #fff;
 }
 .tipsTit{
   margin-bottom: 15px;
+  font-weight: bold;
 }
 .list{
     width: 100%;
@@ -979,7 +1149,7 @@ export default {
     font-size: 14px
 }
 .name:hover{
-    font-size: 15px
+    /*font-size: 15px*/
 }
 p{
     font-size: 16px
@@ -1023,9 +1193,8 @@ p{
   margin:5px;
   font-size: 14px;
 }
-.printroom{
+.printroom, .printroom2{
   font-size:13px;
-  cursor:pointer
 }
 .printroom:hover{
   color:  #2d8cf0;
