@@ -6,6 +6,7 @@
     <EquipmentByKind :curHomeId="curHomeId" v-if="curMenuText === '按类别分类'"/>
     <FeedBack v-if="curMenuText === '意见反馈'"/>
     <Problem v-if="curMenuText === '常见问题'"/>
+    <Article v-if="curMenuText === '适玩'"/>
     <SPIN v-if="ifSpin"/>
   </div>
 </template>
@@ -19,6 +20,7 @@ import EquipmentByRoom from './cons/EquipmentByRoom.vue'
 import EquipmentByKind from './cons/EquipmentByKind/EquipmentByKind.vue'
 import FeedBack from './cons/FeedBack.vue'
 import Problem from './cons/Problem.vue'
+import Article from './cons/Article/articleList.vue'
 import SPIN from './Spin.vue'
 export default {
   name: 'Content',
@@ -50,6 +52,7 @@ export default {
     EquipmentByKind,
     FeedBack,
     Problem,
+    Article,
     SPIN
   },
   created () {

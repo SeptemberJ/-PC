@@ -28,6 +28,7 @@ export default {
   margin-left: -34px;
   img{
     width: 80px;
+    height: 52.4px;
   }
   p{
     font-size: 22px;

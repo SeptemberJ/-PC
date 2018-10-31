@@ -20,11 +20,18 @@ const state = {
       ]
     },
     {
-      'tit': '设置',
+      'tit': '智能设定',
+      'menu': [
+        {'icon': 'ios-bulb', 'text': '自动化'},
+        {'icon': 'md-cloudy-night', 'text': '场景'}
+      ]
+    },
+    {
+      'tit': '个人中心',
       'menu': [
         {'icon': 'ios-mail', 'text': '意见反馈'},
-        // {'icon': 'md-cloud-upload', 'text': '固件升级'},
-        {'icon': 'md-help', 'text': '常见问题'}
+        {'icon': 'md-help', 'text': '常见问题'},
+        {'icon': 'ios-paper', 'text': '适玩'}
       ]
     }
   ]
@@ -57,7 +64,6 @@ const actions = {
 }
 
 // mutations
-
 const mutations = {
   setCurTab (state, CURTAB) {
     state.curTab = CURTAB

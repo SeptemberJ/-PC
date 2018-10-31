@@ -58,7 +58,7 @@
     <NoData v-if="homelist.length == 0"/>
     <!-- 列表结束 -->
     <!-- 添加家 -->
-    <Modal v-model="ifAddHome" scrollable width="520">
+    <Modal v-model="ifAddHome" scrollable width="850">
       <p slot="header" style="color:#333;text-align:left">
           <!-- <Icon type="ios-information-circle"></Icon> -->
           <span>添加家</span>
@@ -71,15 +71,15 @@
           <FormItem label="家庭地址">
               <!-- <Input v-model="homeinfo.address" placeholder="请输入家的地址"></Input> -->
               <span style="padding-right: 5px;">省</span>
-              <Select v-model="provinceId" size="small" style="width:100px" @on-change="changeProvince">
+              <Select v-model="provinceId" style="width:150px" @on-change="changeProvince">
                 <Option v-for="item in provinceList" :value="item.provinceId" :key="item.provinceId">{{ item.provinceName }}</Option>
               </Select>
               <span style="padding: 0 5px;">市</span>
-              <Select v-model="cityId" size="small" style="width:100px" @on-change="changeCity">
+              <Select v-model="cityId" style="width:150px" @on-change="changeCity">
                 <Option v-for="item in cityList" :value="item.cityId" :key="item.cityName">{{ item.cityName }}</Option>
               </Select>
               <span v-if="hasDistrict" style="padding: 0 5px;">区</span>
-              <Select v-if="hasDistrict" v-model="district" size="small" style="width:100px" @on-change="changeDistrict">
+              <Select v-if="hasDistrict" v-model="district" style="width:150px" @on-change="changeDistrict">
                 <Option v-for="item in districtList" :value="item.districtName" :key="item.districtName">{{ item.districtName }}</Option>
               </Select>
           </FormItem>
@@ -163,7 +163,7 @@
         title="家信息"
         @on-ok="sureedithouse"
         @on-cancel="cancel"
-        width="550"
+        width="850"
         >
         <div>
             <Form ref="form" :model="form">
@@ -176,15 +176,15 @@
                 </FormItem>
                 <FormItem v-if="ifChangeAddress"  prop="faddress" label="新地址">
                   <span style="padding-right: 5px;">省</span>
-                  <Select v-model="provinceId" size="small" style="width:100px" @on-change="changeProvince">
+                  <Select v-model="provinceId" size="" style="width:150px" @on-change="changeProvince">
                     <Option v-for="item in provinceList" :value="item.provinceId" :key="item.provinceId">{{ item.provinceName }}</Option>
                   </Select>
                   <span style="padding: 0 5px;">市</span>
-                  <Select v-model="cityId" size="small" style="width:100px" @on-change="changeCity">
+                  <Select v-model="cityId" size="" style="width:150px" @on-change="changeCity">
                     <Option v-for="item in cityList" :value="item.cityId" :key="item.cityName">{{ item.cityName }}</Option>
                   </Select>
                   <span v-if="hasDistrict" style="padding: 0 5px;">区</span>
-                  <Select v-if="hasDistrict" v-model="district" size="small" style="width:100px" @on-change="changeDistrict">
+                  <Select v-if="hasDistrict" v-model="district" size="" style="width:150px" @on-change="changeDistrict">
                     <Option v-for="item in districtList" :value="item.districtName" :key="item.districtName">{{ item.districtName }}</Option>
                   </Select>
                   <span @click="cancelChangeAddress" class="MarginL_10 CursorPointer ColorRed Bold">取消</span>
@@ -1071,11 +1071,50 @@ export default {
         this.$Message.error('Interface Error!')
       })
     },
+    // 过滤
+    filterSingle () {
+      return new Promise((resolve, reject) => {
+        // this.defaultRoomList.filter(room => {
+        //   if (room.dhouse_name === this.newRommName) {
+        //     alert(room.dhouse_name + '---' + this.newRommName)
+        //     return (true)
+        //   }
+        // })
+        alert('kk')
+        resolve('hahhaha')
+      })
+    },
     addOtherRoom () {
       this.$Modal.confirm({
         onOk: () => {
-          this.defaultRoomList = [...this.defaultRoomList, {'dhouse_name': this.newRommName}]
-          this.choosedRoom = [...this.choosedRoom, this.newRommName]
+          let ifHased = false
+          this.defaultRoomList.filter(room => {
+            if (room.dhouse_name === this.newRommName) {
+              ifHased = true
+            }
+          })
+          // let fn = () => {
+          //   return new Promise((resolve, reject) => {
+          //     this.defaultRoomList.filter(room => {
+          //       if (room.dhouse_name === this.newRommName) {
+          //         ifHased = true
+          //       }
+          //     })
+          //     resolve(ifHased)
+          //   })
+          // }
+          // let  hased  = fn().then(function(_res) {
+          //   console.log('_res---' + _res)
+          //   return _res
+          // })
+          // // async fn().then(function(_res) {console.log('_res---' + _res)})
+          // console.log(hased)
+          if (ifHased) {
+            this.$Message.warning('该房间名称已存在！')
+          } else {
+            this.defaultRoomList = [...this.defaultRoomList, {'dhouse_name': this.newRommName}]
+            this.choosedRoom = [...this.choosedRoom, this.newRommName]
+          }
         },
         render: (h) => {
           return h('div', [
@@ -1112,7 +1151,7 @@ export default {
 </script>
 <style scoped>
 .homeManage{
-  margin: -30px 0 0 20px;
+  margin: -30px 0 0 0px;
 }
 .homeManage h1{
   color: #fff;

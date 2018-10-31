@@ -41,6 +41,10 @@ html, body{
 .Bold{
 	font-weight: bold;
 }
+.hoverColor:hover{
+  color:  #2d8cf0;
+  font-weight:bold
+}
 .CursorPointer{
 	cursor: pointer;
 }

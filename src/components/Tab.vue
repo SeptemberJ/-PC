@@ -4,6 +4,7 @@
     <Col span="6"><div :class="[curTab == 0 ? 'triangle_active triangle_active_0' : 'triangle_normal']" style=""></div></Col>
     <Col span="6"><div :class="[curTab == 1 ? 'triangle_active triangle_active_1' : 'triangle_normal']" style=""></div></Col>
     <Col span="6"><div :class="[curTab == 2? 'triangle_active triangle_active_2' : 'triangle_normal']" style=""></div></Col>
+    <Col span="6"><div :class="[curTab == 3? 'triangle_active triangle_active_3' : 'triangle_normal']" style=""></div></Col>
   </Row>
   <!-- <Row style="height: 20px;background: #2d8cf0;">
     <Col span="6"><div :class="[curTab == 0 ? 'triangle_active' : 'triangle_normal']" style=""></div></Col>
@@ -13,7 +14,7 @@
   <Row v-if="ifShowTabBar" style="height: 130px;">
     <Col span="6">
       <span @click="changeTab(0)">
-        <Card style="width:90%;margin: 0px auto 0px auto;background: #d2691e;color: #fff;cursor: pointer;">
+        <Card class="tabCard" style="width:90%;margin: 0px auto 0px auto;background: #d2691e;color: #fff;cursor: pointer;">
           <div style="text-align:center">
             <img class="tabIcon" src="../../static/img/icons/tab_home.png">
             <h3>家管理</h3>
@@ -23,7 +24,7 @@
     </Col>
     <Col span="6">
       <span @click="changeTab(1)">
-        <Card style="width:90%;margin: 0px auto 0px auto;background: #8a2be2;color: #fff;cursor: pointer;">
+        <Card class="tabCard" style="width:90%;margin: 0px auto 0px auto;background: #8a2be2;color: #fff;cursor: pointer;">
           <div style="text-align:center">
             <img class="tabIcon" src="../../static/img/icons/tab_eq.png">
             <h3>设备管理</h3>
@@ -31,9 +32,19 @@
         </Card>
       </span>
     </Col>
-    <Col span="6">
+   <!--  <Col span="6">
       <span @click="changeTab(2)">
-        <Card style="width:90%;margin: 0px auto 0px auto;background: #2b85e4;color: #fff;cursor: pointer;">
+        <Card class="tabCard" style="width:90%;margin: 0px auto 0px auto;background: #deb887;color: #fff;cursor: pointer;">
+          <div style="text-align:center">
+            <img class="tabIcon" src="../../static/img/icons/ZKsetting.png">
+            <h3>智能设定</h3>
+          </div>
+        </Card>
+      </span>
+    </Col> -->
+    <Col span="6">
+      <span @click="changeTab(3)">
+        <Card class="tabCard" style="width:90%;margin: 0px auto 0px auto;background: #2b85e4;color: #fff;cursor: pointer;">
           <div style="text-align:center">
             <img class="tabIcon" src="../../static/img/icons/tab_set.png">
             <h3>个人中心</h3>
@@ -70,6 +81,7 @@
 
 <script>
 import {mapState, mapActions} from 'vuex'
+import * as $ from 'jquery'
 export default {
   name: 'HelloWorld',
   data () {
@@ -104,6 +116,7 @@ export default {
     ]),
     changeTab (idx) {
       this.changeCurTab(idx)
+      $('html,body').animate({scrollTop: '0px'}, 800)
     },
     toggleTabBar () {
       this.changeTabStatus()
@@ -127,6 +140,9 @@ export default {
   .tabIcon{
     width: 50px;
     height: 50px;
+  }
+  .tabCard:hover{
+    transform: scale(1.1);
   }
   .togglePic{
     width: 40px;
@@ -287,10 +303,10 @@ export default {
   background: #8a2be2;
 }
 .triangle_active_2{
-  background: #2b85e4;
+  background: #deb887;
 }
 .triangle_active_3{
-  background: #5f9ea0;
+  background: #2b85e4;
 }
 .triangle_normal{
   width: 10px;

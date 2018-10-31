@@ -3,7 +3,7 @@
     <div v-if="EqList.length > 0" class="ListBox">
       <Row type="flex" justify="start" class="code-row-bg">
         <Col span="8"  v-for="(EQ, idx) in EqList" :key="idx">
-          <Card style="width: 90%;margin:0 auto 30px auto;">
+          <Card style="width: 90%;margin-bottom: 30px;">
             <div style="text-align:left">
               <Row>
                 <Col span="8" class="eqIcon">
@@ -18,9 +18,9 @@
                   <p v-if="EQ.default_device_type != 'HAir(有线)'"></p>
                   <Row class="operationIcon">
                     <Col span="24">
-                      <img class="iconImg" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
-                      <img v-if="EQ.default_device_type == 'HAir(有线)'" class="iconImg" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts(EQ)">
-                      <i-switch v-if="EQ.default_device_type== 'lamp'" style="float:right;margin-top:0px;" :value="EQ.device_status == 1? true: false" @on-change="OperationToggle(EQ, idx)">
+                      <img title="移动设备" class="iconImg scaleAnimation" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
+                      <img title="查看数据" v-if="EQ.default_device_type == 'HAir(有线)'" class="iconImg scaleAnimation" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts(EQ)">
+                      <i-switch title="设备开关" v-if="EQ.default_device_type== 'lamp'" style="float:right;margin-top:0px;" :value="EQ.device_status == 1? true: false" @on-change="OperationToggle(EQ, idx)">
                         <span slot="open">ON</span>
                         <span slot="close">OFF</span>
                       </i-switch>
@@ -29,8 +29,8 @@
                 </Col>
               </Row>
               <Row class="MarginT_10 PaddingT_16 BorderT_gray">
-                <Col span="12"><img @click="editEqInfo(EQ.id, EQ.device_name)" class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editEqInfo(EQ.id, EQ.device_name)">编辑</span></Col>
-                <Col span="12" class="TextAlignR"><img @click="deleteEq(EQ)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteEq(EQ)">删除</span></Col>
+                <Col span="12"><span class="hoverColor"><img @click="editEqInfo(EQ.id, EQ.device_name)" class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editEqInfo(EQ.id, EQ.device_name)">编辑</span></span></Col>
+                <Col span="12" class="TextAlignR"><span class="hoverColor"><img @click="deleteEq(EQ)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteEq(EQ)">删除</span></span></Col>
               </Row>
             </div>
           </Card>
@@ -71,7 +71,7 @@
       </div>
     </Modal>
     <!-- 添加设备 -->
-    <Modal v-model="ifAddEQ" scrollable width="460">
+    <Modal v-model="ifAddEQ" scrollable width="850">
       <p slot="header" style="color:#333;text-align:left">
           <!-- <Icon type="ios-information-circle"></Icon> -->
           <span>添加设备</span>
@@ -1136,7 +1136,7 @@ export default {
 </script>
 <style scoped lang="less">
 .ListBox{
-  margin: 40px 0;
+  margin: 0 0 40px 0;
   h4{
   }
   .eqIcon img{
@@ -1157,12 +1157,18 @@ export default {
     margin-top: 10px;
   }
   .iconImg{
-    width: 20px;
-    height: 20px;
+    width: 25px;
+    height: 25px;
     margin-right: 5px;
     display: inline-block;
     vertical-align: bottom;
     cursor: pointer;
+  }
+  .scaleAnimation{
+    box-shadow: 0px 0px 4px #888888;
+    padding: 4px;
+    animation:ScaleToggle2 2s infinite ease-in-out forwards;
+    -webkit-animation:ScaleToggle2 2s infinite ease-in-out forwards;
   }
   .ivu-col-span-10{
     margin-bottom: 30px;
@@ -1172,6 +1178,15 @@ export default {
     border-top: 0px !important;
     order-left: 0px;
     order-right: 0px;
+  }
+}
+@keyframes ScaleToggle
+{
+  0%{
+    transform: scale(1.1);
+  }
+  100%{
+    transform: scale(1);
   }
 }
 </style>

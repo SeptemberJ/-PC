@@ -22,7 +22,7 @@
     </Row>
     <Row type="flex" justify="start" class="code-row-bg" v-if="addType == -1">
       <Col span="8"  v-for="(item, idx) in kindList" :key="idx">
-        <Card class="CursorPointer" style="width: 90%;margin:0 auto 30px auto;">
+        <Card class="CursorPointer" style="width: 90%;margin-bottom: 30;">
             <div style="text-align:left" @click="toKindList(item.devcieType, item.deviceTypeName, item.deviceDescibe, item.id)">
               <Row>
                 <Col span="8"><img :src="item.devcieTypePic ? 'http://112.90.178.68:8083/upFiles/' + item.devcieTypePic : '../../../static/img/icons/eqNormalIcon.png'"></Col>

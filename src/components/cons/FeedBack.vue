@@ -7,10 +7,10 @@
     <div class="ListBox" v-if="MessageList.length > 0">
       <Row>
         <Col span="23" class="PaddingL_16" v-for="(Message, idx) in MessageList" :key="idx">
-          <Alert :type="Message.status == 0 ? 'warning' : 'success'" show-icon>
+          <Alert :type="Message.status == 0 ? 'warning' : 'success'" show-icon class="CursorPointer">
             <Row>
               <Col span="12">{{Message.tit}}</Col>
-              <Col span="12" class="TextAlignR"><span v-if="Message.status == 0" class="smallSize Bold CursorPointer">标记为已读 | </span><span class="smallSize Bold CursorPointer">删除</span></Col>
+              <Col span="12" class="TextAlignR"><span v-if="Message.status == 0" class="smallSize Bold CursorPointer hoverColor">标记为已读 | </span><span class="smallSize Bold CursorPointer hoverColor">删除</span></Col>
             </Row>
             <span slot="desc">{{Message.time}}</span>
           </Alert>

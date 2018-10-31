@@ -2,6 +2,7 @@
   <Menu :active-name="curMenu" theme="primary" width="auto" :class="menuitemClasses" @on-select="changeMenu">
    <!--  <MenuItem name="logo"><img class="logo" src="../../static/img/Logo.png"></MenuItem> -->
    <img class="logo" src="../../static/img/Logo.png">
+   <h1 class="weightNormal">{{curTab == 0 ? '家管理' : (curTab == 1 ? '设备管理' : (curTab == 2 ? '智能设定' : '个人中心'))}}</h1>
     <MenuItem :name="idx" v-for="(menu, idx) in menuList[curTab].menu" :key="idx">
       <Icon :type="menu.icon"></Icon>
       <span>{{menu.text}}</span>
@@ -44,6 +45,11 @@ export default {
 .logo{
   height: 80px;
   width: 170px;
+}
+.weightNormal{
+  font-size: 2.5em;
+  font-weight: normal;
+  margin: 5px 0 10px 0;
 }
 .ivu-menu-light.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu){
   font-size: 18px;

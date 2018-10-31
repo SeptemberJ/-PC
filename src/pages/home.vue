@@ -1,19 +1,17 @@
 <template>
   <Row>
     <Col span="24" :style="{height: CurHeight + '%'}">
-      <!-- <div class="home" style="height: 100%;background: #2d8cf0;overflow: hidden"> -->
       <div class="home" style="height: 100%;overflow: hidden">
         <Row style="width: 100%;height: 100%;">
-          <Col span="6" :style="{height: '100%',background:curTab == 0 ? '#d17a3c': (curTab == 1 ? '#9a4de2': '#469bf4'), borderRight:curTab == 0 ? '2px solid #d17a3c': (curTab == 1 ? '2px solid #9a4de2': '2px solid #469bf4')}">
+          <Col span="6" :style="{height: '100%',background:curTab == 0 ? '#d17a3c': (curTab == 1 ? '#9a4de2': (curTab == 2 ? '#dcbd96': '#469bf4')), borderRight:curTab == 0 ? '2px solid #d17a3c': (curTab == 1 ? '2px solid #9a4de2': curTab == 2 ? '2px solid #dcbd96': '2px solid #469bf4')}">
             <SIDER/>
           </Col>
-          <Col span="18" :style="{height: '100%',background:curTab == 0 ? '#d2691e': (curTab == 1 ? '#8a2be2': '#2b85e4')}">
+          <Col span="18" :style="{height: '100%',background:curTab == 0 ? '#d2691e': (curTab == 1 ? '#8a2be2': (curTab == 2 ? '#deb887': '#2b85e4'))}">
             <Spin/>
             <div style="position:absolute;top:0;left:34px;padding-right: 0;width: 100%;height:100% !important;overflow-x:hidden;overflow-y:scroll">
               <Layout class="mainContent">
-                <!-- <Content :style="{margin: '0', background: '#2d8cf0', overflowX: 'hidden', overflowY: 'scroll'}"> -->
-                <Content :style="{margin: '0', overflowX: 'hidden', overflowY: 'scroll',background:curTab == 0 ? '#d2691e': (curTab == 1 ? '#8a2be2': '#2b85e4')}">
-                  <p class='ColorWhite TextAlignR PaddingTB_10 PaddingR_16'>{{accountPhone}} | <span class="CursorPointer" @click="ToLogout">退出</span></p>
+                <Content :style="{margin: '0', overflowX: 'hidden', overflowY: 'scroll',background:curTab == 0 ? '#d2691e': (curTab == 1 ? '#8a2be2': (curTab == 2 ? '#deb887': '#2b85e4'))}">
+                  <p class='ColorWhite TextAlignR PaddingTB_10 PaddingR_16'>{{accountPhone}} | <span class="CursorPointer hoverColor" @click="ToLogout">退出</span></p>
                   <Row type="flex" justify="start" class="code-row-bg" style="width: 100%;height: 60px;">
                     <Col span="4"><h1 v-if="curTab == 1">当前家</h1></Col>
                     <Col span="8">
@@ -22,8 +20,8 @@
                       </Select>
                     </Col>
                   </Row>
-                  <Row type="flex" justify="start" class="code-row-bg" style="width: 100%;margin: 20px 0px;">
-                    <Col v-if="curMenuText === '所有设备'" span="24" offset="0" class="TextAlignR PaddingR_16"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备</Button></Col>
+                  <Row v-if="curMenuText === '所有设备'" style="width: 100%;margin: 10px 0px;">
+                    <Col span="24" offset="0" class="TextAlignR PaddingR_16"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备</Button></Col>
                   </Row>
                   <CONTENT :curHomeId="curHome.home_id" ref="content"/>
                 </Content>

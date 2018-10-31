@@ -22,7 +22,7 @@
     </div>
     <NoData v-if="SecondControlList.length == 0"/>
     <!-- 添加主控 -->
-    <Modal v-model="ifAddSecond" width="460">
+    <Modal v-model="ifAddSecond" width="850">
       <p slot="header" style="color:#333;text-align:left">
           <!-- <Icon type="ios-information-circle"></Icon> -->
           <span>添加{{addName}}产品</span>

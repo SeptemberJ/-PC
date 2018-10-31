@@ -1,7 +1,7 @@
 <template>
   <div>
     <Row style="margin: 20px 0px;">
-      <Col span="12" class="">
+      <Col span="12">
         <Breadcrumb>
           <span @click="back">
             <BreadcrumbItem to="/Home">
@@ -30,7 +30,7 @@
     <div class="ListBox" v-show="locationIdex == -1 && HouseList.length > 0">
       <Row type="flex" justify="start" class="code-row-bg">
         <Col span="8"  v-for="(Room, idx) in HouseList" :key="idx">
-          <Card class="houseCard" :title="Room.house_name" icon="ios-options" :padding="0"  style="width: 90%;margin: auto;">
+          <Card class="houseCard" :title="Room.house_name" icon="ios-options" :padding="0"  style="width: 90%;margin-bottom:30px;">
             <CellGroup>
               <span @click="SeeEqList(idx, Room.id, Room.house_name)">
                 <Cell title="设备" to="/Home" extra="查看">
@@ -50,8 +50,8 @@
     <HouseAllEquipment ref="content" :locationIdex="locationIdex" :choosedHouseName="choosedHouseName" :choosedHouseId="choosedHouseId" :AddList="AddList" :deviceTypeList="deviceTypeList" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="locationIdex != -1"/>
     <!-- <AllEquipment v-on:listenSpin="toggleSpin" :AddList="AddList" :deviceTypeList="deviceTypeList" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="curMenuText === '所有设备'"/> -->
 
-    <!-- 移动 -->
-    <Modal v-model="ifAdd" width="360">
+    <!-- 添加房间 -->
+    <Modal v-model="ifAdd" width="850">
       <p slot="header" style="color:#333;text-align:left">
           <!-- <Icon type="ios-information-circle"></Icon> -->
           <span>添加房间</span>
@@ -399,7 +399,7 @@ export default {
 </script>
 <style lang="less" scoped>
 .ListBox{
-  margin: 40px 0;
+  margin: 5px 0 40px 0;
   img{
     width: 80px;
     height: 80px;
@@ -423,8 +423,7 @@ export default {
     vertical-align: bottom;
     cursor: pointer;
   }
-  .ivu-col-span-8{
-    margin-bottom: 30px;
+  .ivu-col-span-24{
   }
 }
 </style>

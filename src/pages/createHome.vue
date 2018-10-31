@@ -11,15 +11,15 @@
 	            <!-- <Input v-model="homeinfo.address"></Input> -->
               <!-- <Cascader :data="data4" :load-data="loadData"></Cascader> -->
               <span style="padding-right: 5px;">省</span>
-              <Select v-model="provinceId" size="small" style="width:100px" @on-change="changeProvince">
+              <Select v-model="provinceId" style="width:100px" @on-change="changeProvince">
                 <Option v-for="item in provinceList" :value="item.provinceId" :key="item.provinceId">{{ item.provinceName }}</Option>
               </Select>
               <span style="padding: 0 5px;">市</span>
-              <Select v-model="cityId" size="small" style="width:100px" @on-change="changeCity">
+              <Select v-model="cityId" style="width:100px" @on-change="changeCity">
                 <Option v-for="item in cityList" :value="item.cityId" :key="item.cityName">{{ item.cityName }}</Option>
               </Select>
               <span v-if="hasDistrict" style="padding: 0 5px;">区</span>
-              <Select v-if="hasDistrict" v-model="district" size="small" style="width:100px" @on-change="changeDistrict">
+              <Select v-if="hasDistrict" v-model="district" style="width:100px" @on-change="changeDistrict">
                 <Option v-for="item in districtList" :value="item.districtName" :key="item.districtName">{{ item.districtName }}</Option>
               </Select>
 	        </FormItem>
