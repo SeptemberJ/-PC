@@ -83,6 +83,7 @@
 <script>
 import {mapState, mapActions} from 'vuex'
 import {send} from '../../util/send'
+import {Decrypt} from '../../util/util'
 import HouseAllEquipment from './HouseAllEquipment.vue'
 import NoData from '../NoData.vue'
 export default {
@@ -102,7 +103,8 @@ export default {
       addRoomName: '',
       AddList: [],
       MasterControlList: [],
-      deviceTypeList: []
+      deviceTypeList: [],
+      openCode: ''
     }
   },
   components: {
@@ -183,7 +185,7 @@ export default {
     sureModify (Room) {
       this.toggleSpin(true)
       send({
-        name: encodeURI('/house?home_id=' + this.curHomeId + '&id=' + Room.id + '&house_name=' + this.newRoomName),
+        name: '/house?home_id=' + this.curHomeId + '&id=' + Room.id + '&house_name=' + this.newRoomName,
         method: 'PUT',
         data: {
         }
@@ -213,11 +215,43 @@ export default {
       }
       this.$Modal.confirm({
         title: '提示',
-        content: '该操作会将该房间下的设备也删除，确定删除该房间?',
         onOk: () => {
-          this.sureDel(Room.id)
+          if (Decrypt(localStorage['openCode']) === this.openCode) {
+            this.sureDel(Room.id)
+          } else {
+            this.$Message.error('请输入账户密码予以删除！')
+          }
         },
         onCancel: () => {
+          this.openCode = ''
+        },
+        render: (h) => {
+          return h('div', [
+            h('p', {
+              style: {
+                marginBottom: '10px'
+              }
+
+            }, '该操作会将该房间下的设备也删除！'),
+            h('h4', {
+              style: {
+                marginBottom: '10px'
+              }
+
+            }, ''),
+            h('Input', {
+              props: {
+                type: 'password',
+                autofocus: true,
+                placeholder: '请输入账户密码予以删除...'
+              },
+              on: {
+                input: (val) => {
+                  this.openCode = val
+                }
+              }
+            })
+          ])
         }
       })
     },
@@ -232,16 +266,19 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
+            this.openCode = ''
             this.getAllRoom()
             this.toggleSpin(false)
             this.$Message.success('删除成功!')
             break
           default:
+            this.openCode = ''
             this.toggleSpin(false)
             this.$Message.error(_res.data.message)
         }
       }).catch((_res) => {
         console.log(_res)
+        this.openCode = ''
         this.toggleSpin(false)
         this.$Message.error('Interface Error!')
       })

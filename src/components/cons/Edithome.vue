@@ -1,7 +1,7 @@
 <template>
   <!-- <h1>Edithome...</h1> -->
   <div class="homeManage">
-    <Row type="flex" justify="start" class="code-row-bg">
+    <Row type="flex" justify="start" class="code-row-bg MarginT_40">
       <Col span="12"  v-show = "show">
         <template>
           <Breadcrumb>
@@ -143,20 +143,23 @@
         @on-ok="suredelete"
         @on-cancel="cancel">
         <p>删除该房间后，该房间下的所有设备都将删除！</p>
+        <Input class="MarginT_10" type="password" v-model="openCode" placeholder="请输入账户密码予以删除..."/>
     </Modal>
     <Modal
         v-model="modal4"
         title="删除家"
         @on-ok="surehousedelall"
         @on-cancel="cancel">
-        <p>该操作会将该家下面的房间、设备以及成员信息都删除，确认删除？</p>
+        <p>该操作会将该家下面的房间、设备以及成员信息都删除!</p>
+        <Input class="MarginT_10" type="password" v-model="openCode" placeholder="请输入账户密码予以删除..."/>
     </Modal>
     <Modal
         v-model="modal8"
         title="删除家庭成员"
         @on-ok="surehousedel"
         @on-cancel="cancel">
-        <p>确定将该成员移除？</p>
+        <p>该操作会将该成员移除！</p>
+        <Input class="MarginT_10" type="password" v-model="openCode" placeholder="请输入账户密码予以删除..."/>
     </Modal>
     <Modal
         v-model="homename"
@@ -195,7 +198,7 @@
     </Modal>
     <Modal
         v-model="edithomename"
-        title="厨房"
+        title="房间"
         @on-ok="surechange"
         @on-cancel="cancel">
         <div>
@@ -265,6 +268,7 @@ import {mapState, mapActions} from 'vuex'
 import Vue from 'vue'
 import axios from 'axios'
 import {send} from '../../util/send'
+import {Decrypt} from '../../util/util'
 import NoData from '../NoData.vue'
 export default {
   name: 'Edithome',
@@ -350,7 +354,8 @@ export default {
       district: '',
       districtList: [],
       // edit
-      ifChangeAddress: false
+      ifChangeAddress: false,
+      openCode: ''
     }
   },
   computed: {
@@ -586,9 +591,15 @@ export default {
       this.modal8 = true
     },
     surehousedelall () {
+      if (Decrypt(localStorage['openCode']) != this.openCode) {
+        this.$Message.error('请输入账户密码予以删除！')
+        this.openCode = ''
+        return false
+      }
       axios.delete(encodeURI(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id + '&home_id=' + this.home_id
  + '&timestamp=' + Date.now())
       ).then((res) => {
+        this.openCode = ''
         this.gethomelistinfo()
       //   axios.get(encodeURI(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid + '&timestamp=' + Date.now())
       // ).then((res) => {
@@ -608,6 +619,11 @@ export default {
     },
     // 删除家或家庭成员
     surehousedel () {
+      if (Decrypt(localStorage['openCode']) != this.openCode) {
+        this.$Message.error('请输入账户密码予以删除！')
+        this.openCode = ''
+        return false
+      }
       axios.delete(encodeURI(this.$store.state.home.app_URL + 'home?register_id=' + this.memberid + '&home_id=' + this.homeid
  + '&timestamp=' + Date.now())
       ).then((res) => {
@@ -615,6 +631,7 @@ export default {
         axios.get(encodeURI(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid + '&timestamp=' + Date.now())
       ).then((res) => {
           if (res.data.code ==1 ){
+              this.openCode = ''
               if (res.data.homeList.length == 0){
                   this.$Message.warning('暂无数据!')//here
               }else{
@@ -805,10 +822,16 @@ export default {
       console.log(this.id)
     },
     suredelete () {
+      if (Decrypt(localStorage['openCode']) != this.openCode) {
+        this.$Message.error('请输入账户密码予以删除！')
+        this.openCode = ''
+        return false
+      }
       axios.delete(encodeURI(this.$store.state.home.app_URL + 'house?register_id=' + this.register_id + '&house_id=' + this.id + '&timestamp=' + Date.now())
             ).then((res) => {
                 if (res.data.code ==1 ){
-                this.$Message.success('删除成功!')//删除成功重新加载房间列表
+                  this.openCode = ''
+                  this.$Message.success('删除成功!')//删除成功重新加载房间列表
                 axios.get(encodeURI(this.$store.state.home.app_URL + 'house?home_id=' + this.homeid + '&timestamp=' + Date.now())
                     ).then((res) => {
                         if (res.data.code ==1 ){

@@ -10,8 +10,8 @@
                 <Col span="16">
                   <h4>{{SingleProduct.device_name}}</h4>
                   <Row class="MarginT_20">
-                    <Col span="12"><img class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editMasterInfo(SingleProduct.id, SingleProduct.device_name)">编辑</span></Col>
-                    <Col span="12" class="TextAlignR"><img class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteMaster(SingleProduct)">删除</span></Col>
+                    <Col span="12"><img class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editSingleInfo(SingleProduct.id, SingleProduct.device_name)">编辑</span></Col>
+                    <Col span="12" class="TextAlignR"><img class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteSingle(SingleProduct)">删除</span></Col>
                   </Row>
                 </Col>
               </Row>
@@ -58,6 +58,7 @@
 <script>
 import {mapState, mapActions} from 'vuex'
 import {send} from '../../util/send'
+import {Decrypt} from '../../util/util'
 import NoData from '../NoData.vue'
 export default {
   name: 'AllEquipment',
@@ -84,7 +85,8 @@ export default {
         SingleCode: [
           { required: true, message: '单品码不能为空！', trigger: 'change' }
         ]
-      }
+      },
+      openCode: ''
     }
   },
   computed: {
@@ -137,7 +139,7 @@ export default {
         this.formSingle.selectRoomId = this.HouseList[0].id
       }
     },
-    editMasterInfo (SingleId, SingleName) {
+    editSingleInfo (SingleId, SingleName) {
       if (!this.curHome.isCreater) {
         this.$Message.warning('您不是管理员不能进行该操作！')
         return false
@@ -196,20 +198,61 @@ export default {
         this.$Message.error('Interface Error!')
       })
     },
-    deleteMaster (Single) {
+    deleteSingle (Single) {
       if (!this.curHome.isCreater) {
         this.$Message.warning('您不是管理员不能进行该操作！')
         return false
       }
       this.$Modal.confirm({
         title: '提示',
-        content: '该操作会将' + Single.device_name + '主控下面的从控以及设备全部删除，确定删除该主控?',
         onOk: () => {
-          this.sureDel(Single)
+          if (Decrypt(localStorage['openCode']) === this.openCode) {
+            this.sureDel(Single)
+          } else {
+            this.$Message.error('请输入账户密码予以删除！')
+          }
         },
         onCancel: () => {
+          this.openCode = ''
+        },
+        render: (h) => {
+          return h('div', [
+            h('p', {
+              style: {
+                marginBottom: '10px'
+              }
+
+            }, '该操作会将' + Single.device_name + '主控下面的从控以及设备全部删除，确定删除该主控?'),
+            h('h4', {
+              style: {
+                marginBottom: '10px'
+              }
+
+            }, ''),
+            h('Input', {
+              props: {
+                type: 'password',
+                autofocus: true,
+                placeholder: '请输入账户密码予以删除...'
+              },
+              on: {
+                input: (val) => {
+                  this.openCode = val
+                }
+              }
+            })
+          ])
         }
       })
+      // this.$Modal.confirm({
+      //   title: '提示',
+      //   content: '该操作会将' + Single.device_name + '主控下面的从控以及设备全部删除，确定删除该主控?',
+      //   onOk: () => {
+      //     this.sureDel(Single)
+      //   },
+      //   onCancel: () => {
+      //   }
+      // })
     },
     // 删除设备
     sureDel (Single) {
@@ -222,6 +265,7 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
+            this.openCode = ''
             this.getSingleProduct()
             setTimeout(() => {
               this.toggleSpin(false)
@@ -229,11 +273,13 @@ export default {
             }, 1000)
             break
           default:
+            this.openCode = ''
             this.toggleSpin(false)
             this.$Message.error(_res.data.message)
         }
       }).catch((_res) => {
         console.log(_res)
+        this.openCode = ''
         this.toggleSpin(false)
         this.$Message.error('Interface Error!')
       })

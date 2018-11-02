@@ -12,16 +12,19 @@
               <Layout class="mainContent">
                 <Content :style="{margin: '0', overflowX: 'hidden', overflowY: 'scroll',background:curTab == 0 ? '#d2691e': (curTab == 1 ? '#8a2be2': (curTab == 2 ? '#deb887': '#2b85e4'))}">
                   <p class='ColorWhite TextAlignR PaddingTB_10 PaddingR_16'>{{accountPhone}} | <span class="CursorPointer hoverColor" @click="ToLogout">退出</span></p>
-                  <Row type="flex" justify="start" class="code-row-bg" style="width: 100%;height: 60px;">
-                    <Col span="4"><h1 v-if="curTab == 1">当前家</h1></Col>
+                  <Row v-if="curTab == 1 || curTab == 2" type="flex" justify="start" class="code-row-bg" style="width: 100%;height: 60px;">
+                    <Col span="4"><h1>当前家</h1></Col>
                     <Col span="8">
-                      <Select v-if="curTab == 1" :value="curHomeIdx" style="width:100%;height:50px;" @on-change="selectChangeCurHome">
+                      <Select :value="curHomeIdx" style="width:100%;height:50px;" @on-change="selectChangeCurHome">
                         <Option v-for="(home, idx) in homeList" :value="idx" :key="idx">{{home.home_name}}</Option>
                       </Select>
                     </Col>
                   </Row>
                   <Row v-if="curMenuText === '所有设备'" style="width: 100%;margin: 10px 0px;">
                     <Col span="24" offset="0" class="TextAlignR PaddingR_16"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备</Button></Col>
+                  </Row>
+                  <Row v-if="curMenuText === '场景'" style="width: 100%;margin: 10px 0px;">
+                    <Col span="24" offset="0" class="TextAlignR PaddingR_16"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addScene">添加场景</Button></Col>
                   </Row>
                   <CONTENT :curHomeId="curHome.home_id" ref="content"/>
                 </Content>
@@ -216,6 +219,9 @@ export default {
       this.getMasterControl()
       this.changeModalShow('EQ')
       this.$refs.content.getMasterControl()
+    },
+    addScene () {
+      this.changeModalShow('Scene')
     },
     addHome () {
       this.$router.push({name: 'CreateHome'})

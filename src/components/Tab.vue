@@ -32,7 +32,7 @@
         </Card>
       </span>
     </Col>
-   <!--  <Col span="6">
+    <!-- <Col span="6">
       <span @click="changeTab(2)">
         <Card class="tabCard" style="width:90%;margin: 0px auto 0px auto;background: #deb887;color: #fff;cursor: pointer;">
           <div style="text-align:center">

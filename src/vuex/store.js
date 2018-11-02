@@ -21,6 +21,7 @@ const state = {
   ifAddMaster: false,
   ifAddSecond: false,
   ifAddEQ: false,
+  ifAddScene: false,
   ifShowChart: false,
   ifShowTabBar: true,
   LimitRange: {
@@ -230,6 +231,9 @@ const mutations = {
         break
       case 'EQ':
         state.ifAddEQ = !state.ifAddEQ
+        break
+      case 'Scene':
+        state.ifAddScene = !state.ifAddScene
         break
       case 'Chart':
         state.ifShowChart = !state.ifShowChart

@@ -66,6 +66,9 @@ html, body{
 .MarginT_30{
 	margin-top: 30px !important;
 }
+.MarginT_40{
+	margin-top: 40px !important;
+}
 .MarginR_10{
 	margin-right: 10px;
 }
@@ -153,3 +156,12 @@ html, body{
 .ivu-form .ivu-form-item-label{
 	font-weight: bold !important;
 }
+/*smallSwitch*/
+/*.ivu-switch-small .ivu-switch-inner{
+  font-size: 12px !important;
+  left: 15px !important;
+}
+.ivu-switch-checked .ivu-switch-inner{
+  font-size: 12px !important;
+  left: 4px !important;
+}*/

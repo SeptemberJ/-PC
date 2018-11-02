@@ -3,7 +3,7 @@
     <Row>
       <Col span="12" class="PaddingL_16"><h1>文章列表</h1></Col>
     </Row>
-    <Row style="padding-left: 16px;padding-right: 34px;margin-top: 40px;">
+    <!-- <Row style="padding-left: 16px;padding-right: 34px;margin-top: 40px;">
       <NoData v-if="data1.length == 0"/>
       <Table v-if="data1.length > 0" :data="data1" :columns="columns1" :show-header='false' @on-row-click="seeDetail"></Table>
       <div v-if="data1.length > 0" style="margin: 10px;overflow: hidden">
@@ -11,7 +11,7 @@
           <Page :total="100" :current="1" @on-change="changePage"></Page>
         </div>
       </div>
-    </Row>
+    </Row> -->
   </div>
 </template>
 

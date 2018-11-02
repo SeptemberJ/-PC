@@ -7,15 +7,25 @@
 		<div class="loginItem">
 			<Input type="password" v-model="psd" placeholder="请输入密码..." style="width: 300px" />
 		</div>
-		<div class="loginItem">
+    <div class="loginItem">
+      <div class="operationBar">
+        <Button type="text" ghost @click="forgetPsd">忘记密码</Button>
+        <Button type="text" ghost @click="goSign(0)">去注册</Button>
+      </div>
+    </div>
+		<div class="loginItem" style="margin-top: 5px;">
 			<div class="loginBt"><Button style="background: yellow;width: 100%; font-weight: bold;" shape="circle" @click="goLogin">登陆</Button></div>
 		</div>
-		<div class="loginItem">
-			<div class="operationBar">
-				<Button type="text" ghost @click="forgetPsd">忘记密码</Button>
-				<Button type="text" ghost @click="goSign(0)">去注册</Button>
-			</div>
-		</div>
+		<!-- <div class="loginItem">
+      <div class="operationBar">
+        <p class="">其他方式登陆</p>
+        <p class="MarginT_10">
+          <a href="https://passport.yhd.com/qq/login.do"><img style="width:30px;height:30px;" src="../../static//img/icons/qq.png"></a>
+          <img style="width:30px;height:30px;" src="../../static//img/icons/qq.png">
+          <img style="width:30px;height:30px;" src="../../static//img/icons/wechat.png">
+        </p>
+      </div>
+		</div> -->
 	</div>
 </template>
 
@@ -59,7 +69,7 @@ export default {
 	      }).then(_res => {
 	      	switch (_res.data.code) {
 	      		case 0:
-	      		// this.goSign(0)
+	      		this.goSign(0)
 	      		break
 	      		case 2:
 	      			this.goSign(1)
@@ -99,11 +109,15 @@ export default {
             this.$Message.success('登陆成功！')
             let cookieStr = this.phone.toString() + this.psd.toString()
 			      setCookie('btznkz', Encrypt(cookieStr), 2)
+            localStorage['openCode'] = Encrypt(this.psd.toString())
 			      this.changeCurRegisterId(_res.data.memberInfo.id)
             this.changeCurAccountPhone(_res.data.memberInfo.ftelephone)
 			      this.checkIfHasHome(_res.data.memberInfo.id)
             setRegisterId(_res.data.memberInfo.id)
             setAccount(_res.data.memberInfo.ftelephone)
+            break
+          case 2:
+            this.$Message.error(_res.data.message)
             break
           default:
           	this.$Message.error(_res.data.message)
@@ -134,7 +148,7 @@ export default {
 
 <style lang="less">
 .Login{
-	width: 100vw;
+	width: 100%;
 	height: 100vh;
 	min-width: 1024px;
 	display: flex;
@@ -146,10 +160,11 @@ export default {
 	.loginItem{
 		display: flex;
 		justify-content: center;
+    flex-direction: column;
 		margin-top: 30px;
 		.loginBt{
 			width: 300px;
-			margin-top:20px;
+			margin-top:0px;
 			margin: 0 auto;
 		}
 		.operationBar{
@@ -171,6 +186,10 @@ export default {
 					}
 				}
 			}
+      p{
+        color: #fff;
+        text-align: left;
+      }
 		}
 	}
 	h1{

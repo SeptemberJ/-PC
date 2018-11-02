@@ -4,6 +4,20 @@
       <Row type="flex" justify="start" class="code-row-bg">
         <Col span="8"  v-for="(EQ, idx) in EqList" :key="idx">
           <Card style="width: 90%;margin-bottom:30px;">
+            <p style="font-size: 12px;" slot="title" v-if="EQ.default_device_type == 'HAir(有线)'" @click="showCharts(EQ)">
+              {{EQ.device_name}}
+            </p>
+            <p slot="title" v-if="EQ.default_device_type != 'HAir(有线)'">
+              {{EQ.device_name}}
+            </p>
+            <p slot="extra" @click.prevent="changeLimit" v-if="EQ.default_device_type == 'HAir(有线)'">
+              <Icon type="ios-loop-strong"></Icon>
+              {{EQ.type == 0 ? '离线' : '在线'}}
+            </p>
+            <i-switch slot="extra" title="设备开关" v-if="EQ.default_device_type== 'lamp'" style="float:right;margin-top:0px;" :value="EQ.device_status == 1? true: false" @on-change="OperationToggle(EQ, idx)">
+              <span slot="open">ON</span>
+              <span slot="close">OFF</span>
+            </i-switch>
             <div style="text-align:left">
               <Row>
                 <Col span="8" class="eqIcon">
@@ -11,22 +25,15 @@
                   <img v-if="EQ.default_device_type == 'HAir(有线)'" class="CursorPointer"  @click="showCharts(EQ)" :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'">
                 </Col>
                 <Col span="16">
-                  <h4 v-if="EQ.default_device_type == 'HAir(有线)'" class="CursorPointer" @click="showCharts(EQ)">{{EQ.device_name}}</h4>
-                  <h4 v-if="EQ.default_device_type != 'HAir(有线)'">{{EQ.device_name}}</h4>
-                  <p>位置: {{EQ.house_name}} </p>
-                  <p v-if="EQ.default_device_type == 'HAir(有线)'">状态: {{EQ.type == 0 ? '离线' : '在线'}}</p>
-                  <p v-if="EQ.default_device_type != 'HAir(有线)'"></p>
-                  <Row class="operationIcon">
-                    <Col span="24">
-                      <img title="移动设备" class="iconImg scaleAnimation" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
-                      <img title="查看数据" v-if="EQ.default_device_type == 'HAir(有线)'" class="iconImg scaleAnimation" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts(EQ)">
-                      <i-switch title="设备开关" v-if="EQ.default_device_type== 'lamp'" style="float:right;margin-top:0px;" :value="EQ.device_status == 1? true: false" @on-change="OperationToggle(EQ, idx)">
-                        <span slot="open">ON</span>
-                        <span slot="close">OFF</span>
-                      </i-switch>
-                      <!-- <i-switch style="float:right;margin-top:5px;" size="small" @on-change="setConfig(EQ)"/> -->
-                    </Col>
-                  </Row>
+                  <p class="smallP">位置: {{EQ.house_name}}</p>
+                  <p class="smallP">主控: {{EQ.main_control_name}}</p>
+                  <p class="smallP">从控: {{EQ.second_control_name}}</p>
+                </Col>
+              </Row>
+              <Row class="operationIcon">
+                <Col span="24" class="TextAlignR">
+                  <img title="移动设备" class="iconImg scaleAnimation" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
+                  <img title="查看数据" v-if="EQ.default_device_type == 'HAir(有线)'" class="iconImg scaleAnimation" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts(EQ)">
                 </Col>
               </Row>
               <Row class="MarginT_10 PaddingT_16 BorderT_gray">
@@ -203,6 +210,7 @@
 <script>
 import {mapState, mapActions} from 'vuex'
 import {send} from '../../util/send'
+import {Decrypt} from '../../util/util'
 import NoData from '../NoData.vue'
 export default {
   name: 'AllEquipment',
@@ -282,7 +290,8 @@ export default {
       time: '6',
       kindI: ['pm25', 'temperature', 'humidity', 'pm100', 'formaldehyde', 'voc', 'co2', 'co'],
       kind: ['PM2.5', '温度', '湿度', 'PM10', '甲醛', 'VOCs', 'CO2', 'CO'],
-      hasData: false
+      hasData: false,
+      openCode: ''
     }
   },
   computed: {
@@ -448,14 +457,91 @@ export default {
       }
       this.$Modal.confirm({
         title: '提示',
-        content: '确定删除该设备?',
         onOk: () => {
-          this.sureDel(EQ)
+          if (Decrypt(localStorage['openCode']) === this.openCode) {
+            this.sureDel(EQ)
+          } else {
+            this.$Message.error('请输入账户密码予以删除！')
+          }
         },
         onCancel: () => {
+          this.openCode = ''
+        },
+        render: (h) => {
+          return h('div', [
+            h('p', {
+              style: {
+                marginBottom: '10px'
+              }
+
+            }, '该操作会将设备彻底删除！'),
+            h('h4', {
+              style: {
+                marginBottom: '10px'
+              }
+
+            }, ''),
+            h('Input', {
+              props: {
+                type: 'password',
+                autofocus: true,
+                placeholder: '请输入账户密码予以删除...'
+              },
+              on: {
+                input: (val) => {
+                  this.openCode = val
+                }
+              }
+            })
+          ])
         }
       })
+
+      // this.$Modal.confirm({
+      //   title: '提示',
+      //   content: '确定删除该设备?',
+      //   onOk: () => {
+      //     // this.checkCode(EQ)
+      //     this.ifOpenCode = true
+      //     // this.sureDel(EQ)
+      //   },
+      //   onCancel: () => {
+      //   }
+      // })
     },
+    // 输入验证码
+    // checkCode () {
+    //   this.$Modal.confirm({
+    //     onOk: () => {
+    //       if (Decrypt(localStorage['openCode']) == this.openCode) {
+    //         this.sureDel(this.deleteEQ)
+    //       } else {
+    //         this.$Message.error('密码不一致！')
+    //       }
+    //     },
+    //     render: (h) => {
+    //       return h('div', [
+    //         h('h4', {
+    //           style: {
+    //             marginBottom: '10px'
+    //           }
+
+    //         }, '账户密码'),
+    //         h('Input', {
+    //           props: {
+    //             autofocus: true,
+    //             placeholder: '请输入账户密码...'
+    //           },
+    //           on: {
+    //             input: (val) => {
+    //               this.openCode = val
+    //             }
+    //           }
+    //         })
+    //       ])
+    //     }
+    //   })
+    // },
     // 删除设备
     sureDel (EQ) {
       this.toggleSpin(true)
@@ -467,18 +553,18 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
+            this.openCode = ''
             this.getAllEq()
-            setTimeout(() => {
-              this.toggleSpin(false)
-              this.$Message.success('删除成功!')
-            }, 1000)
+            // this.$Message.success('删除成功!')
             break
           default:
+            this.openCode = ''
             this.toggleSpin(false)
             this.$Message.error(_res.data.message)
         }
       }).catch((_res) => {
         console.log(_res)
+        this.openCode = ''
         this.toggleSpin(false)
         this.$Message.error('Interface Error!')
       })
@@ -1158,15 +1244,17 @@ export default {
     width: 60px;
     height: 60px;
   }
-  p{
-    height: 25px;
-    line-height: 25px;
-    color: #333;
-  }
   span{
     font-weight: bold;
     font-size: 14px;
     cursor: pointer;
+  }
+  .smallP{
+    color: #333;
+    font-size: 12px;
+    span{
+      font-weight: normal;
+    }
   }
   .operationIcon{
     margin-top: 10px;

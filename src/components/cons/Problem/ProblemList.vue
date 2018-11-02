@@ -1,6 +1,6 @@
 <template>
   <div class="problem">
-    <Row style="padding-right: 34px;">
+    <Row style="padding-left: 16px;padding-right: 34px;">
       <Col span="12" class=""><h1>常见问题</h1></Col>
       <!-- <Col span="12" class=""><Input v-model="keyWord" clearable search placeholder="输入关键字..."/></Col> -->
     </Row>
@@ -13,17 +13,17 @@
             </BreadcrumbItem>
           </span>
           <BreadcrumbItem v-if="locationIdex != -1">
-            <Icon type="md-paper"></Icon> {{problem.fname}}
+            <Icon type="logo-buffer"></Icon>titlt
           </BreadcrumbItem>
         </Breadcrumb>
       </Col>
-      <Col span="12" v-if="locationIdex != -1" class="TextAlignR">
+      <Col span="24" v-if="locationIdex != -1" class="TextAlignR">
         <Button v-if="locationIdex != -1" type="warning" icon="ios-undo" @click="back" class="MarginR_10">返回上级</Button>
       </Col>
     </Row>
     <Row v-if="locationIdex == -1" style="padding-right: 34px;margin-top: 40px;">
       <NoData v-if="(!ifSearch && problemList.length == 0) || (ifSearch && resultList.length == 0)"/>
-      <Table class="CursorPointer" v-if="!ifSearch && problemList.length > 0" :data="problemList" :columns="columns" :show-header='false' @on-row-click="seeDetail"></Table>
+      <Table v-if="!ifSearch && problemList.length > 0" :data="problemList" :columns="columns" :show-header='false' @on-row-click="seeDetail"></Table>
       <div v-if="!ifSearch && problemList.length > 0" style="margin: 10px;overflow: hidden">
         <div style="float: right; margin-top: 20px;">
           <Page :total="total" :current="1" @on-change="changePage"></Page>
@@ -38,10 +38,8 @@
       </div> -->
     </Row>
     <!-- detail -->
-    <Row v-if="locationIdex != -1" style="background: #fff;margin-right: 34px;padding-top: 20px;padding-bottom: 20px;">
-      <h2 class="TextAlignC MarginB_10">{{problem.fname}}</h2>
-      <p class="TextAlignC MarginB_20">{{problem.createDate}}</p>
-      <Col span="24" class="PaddingL_16" v-html="problem.fcontent"></Col>
+    <Row v-if="locationIdex != -1">
+      <Col span="24" class="PaddingL_16"><h1>文章列表</h1></Col>
     </Row>
     <!-- <div class="problemList PaddingL_16">
       <div v-if="!ifSearch && problemList.length > 0" class="problemItem" v-for="(problem, idx) in problemList" :key="idx">
@@ -63,8 +61,9 @@
 
 <script>
 import {mapState} from 'vuex'
-import {send} from '../../util/send'
-import NoData from '../NoData.vue'
+import {send} from '../../../util/send'
+import ProblemDetail from './ProblemDetail.vue'
+import NoData from '../../NoData.vue'
 export default {
   name: 'Problem',
   data () {
@@ -91,8 +90,7 @@ export default {
           align: 'right'
         }
       ],
-      problemList: [],
-      problem: ''
+      problemList: []
     }
   },
   computed: {
@@ -113,7 +111,8 @@ export default {
     }
   },
   components: {
-    NoData
+    NoData,
+    ProblemDetail
   },
   created () {
     this.getProblems()
@@ -135,9 +134,8 @@ export default {
     back () {
       this.locationIdex = -1
     },
-    seeDetail (article) {
+    seeDetail () {
       this.locationIdex = 1
-      this.problem = article
     },
     changePage () {
     },

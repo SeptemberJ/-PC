@@ -4,7 +4,7 @@ import axios from 'axios'
 // import _ from 'underscore'
 
 const URL_PREFIX = 'http://www.smart-hox.com:8081/hoxJK'
-// const URL_PREFIX = 'http://205.168.1.122:8081/hoxJK'
+// const URL_PREFIX = 'http://205.168.1.104:8081/hoxJK'
 
 let registerId = localStorage['registerId']
 let account = localStorage['account']
