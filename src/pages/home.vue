@@ -115,7 +115,7 @@ export default {
   watch: {
     ifShowTabBar: function (val) {
       this.CurHeight = val ? 75 : 90
-      document.body.style.height = val ? window.innerHeight + 200 + 'px' : window.innerHeight + 'px'
+      document.body.style.height = val ? window.innerHeight + 280 + 'px' : window.innerHeight + 80 + 'px'
     }
   },
   components: {

@@ -3,8 +3,8 @@
   <Row style="height: 20px;overflow: hidden;" v-if="ifShowTabBar">
     <Col span="6"><div :class="[curTab == 0 ? 'triangle_active triangle_active_0' : 'triangle_normal']" style=""></div></Col>
     <Col span="6"><div :class="[curTab == 1 ? 'triangle_active triangle_active_1' : 'triangle_normal']" style=""></div></Col>
-    <Col span="6"><div :class="[curTab == 2? 'triangle_active triangle_active_2' : 'triangle_normal']" style=""></div></Col>
     <Col span="6"><div :class="[curTab == 3? 'triangle_active triangle_active_3' : 'triangle_normal']" style=""></div></Col>
+    <Col span="6"><div :class="[curTab == 2? 'triangle_active triangle_active_2' : 'triangle_normal']" style=""></div></Col>
   </Row>
   <!-- <Row style="height: 20px;background: #2d8cf0;">
     <Col span="6"><div :class="[curTab == 0 ? 'triangle_active' : 'triangle_normal']" style=""></div></Col>
@@ -64,6 +64,10 @@
   <Row style="height: 50px;text-align: center">
       <img class="togglePic toggle_close CursorPointer" v-if="ifShowTabBar" @click="toggleTabBar" src="../../static/img/icons/tabBarClose.png">
       <img class="togglePic toggle_open CursorPointer" v-if="!ifShowTabBar" @click="toggleTabBar" src="../../static/img/icons/tabBarOpen.png">
+  </Row>
+  <Row style="height: 80px;text-align: center;">
+    <p>Copyright©海门柏田信息科技有限公司</p>
+    <!-- <p>沪ICP备16036901</p> -->
   </Row>
 </div>
 <!--   <div>

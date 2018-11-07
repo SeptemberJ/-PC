@@ -22,7 +22,7 @@ import EquipmentByKind from './cons/EquipmentByKind/EquipmentByKind.vue'
 import FeedBack from './cons/FeedBack.vue'
 import Problem from './cons/Problem.vue'
 import Scene from './cons/Scene.vue'
-import Article from './cons/Article/articleList.vue'
+import Article from './cons/Article.vue'
 import SPIN from './Spin.vue'
 export default {
   name: 'Content',

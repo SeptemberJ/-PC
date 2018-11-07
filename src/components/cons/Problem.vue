@@ -17,8 +17,8 @@
           </BreadcrumbItem>
         </Breadcrumb>
       </Col>
-      <Col span="12" v-if="locationIdex != -1" class="TextAlignR">
-        <Button v-if="locationIdex != -1" type="warning" icon="ios-undo" @click="back" class="MarginR_10">返回上级</Button>
+      <Col span="12" v-if="locationIdex != -1" class="TextAlignR PaddingR_34">
+        <Button v-if="locationIdex != -1" type="warning" icon="ios-undo" @click="back">返回上级</Button>
       </Col>
     </Row>
     <Row v-if="locationIdex == -1" style="padding-right: 34px;margin-top: 40px;">
@@ -26,7 +26,7 @@
       <Table class="CursorPointer" v-if="!ifSearch && problemList.length > 0" :data="problemList" :columns="columns" :show-header='false' @on-row-click="seeDetail"></Table>
       <div v-if="!ifSearch && problemList.length > 0" style="margin: 10px;overflow: hidden">
         <div style="float: right; margin-top: 20px;">
-          <Page :total="total" :current="1" @on-change="changePage"></Page>
+          <Page :total="total" :current="curPage" @on-change="changePage" :page-size="pageSize" show-total></Page>
         </div>
       </div>
       <!-- 查询结果 -->
@@ -73,8 +73,9 @@ export default {
       keyWord: '',
       ifSearch: false,
       resultList: [],
+      pageSize: 10,
+      curPage: 1,
       total: 0,
-      problemList2: [{tit: '主控问题'}, {tit: '从控问题'}, {tit: '设备问题'}],
       columns: [
         {
           type: 'index',
@@ -82,7 +83,7 @@ export default {
           align: 'center'
         },
         {
-          title: 'Name',
+          title: 'title',
           key: 'fname'
         },
         {
@@ -91,6 +92,7 @@ export default {
           align: 'right'
         }
       ],
+      allProblem: [],
       problemList: [],
       problem: ''
     }
@@ -139,7 +141,10 @@ export default {
       this.locationIdex = 1
       this.problem = article
     },
-    changePage () {
+    changePage (page) {
+      let PageSize = this.pageSize
+      this.problemList = this.allProblem.slice((page - 1) * PageSize, (page - 1) * PageSize + PageSize)
+      this.curPage = page
     },
     // 所有常见问题
     getProblems (type, eqItem, eqIdx) {
@@ -151,8 +156,9 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
-            this.problemList = _res.data.commonQuestionList.data
-            this.total = _res.data.commonQuestionList.data.length
+            this.allProblem = _res.data.commonQuestionList.data.slice(0)
+            this.problemList = _res.data.commonQuestionList.data.slice(0, this.pageSize)
+            this.total = this.allProblem.length
             break
           default:
             this.$Message.error(_res.data.message)

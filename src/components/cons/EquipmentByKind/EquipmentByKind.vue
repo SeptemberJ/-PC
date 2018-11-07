@@ -22,17 +22,17 @@
     </Row>
     <Row type="flex" justify="start" class="code-row-bg" v-if="addType == -1">
       <Col span="8"  v-for="(item, idx) in kindList" :key="idx">
-        <Card class="CursorPointer" style="width: 90%;margin-bottom: 30;">
-            <div style="text-align:left" @click="toKindList(item.devcieType, item.deviceTypeName, item.deviceDescibe, item.id)">
-              <Row>
-                <Col span="8"><img :src="item.devcieTypePic ? 'http://112.90.178.68:8083/upFiles/' + item.devcieTypePic : '../../../static/img/icons/eqNormalIcon.png'"></Col>
-                <Col span="16">
-                  <h4 style="padding-top:2px;">{{item.deviceDescibe}}</h4>
-                  <p style="padding-top:5px;">类型: {{item.devcieType == 0 ? '主控' : (item.devcieType == 2 ? '单品' : (item.devcieType == 4 ? '三级设备' : '从控'))}}</p>
-                </Col>
-              </Row>
-            </div>
-          </Card>
+        <Card class="CursorPointer" style="width: 90%;margin-bottom: 30px;">
+          <div style="text-align:left" @click="toKindList(item.devcieType, item.deviceTypeName, item.deviceDescibe, item.id)">
+            <Row>
+              <Col span="8"><img :src="item.devcieTypePic ? 'http://112.90.178.68:8083/upFiles/' + item.devcieTypePic : '../../../static/img/icons/eqNormalIcon.png'"></Col>
+              <Col span="16">
+                <h4 style="padding-top:2px;">{{item.deviceDescibe}}</h4>
+                <p style="padding-top:5px;">类型: {{item.devcieType == 0 ? '主控' : (item.devcieType == 2 ? '单品' : (item.devcieType == 4 ? '三级设备' : '从控'))}}</p>
+              </Col>
+            </Row>
+          </div>
+        </Card>
       </Col>
     </Row>
    <!--  <div class="modules">

@@ -91,6 +91,9 @@ html, body{
 .PaddingR_16{
 	padding-right: 16px !important;
 }
+.PaddingR_34{
+	padding-right: 34px;
+}
 .ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu), .ivu-menu-dark.ivu-menu-vertical .ivu-menu-submenu-title-active:not(.ivu-menu-submenu){
 	background: #2b85e4 !important;
 	color: #fff !important;
@@ -165,3 +168,6 @@ html, body{
   font-size: 12px !important;
   left: 4px !important;
 }*/
+.contentBox img{
+  width: 100%;
+}

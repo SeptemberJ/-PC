@@ -20,8 +20,7 @@
       <div class="operationBar">
         <p class="">其他方式登陆</p>
         <p class="MarginT_10">
-          <a href="https://passport.yhd.com/qq/login.do"><img style="width:30px;height:30px;" src="../../static//img/icons/qq.png"></a>
-          <img style="width:30px;height:30px;" src="../../static//img/icons/qq.png">
+          <img class="ThirdIcon" src="../../static//img/icons/qq.png" @click="QQLogin">
           <img style="width:30px;height:30px;" src="../../static//img/icons/wechat.png">
         </p>
       </div>
@@ -141,6 +140,14 @@ export default {
       }).catch((res) => {
         this.$Message.error('Interface Error!')
       })
+    },
+    // QQ登陆
+    QQLogin () {
+      const oOpts = {
+        appId: '101518980',
+        redirectURI: 'http://btzoon.com/dist/znkz'
+      }
+      QC.Login.showPopup(oOpts)
     }
   }
 }
@@ -189,6 +196,11 @@ export default {
       p{
         color: #fff;
         text-align: left;
+      }
+      .ThirdIcon{
+        width:30px;
+        height:30px;
+        cursor: pointer;
       }
 		}
 	}
