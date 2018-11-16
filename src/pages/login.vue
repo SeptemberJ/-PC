@@ -30,7 +30,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import {send, setRegisterId, setAccount} from '../util/send'
+import {send, setRegisterId, setAccount, setNickName, setAvatar} from '../util/send'
 import {setCookie, Encrypt} from '../util/util'
 
 export default {
@@ -114,6 +114,8 @@ export default {
 			      this.checkIfHasHome(_res.data.memberInfo.id)
             setRegisterId(_res.data.memberInfo.id)
             setAccount(_res.data.memberInfo.ftelephone)
+            setNickName(_res.data.memberInfo.fnickname ? _res.data.memberInfo.fnickname : '--')
+            setAvatar(_res.data.memberInfo.head_pic ? _res.data.memberInfo.head_pic : 'https://i.loli.net/2017/08/21/599a521472424.jpg')
             break
           case 2:
             this.$Message.error(_res.data.message)

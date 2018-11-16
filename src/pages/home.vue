@@ -3,16 +3,17 @@
     <Col span="24" :style="{height: CurHeight + '%'}">
       <div class="home" style="height: 100%;overflow: hidden">
         <Row style="width: 100%;height: 100%;">
-          <Col span="6" :style="{height: '100%',background:curTab == 0 ? '#d17a3c': (curTab == 1 ? '#9a4de2': (curTab == 2 ? '#dcbd96': '#469bf4')), borderRight:curTab == 0 ? '2px solid #d17a3c': (curTab == 1 ? '2px solid #9a4de2': curTab == 2 ? '2px solid #dcbd96': '2px solid #469bf4')}">
+          <!-- <Col span="6" :style="{height: '100%',background:curTab == 0 ? '#d17a3c': (curTab == 1 ? '#9a4de2': (curTab == 2 ? '#79a4a5': (curTab == 3 ? '#dcbd96': '#469bf4'))), borderRight:curTab == 0 ? '2px solid #d17a3c': (curTab == 1 ? '2px solid #9a4de2': (curTab == 2 ? '2px solid #79a4a5': (curTab == 3 ? '2px solid #dcbd96': '2px solid #469bf4')))}"> -->
+          <Col span="6" :style="{height: '100%',background:curTab == -1 ? '#d17a3c': (curTab == 0 ? '#9a4de2': (curTab == 1 ? '#79a4a5': (curTab == 2 ? '#dcbd96': '#469bf4'))), borderRight:curTab == -1 ? '2px solid #d17a3c': (curTab == 0 ? '2px solid #9a4de2': (curTab == 1 ? '2px solid #79a4a5': (curTab == 2 ? '2px solid #dcbd96': '2px solid #469bf4')))}">
             <SIDER/>
           </Col>
-          <Col span="18" :style="{height: '100%',background:curTab == 0 ? '#d2691e': (curTab == 1 ? '#8a2be2': (curTab == 2 ? '#deb887': '#2b85e4'))}">
+          <Col span="18" :style="{height: '100%',background:curTab == -1 ? '#d2691e': (curTab == 0 ? '#8a2be2': (curTab == 1 ? '#5f9ea0': (curTab == 2 ? '#deb887': '#2b85e4')))}">
             <Spin/>
             <div style="position:absolute;top:0;left:34px;padding-right: 0;width: 100%;height:100% !important;overflow-x:hidden;overflow-y:scroll">
               <Layout class="mainContent">
-                <Content :style="{margin: '0', overflowX: 'hidden', overflowY: 'scroll',background:curTab == 0 ? '#d2691e': (curTab == 1 ? '#8a2be2': (curTab == 2 ? '#deb887': '#2b85e4'))}">
+                <Content :style="{margin: '0', overflowX: 'hidden', overflowY: 'scroll',background:curTab == -1 ? '#d2691e': (curTab == 0 ? '#8a2be2': (curTab == 1 ? '#5f9ea0': (curTab == 2 ? '#deb887': '#2b85e4')))}">
                   <p class='ColorWhite TextAlignR PaddingTB_10 PaddingR_16'>{{accountPhone}} | <span class="CursorPointer hoverColor" @click="ToLogout">退出</span></p>
-                  <Row v-if="curTab == 1 || curTab == 2" type="flex" justify="start" class="code-row-bg" style="width: 100%;height: 60px;">
+                  <Row v-if="curTab == 0 || (curTab == 3 && (curMenuText === '场景' || curMenuText === '自动化'))" type="flex" justify="start" class="code-row-bg" style="width: 100%;height: 60px;">
                     <Col span="4"><h1>当前家</h1></Col>
                     <Col span="8">
                       <Select :value="curHomeIdx" style="width:100%;height:50px;" @on-change="selectChangeCurHome">
@@ -21,7 +22,13 @@
                     </Col>
                   </Row>
                   <Row v-if="curMenuText === '所有设备'" style="width: 100%;margin: 10px 0px;">
-                    <Col span="24" offset="0" class="TextAlignR PaddingR_16"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备</Button></Col>
+                    <Col span="24" offset="0" class="TextAlignR PaddingR_16">
+                      <Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加设备</Button>
+                      <!-- <Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="seePanel">面板</Button> -->
+                    </Col>
+                  </Row>
+                  <Row v-if="curMenuText === '自动化'" style="width: 100%;margin: 10px 0px;">
+                    <Col span="24" offset="0" class="TextAlignR PaddingR_16"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addAutomation">添加自动化</Button></Col>
                   </Row>
                   <Row v-if="curMenuText === '场景'" style="width: 100%;margin: 10px 0px;">
                     <Col span="24" offset="0" class="TextAlignR PaddingR_16"><Button type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addScene">添加场景</Button></Col>
@@ -131,6 +138,9 @@ export default {
       'changeRoomList',
       'changeModalShow'
     ]),
+    ...mapActions('sider', [
+      'changeCurMenu'
+    ]),
     ToLogout () {
       logout()
       clearCookie('btznkz')
@@ -142,7 +152,7 @@ export default {
     updateCurHome (HomeInfo) {
       // console.log(HomeInfo)
       send({
-        name: '/home?isdefault=1&id=' + HomeInfo.home_id + '&home_name=' + HomeInfo.home_name + '&faddress=' + HomeInfo.faddress + '&register_id=' + this.$store.state.register_id,
+        name: '/home?isdefault=1&id=' + HomeInfo.home_id + '&home_name=' + HomeInfo.home_name + '&faddress=' + HomeInfo.faddress + '&register_id=' + this.$store.state.register_id + '&home_pic=' + HomeInfo.homePic,
         method: 'PUT',
         data: {
         }
@@ -214,11 +224,16 @@ export default {
       })
     },
     addEQ () {
-      // console.log('this.curHome=======================')
-      // console.log(this.curHome)
-      this.getMasterControl()
-      this.changeModalShow('EQ')
-      this.$refs.content.getMasterControl()
+      this.changeCurMenu(3)
+      // this.getMasterControl()
+      // this.changeModalShow('EQ')
+      // this.$refs.content.getMasterControl()
+    },
+    seePanel () {
+      this.changeModalShow('Panel')
+    },
+    addAutomation () {
+      this.changeModalShow('Automation')
     },
     addScene () {
       this.changeModalShow('Scene')

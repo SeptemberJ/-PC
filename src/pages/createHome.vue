@@ -23,9 +23,36 @@
                 <Option v-for="item in districtList" :value="item.districtName" :key="item.districtName">{{ item.districtName }}</Option>
               </Select>
 	        </FormItem>
+          <FormItem label="家庭图片">
+            <Row>
+              <Col span="4">
+                <div v-if="homePicture != ''" class="">
+                  <img :src="homePicture" style="width: 50px;height: 50px;">
+                </div>
+              </Col>
+              <Col span="10">
+                <Upload
+                  ref="upload"
+                  :show-upload-list="false"
+                  :on-success="handleSuccess"
+                  :format="['jpg','jpeg','png']"
+                  :max-size="2048"
+                  :on-format-error="handleFormatError"
+                  :on-exceeded-size="handleMaxSize"
+                  :before-upload="handleBeforeUpload"
+                  action=""
+                  style="display: inline-block;">
+                  <Button icon="ios-cloud-upload-outline" size="small" style="margin-top: 25px !important">选择上传的图片</Button>
+                </Upload>
+              </Col>
+              <Col span="10">
+                <Button icon="ios-trash-outline" v-if="homePicture != ''" @click="handleRemove" size="small" style="margin-top: 25px !important">删除图片</Button>
+              </Col>
+            </Row>
+          </FormItem>
 	        <Row class="tipsTit">
 		        <Col span="8">在哪些房间有智能设备</Col>
-		        <Col span="8" offset="8" class="TextAlignR CursorPointer"><span @click="addOtherRoom">添加其他房间</span></Col>
+		        <Col span="8" offset="8" class="TextAlignR CursorPointer hoverColor"><span @click="addOtherRoom">添加其他房间</span></Col>
 			    </Row>
 			    <Row>
 			    	<Col span="24">
@@ -53,7 +80,8 @@ export default {
   	return {
   		homeinfo: {
         name: '',
-        address: ''
+        address: '',
+        picture: ''
       },
       newRommName: '',
   		defaultRoomList: [],
@@ -67,7 +95,8 @@ export default {
       cityId: '',
       cityList: [],
       district: '',
-      districtList: []
+      districtList: [],
+      homePicture: ''
   	}
   },
   watch: {
@@ -202,6 +231,7 @@ export default {
 	        	{
 		  				'home_name': this.homeinfo.name.trim(),
 		  				'faddress': this.homeinfo.address.trim(),
+              'home_pic': this.homeinfo.picture,
 		  				'register_id': this.$store.state.register_id
 		  			}
         	],
@@ -223,7 +253,7 @@ export default {
   	},
     updateCurHome (HomeId) {
       send({
-        name: '/home?isdefault=1&id=' + HomeId + '&home_name=' + this.homeinfo.name.trim() + '&faddress=' + this.homeinfo.address.trim() + '&register_id=' + this.$store.state.register_id,
+        name: '/home?isdefault=1&id=' + HomeId + '&home_name=' + this.homeinfo.name.trim() + '&faddress=' + this.homeinfo.address.trim() + '&home_pic=' + this.homeinfo.picture + '&register_id=' + this.$store.state.register_id,
         method: 'PUT',
         data: {
         }
@@ -235,6 +265,7 @@ export default {
             let CurHomeTemp = {
               home_name: this.homeinfo.name.trim(),
               faddress: this.homeinfo.address.trim(),
+              homePic: this.homeinfo.picture,
               home_id: HomeId,
               isCreater: true,
               isdefault: 1,
@@ -250,7 +281,63 @@ export default {
         this.$Message.error('Interface Error!')
       })
     },
-  	addOtherRoom () {
+    addOtherRoom () {
+      this.$Modal.confirm({
+        onOk: () => {
+          let ifHased = false
+          this.defaultRoomList.filter(room => {
+            if (room.dhouse_name === this.newRommName) {
+              ifHased = true
+            }
+          })
+          // let fn = () => {
+          //   return new Promise((resolve, reject) => {
+          //     this.defaultRoomList.filter(room => {
+          //       if (room.dhouse_name === this.newRommName) {
+          //         ifHased = true
+          //       }
+          //     })
+          //     resolve(ifHased)
+          //   })
+          // }
+          // let  hased  = fn().then(function(_res) {
+          //   console.log('_res---' + _res)
+          //   return _res
+          // })
+          // // async fn().then(function(_res) {console.log('_res---' + _res)})
+          // console.log(hased)
+          if (ifHased) {
+            this.$Message.warning('该房间名称已存在！')
+          } else {
+            this.defaultRoomList = [...this.defaultRoomList, {'dhouse_name': this.newRommName}]
+            this.choosedRoom = [...this.choosedRoom, this.newRommName]
+          }
+        },
+        render: (h) => {
+          return h('div', [
+            h('h4', {
+              style: {
+                marginBottom: '10px'
+              }
+
+            }, '房间名称'),
+            h('Input', {
+              props: {
+                value: this.newRommName,
+                autofocus: true,
+                placeholder: '请输入房间名称...'
+              },
+              on: {
+                input: (val) => {
+                  this.newRommName = val
+                }
+              }
+            })
+          ])
+        }
+      })
+    },
+  	addOtherRoom2 () {
       this.$Modal.confirm({
       	onOk: () => {
         	this.defaultRoomList = [...this.defaultRoomList, {'dhouse_name': this.newRommName}]
@@ -279,6 +366,52 @@ export default {
           ])
         }
       })
+    },
+    handleBeforeUpload (event) {
+      var _this = this
+      var file = event
+      var reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = function (e) {
+        _this.homePicture = this.result
+        let reg = /^data:image\/(jpeg|png|gif);base64,/
+        let jiequ = this.result.replace(reg, '')
+        send({
+          name: '/uploadBase64?imgStr=' + encodeURIComponent(jiequ),
+          method: 'POST',
+          data: {
+          }
+        }).then(_res => {
+          switch (_res.data.result) {
+            case 1:
+              _this.homeinfo.picture = _res.data.fileName
+              break
+            default:
+              this.$Message.error(_res.data.message)
+          }
+        }).catch((res) => {
+          this.$Message.error('Interface Error!')
+        })
+      }
+    },
+    handleFormatError (file) {
+      this.$Notice.warning({
+        title: '图片格式警告',
+        desc: '您上传的图片文件格式不支持!'
+      })
+    },
+    handleMaxSize (file) {
+      this.$Notice.warning({
+        title: '图片大小警告',
+        desc: '您上传的图片太大了, 请不要超过2M!'
+      })
+    },
+    handleView (name) {
+    },
+    handleRemove (file) {
+      this.homePicture = ''
+    },
+    handleSuccess (res, file) {
     }
   }
 }

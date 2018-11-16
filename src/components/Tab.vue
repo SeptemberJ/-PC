@@ -1,18 +1,20 @@
 <template>
 <div class="footerTab">
-  <Row style="height: 20px;overflow: hidden;" v-if="ifShowTabBar">
-    <Col span="6"><div :class="[curTab == 0 ? 'triangle_active triangle_active_0' : 'triangle_normal']" style=""></div></Col>
-    <Col span="6"><div :class="[curTab == 1 ? 'triangle_active triangle_active_1' : 'triangle_normal']" style=""></div></Col>
-    <Col span="6"><div :class="[curTab == 3? 'triangle_active triangle_active_3' : 'triangle_normal']" style=""></div></Col>
-    <Col span="6"><div :class="[curTab == 2? 'triangle_active triangle_active_2' : 'triangle_normal']" style=""></div></Col>
+  <Row type="flex" justify="center" style="height: 20px;overflow: hidden;" v-if="ifShowTabBar">
+    <!-- <Col span="4"><div :class="[curTab == 0 ? 'triangle_active triangle_active_0' : 'triangle_normal']" style=""></div></Col> -->
+    <Col span="4"><div :class="[curTab == 0 ? 'triangle_active triangle_active_1' : 'triangle_normal']" style=""></div></Col>
+    <Col span="4"><div :class="[curTab == 1? 'triangle_active triangle_active_2' : 'triangle_normal']" style=""></div></Col>
+    <Col span="4"><div :class="[curTab == 2? 'triangle_active triangle_active_3' : 'triangle_normal']" style=""></div></Col>
+    <Col span="4"><div :class="[curTab == 3? 'triangle_active triangle_active_4' : 'triangle_normal']" style=""></div></Col>
+    <Col span="4"><div class="triangle_normal" style=""></div></Col>
+    <!-- <Col span="4"><div :class="[curTab == 0 ? 'triangle_active triangle_active_0' : 'triangle_normal']" style=""></div></Col>
+    <Col span="4"><div :class="[curTab == 1 ? 'triangle_active triangle_active_1' : 'triangle_normal']" style=""></div></Col>
+    <Col span="4"><div :class="[curTab == 2? 'triangle_active triangle_active_2' : 'triangle_normal']" style=""></div></Col>
+    <Col span="4"><div :class="[curTab == 3? 'triangle_active triangle_active_3' : 'triangle_normal']" style=""></div></Col>
+    <Col span="4"><div :class="[curTab == 4? 'triangle_active triangle_active_4' : 'triangle_normal']" style=""></div></Col> -->
   </Row>
-  <!-- <Row style="height: 20px;background: #2d8cf0;">
-    <Col span="6"><div :class="[curTab == 0 ? 'triangle_active' : 'triangle_normal']" style=""></div></Col>
-    <Col span="6"><div :class="[curTab == 1 ? 'triangle_active' : 'triangle_normal']" style=""></div></Col>
-    <Col span="6"><div :class="[curTab == 2? 'triangle_active' : 'triangle_normal']" style=""></div></Col>
-  </Row> -->
-  <Row v-if="ifShowTabBar" style="height: 130px;">
-    <Col span="6">
+  <Row v-if="ifShowTabBar" type="flex" justify="center" style="height: 130px;">
+    <!-- <Col span="4">
       <span @click="changeTab(0)">
         <Card class="tabCard" style="width:90%;margin: 0px auto 0px auto;background: #d2691e;color: #fff;cursor: pointer;">
           <div style="text-align:center">
@@ -21,28 +23,38 @@
           </div>
         </Card>
       </span>
-    </Col>
-    <Col span="6">
-      <span @click="changeTab(1)">
+    </Col> -->
+    <Col span="4">
+      <span @click="changeTab(0)">
         <Card class="tabCard" style="width:90%;margin: 0px auto 0px auto;background: #8a2be2;color: #fff;cursor: pointer;">
           <div style="text-align:center">
             <img class="tabIcon" src="../../static/img/icons/tab_eq.png">
-            <h3>设备管理</h3>
+            <h3>智控</h3>
           </div>
         </Card>
       </span>
     </Col>
-    <!-- <Col span="6">
+    <Col span="4">
+      <span @click="changeTab(1)">
+        <Card class="tabCard" style="width:90%;margin: 0px auto 0px auto;background: #5f9ea0;color: #fff;cursor: pointer;">
+          <div style="text-align:center">
+            <img class="tabIcon" src="../../static/img/icons/shop.png">
+            <h3>好品</h3>
+          </div>
+        </Card>
+      </span>
+    </Col>
+    <Col span="4">
       <span @click="changeTab(2)">
         <Card class="tabCard" style="width:90%;margin: 0px auto 0px auto;background: #deb887;color: #fff;cursor: pointer;">
           <div style="text-align:center">
             <img class="tabIcon" src="../../static/img/icons/ZKsetting.png">
-            <h3>智能设定</h3>
+            <h3>适玩</h3>
           </div>
         </Card>
       </span>
-    </Col> -->
-    <Col span="6">
+    </Col>
+    <Col span="4">
       <span @click="changeTab(3)">
         <Card class="tabCard" style="width:90%;margin: 0px auto 0px auto;background: #2b85e4;color: #fff;cursor: pointer;">
           <div style="text-align:center">
@@ -52,7 +64,7 @@
         </Card>
       </span>
     </Col>
-    <Col span="6">
+    <Col span="4">
       <Card :bordered="false" dis-hover style="width:90%;margin: 0px auto 0px auto;">
         <div style="text-align:center">
           <img class="weixinPic" src="../../static/img/weixin-icon.jpg">
@@ -66,7 +78,7 @@
       <img class="togglePic toggle_open CursorPointer" v-if="!ifShowTabBar" @click="toggleTabBar" src="../../static/img/icons/tabBarOpen.png">
   </Row>
   <Row style="height: 80px;text-align: center;">
-    <p>Copyright©海门柏田信息科技有限公司</p>
+    <p>Ztnet (SmartHox Ltd)  版权所有</p>
     <!-- <p>沪ICP备16036901</p> -->
   </Row>
 </div>
@@ -304,12 +316,19 @@ export default {
   background: #d17a3c;
 }
 .triangle_active_1{
+  background: #9a4de2;
+}
+.triangle_active_11{
   background: #8a2be2;
 }
+
 .triangle_active_2{
-  background: #deb887;
+  background: #5f9ea0;
 }
 .triangle_active_3{
+  background: #deb887;
+}
+.triangle_active_4{
   background: #2b85e4;
 }
 .triangle_normal{

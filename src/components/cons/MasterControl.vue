@@ -2,13 +2,22 @@
   <div class="AllEquipment">
     <div class="ListBox" v-if="MasterControlList.length > 0">
       <Row type="flex" justify="start" class="code-row-bg">
-        <Col span="8"  v-for="(MasterControl, idx) in MasterControlList" :key="idx">
-          <Card style="width: 90%;margin:0 auto 30px auto;"><!-- background:bisque; -->
+        <Col span="12"  v-for="(MasterControl, idx) in MasterControlList" :key="idx">
+          <Card style="width: 96%;margin:0 auto 30px auto;"><!-- background:bisque; -->
             <div style="text-align:left">
               <Row>
-                <Col span="8"><img src="../../../static/img/icons/MasterControlNoraml.png"></Col>
-                <Col span="16">
+                <Col span="6"><img src="../../../static/img/icons/MasterControlNoraml.png"></Col>
+                <Col span="18">
                   <h4>{{MasterControl.main_control_name}}</h4>
+                  <Row class="MarginT_10">
+                    <Col :lg="{span: 4}"  :md="{span: 6}" :xs="{span: 6}">
+                      <p class="Bold smallSize ColorLightBlack">设备码：</p>
+                    </Col>
+                    <Col :lg="{span: 20}" :md="{span: 18}" :xs="{span: 18}">
+                      <p class="ColorLightBlack" style="word-wrap:break-word;font-size: 12px;">{{MasterControl.main_control_code}}</p>
+                    </Col>
+                  </Row>
+                  <!-- <p>设备码：{{MasterControl.main_control_code}}F8AC786A1E694BA893CDB5CEDF1AB308</p> -->
                   <Row class="MarginT_20">
                     <Col span="12"><img @click="editMasterInfo(MasterControl.id, MasterControl.main_control_name)" class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editMasterInfo(MasterControl.id, MasterControl.main_control_name)">编辑</span></Col>
                     <Col span="12" class="TextAlignR"><img @click="deleteMaster(MasterControl)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteMaster(MasterControl)">删除</span></Col>
@@ -22,7 +31,7 @@
     </div>
     <NoData v-if="MasterControlList.length == 0"/>
     <!-- 添加主控 -->
-    <Modal v-model="ifAddMaster" width="850">
+    <Modal v-model="ifAddMaster" width="850" :mask-closable="false">
       <p slot="header" style="color:#333;text-align:left">
           <!-- <Icon type="ios-information-circle"></Icon> -->
           <span>添加{{addName}}产品</span>
@@ -104,6 +113,11 @@ export default {
     }
   },
   watch: {
+    ifAddMaster: function (val) {
+      if (!val) {
+        this.btLoading = false
+      }
+    },
     curHomeId: function (val) {
       this.getMasterControl()
     }
@@ -330,17 +344,13 @@ export default {
       if (this.btLoading) {
         return false
       }
-      // this.toggleSpin(true)
       this.btLoading = true
       send({
         name: '/mainControl?home_id=' + this.curHomeId + '&main_control_name=' + this.formMaster.masterName + '&main_control_code=' + this.formMaster.masterCode + '&main_control_type=' + this.addKind + '&device_type_id=' + this.addKindId + '&randomCode=' + this.formMaster.randomCode,
         method: 'POST',
         data: {
-          // home_id: this.curHomeId,
-          // main_control_name: this.formMaster.masterName.trim() !== '' ? this.formMaster.masterName.trim() : this.formMaster.selectName,
-          // main_control_code: this.formMaster.masterCode
         }
-      }).then(_res => {
+      }, this).then(_res => {
         switch (_res.data.code) {
           case 1:
             // this.toggleSpin(false)
@@ -348,6 +358,10 @@ export default {
             this.$Message.success('添加成功！')
             this.getMasterControl()
             this.btLoading = false
+            break
+          case 0:
+            this.btLoading = false
+            this.$Message.error(_res.data.message)
             break
           default:
             // this.toggleSpin(false)

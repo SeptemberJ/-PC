@@ -11,6 +11,10 @@ const debug = process.env.NODE_ENV !== 'production'
 const state = {
   count: 10,
   PlainText: 'ZNKZ',
+  urlPre_scene: '',
+  urlPre_article: 'http://www.smart-hox.com:8081/upFiles/',
+  urlPre_scene: 'http://www.smart-hox.com:8081/upFiles/',
+  urlPre_upload: 'http://112.90.178.68:8081/upFiles/',
   ifSpin: false,
   register_id: '', // '2f40a8dacb9711e88d1a00163e11716c', // '4dd928bab4a811e88d1a00163e11716c',
   accountPhone: '',
@@ -21,7 +25,9 @@ const state = {
   ifAddMaster: false,
   ifAddSecond: false,
   ifAddEQ: false,
+  ifAddAutomation: false,
   ifAddScene: false,
+  ifShowPanel: false,
   ifShowChart: false,
   ifShowTabBar: true,
   LimitRange: {
@@ -232,8 +238,14 @@ const mutations = {
       case 'EQ':
         state.ifAddEQ = !state.ifAddEQ
         break
+      case 'Automation':
+        state.ifAddAutomation = !state.ifAddAutomation
+        break
       case 'Scene':
         state.ifAddScene = !state.ifAddScene
+        break
+      case 'Panel':
+        state.ifShowPanel = !state.ifShowPanel
         break
       case 'Chart':
         state.ifShowChart = !state.ifShowChart

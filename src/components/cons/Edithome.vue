@@ -33,8 +33,9 @@
       <Row  v-show = "show">
         <Col span="8" class="col" v-for="item in homelist" :key="item.home_id" >
             <div class="list" style="width: 90%;">
-                <Col span="7">
-                    <div class="icon"></div>
+                <Col span="7" style="text-align: center;">
+                  <img class="icon" :src=" item.home_pic ? urlPre_upload + item.home_pic : '../../../static/img/icons/house.png'">
+                    <!-- <div class="icon"></div> -->
                 </Col>
                 <Col span="11">
                     <div class="nametext">
@@ -83,7 +84,30 @@
                 <Option v-for="item in districtList" :value="item.districtName" :key="item.districtName">{{ item.districtName }}</Option>
               </Select>
           </FormItem>
-          <Row class="tipsTit">
+          <FormItem label="家庭图片">
+            <Row>
+              <Col span="12">
+                <div v-if="homePicture != ''" class="MarginB_20">
+                  <img :src="homePicture" style="width: 80px;height:80px;">
+                </div>
+                <Upload
+                  ref="upload"
+                  :show-upload-list="false"
+                  :on-success="handleSuccess"
+                  :format="['jpg','jpeg','png']"
+                  :max-size="2048"
+                  :on-format-error="handleFormatError"
+                  :on-exceeded-size="handleMaxSize"
+                  :before-upload="handleBeforeUpload"
+                  action=""
+                  style="display: inline-block;">
+                  <Button icon="ios-cloud-upload-outline" size="small">选择上传的图片</Button>
+                </Upload>
+                <Button class="MarginL_10" icon="ios-trash-outline" v-if="homePicture != ''" size="small" @click="handleRemove">删除图片</Button>
+              </Col>
+            </Row>
+          </FormItem>
+          <Row class="tipsTit MarginT_30">
             <Col span="8">在哪些房间有智能设备</Col>
             <Col span="8" offset="8" class="TextAlignR CursorPointer ColorRed"><span @click="addOtherRoom"><Icon type="md-add-circle" />添加其他房间</span></Col>
           </Row>
@@ -173,6 +197,54 @@
                 <FormItem prop="fname" label="家名字">
                     <Input style="width:60%" type="text" v-model="form.fname" placeholder="家名"></Input>
                 </FormItem>
+                <FormItem label="原图">
+                  <img :src="'http://112.90.178.68:8081/upFiles/' + form.picture" style="width: 50px;height:50px;border-radius:50%;margin-left:10px;display:inline-block;">
+                  <span @click="toChangeHomePic" class="MarginL_10 CursorPointer ColorRed Bold" >编辑</span>
+                </FormItem>
+                <FormItem label="新图" v-if="ifChangeHomePic">
+                  <img v-if="homePicture != ''" :src="homePicture" style="width: 50px;height:50px;border-radius:50%;margin-left:10px;display:inline-block;">
+                  <Upload
+                    ref="upload"
+                    :show-upload-list="false"
+                    :on-success="handleSuccess"
+                    :format="['jpg','jpeg','png']"
+                    :max-size="2048"
+                    :on-format-error="handleFormatError"
+                    :on-exceeded-size="handleMaxSize"
+                    :before-upload="handleBeforeUpload"
+                    action=""
+                    style="display: inline-block;">
+                    <Button icon="ios-cloud-upload-outline" size="small">选择图片</Button>
+                  </Upload>
+                  <Button class="MarginL_10" icon="ios-trash-outline" v-if="homePicture != ''" @click="handleRemove" size="small">删除图片</Button>
+                </FormItem>
+                <!-- <FormItem label="新图">
+                  <Row>
+                    <Col span="4">
+                      <div v-if="homePicture != ''" class="">
+                        <img :src="homePicture" style="width: 50px;height: 50px;">
+                      </div>
+                    </Col>
+                    <Col span="6">
+                      <Upload
+                        ref="upload"
+                        :show-upload-list="false"
+                        :on-success="handleSuccess"
+                        :format="['jpg','jpeg','png']"
+                        :max-size="2048"
+                        :on-format-error="handleFormatError"
+                        :on-exceeded-size="handleMaxSize"
+                        :before-upload="handleBeforeUpload"
+                        action=""
+                        style="display: inline-block;">
+                        <Button icon="ios-cloud-upload-outline" size="small" style="margin-top: 25px !important">选择图片</Button>
+                      </Upload>
+                    </Col>
+                    <Col span="4">
+                      <Button icon="ios-trash-outline" v-if="homePicture != ''" @click="handleRemove" size="small" style="margin-top: 25px !important">删除图片</Button>
+                    </Col>
+                  </Row>
+                </FormItem> -->
                 <FormItem prop="faddress" label="家地址">
                   <span>{{form.faddress}}</span>
                   <span @click="toChangeAddress" class="MarginL_10 CursorPointer ColorRed Bold" >编辑</span>
@@ -315,7 +387,8 @@ export default {
       },
       form: {
         name: '',
-        faddress: ''
+        faddress: '',
+        picture: ''
       },
       fnamelist: '',
       menbername: {
@@ -338,7 +411,8 @@ export default {
       // add home
       homeinfo: {
         name: '',
-        address: ''
+        address: '',
+        picture: ''
       },
       newRommName: '',
       defaultRoomList: [],
@@ -355,14 +429,18 @@ export default {
       districtList: [],
       // edit
       ifChangeAddress: false,
-      openCode: ''
+      openCode: '',
+      // img
+      homePicture: '',
+      ifChangeHomePic: false
     }
   },
   computed: {
     ...mapState({
       register_id: state => state.register_id,
       homeshowtype: state => state.home.homeshowtype,
-      app_URL: state => state.home.app_URL
+      app_URL: state => state.home.app_URL,
+      urlPre_upload: state => state.urlPre_upload
     })
   },
   created: function () {
@@ -535,6 +613,7 @@ export default {
               console.log(res)
               this.form.fname = res.data.home.home_name;
               this.form.faddress = res.data.home.faddress;
+              this.form.picture = res.data.home.home_pic;
             })
     },
     // xiugai jia xinxi
@@ -553,7 +632,7 @@ export default {
           return false
         }
       }
-      axios.put(encodeURI(this.$store.state.home.app_URL + 'home?id=' + this.home_id + '&home_name=' + this.form.fname + '&faddress=' + (this.ifChangeAddress ? this.homeinfo.address : this.form.faddress) + '&isdefault=' + this.isdefault + '&register_id=' + this.register_id + '&timestamp=' + Date.now())
+      axios.put(encodeURI(this.$store.state.home.app_URL + 'home?id=' + this.home_id + '&home_name=' + this.form.fname + '&faddress=' + (this.ifChangeAddress ? this.homeinfo.address : this.form.faddress) + '&home_pic=' + (this.homeinfo.picture !== '' ? this.homeinfo.picture : this.form.picture) + '&isdefault=' + this.isdefault + '&register_id=' + this.register_id + '&timestamp=' + Date.now())
       ).then((res) => {
         if (res.data.code == 1){
           this.$Message.success('修改成功!')
@@ -563,6 +642,9 @@ export default {
           this.city = ''
           this.cityId = ''
           this.district = ''
+          this.homeinfo.picture = ''
+          this.homePicture = ''
+          this.form.picture = ''
           axios.get(encodeURI(this.$store.state.home.app_URL + 'home?register_id=' + this.register_id + '&timestamp=' + Date.now())
           ).then((res) => {
               if (res.data.code ==1 ){
@@ -1040,6 +1122,7 @@ export default {
             {
               'home_name': this.homeinfo.name.trim(),
               'faddress': this.homeinfo.address.trim(),
+              'home_pic': this.homeinfo.picture,
               'register_id': this.$store.state.register_id
             }
           ],
@@ -1056,6 +1139,9 @@ export default {
             this.district = ''
             this.gethomelistinfo()
             this.ifAddHome = false
+            this.homeinfo.picture = ''
+            this.homePicture = ''
+            this.ifChangeHomePic = false
             // this.updateCurHome(_res.data.home_id)
             break
           default:
@@ -1065,35 +1151,36 @@ export default {
         this.$Message.error('Interface Error!')
       })
     },
-    updateCurHome (HomeId) {
-      send({
-        name: '/home?isdefault=1&id=' + HomeId + '&home_name=' + this.homeinfo.name.trim() + '&faddress=' + this.homeinfo.address.trim() + '&register_id=' + this.$store.state.register_id,
-        method: 'PUT',
-        data: {
-        }
-      }).then(_res => {
-        switch (_res.data.code) {
-          case 1:
-            this.$Message.success('设置成功!')
-            // 更新当前家
-            let CurHomeTemp = {
-              home_name: this.homeinfo.name.trim(),
-              faddress: this.homeinfo.address.trim(),
-              home_id: HomeId,
-              isCreater: true,
-              isdefault: 1,
-              register_id: this.$store.state.register_id
-            }
-            this.changeCurHome(CurHomeTemp)
-            this.$router.push({name: 'Home'})
-            break
-          default:
-            this.$Message.error(_res.data.message)
-        }
-      }).catch((res) => {
-        this.$Message.error('Interface Error!')
-      })
-    },
+    // updateCurHome (HomeId) {
+    //   send({
+    //     name: '/home?isdefault=1&id=' + HomeId + '&home_name=' + this.homeinfo.name.trim() + '&faddress=' + this.homeinfo.address.trim() + '&register_id=' + this.$store.state.register_id,
+    //     method: 'PUT',
+    //     data: {
+    //     }
+    //   }).then(_res => {
+    //     switch (_res.data.code) {
+    //       case 1:
+    //         this.$Message.success('设置成功!')
+    //         // 更新当前家
+    //         let CurHomeTemp = {
+    //           home_name: this.homeinfo.name.trim(),
+    //           faddress: this.homeinfo.address.trim(),
+    //           homePic: this.homeinfo.picture,
+    //           home_id: HomeId,
+    //           isCreater: true,
+    //           isdefault: 1,
+    //           register_id: this.$store.state.register_id
+    //         }
+    //         this.changeCurHome(CurHomeTemp)
+    //         this.$router.push({name: 'Home'})
+    //         break
+    //       default:
+    //         this.$Message.error(_res.data.message)
+    //     }
+    //   }).catch((res) => {
+    //     this.$Message.error('Interface Error!')
+    //   })
+    // },
     // 过滤
     filterSingle () {
       return new Promise((resolve, reject) => {
@@ -1103,8 +1190,6 @@ export default {
         //     return (true)
         //   }
         // })
-        alert('kk')
-        resolve('hahhaha')
       })
     },
     addOtherRoom () {
@@ -1168,6 +1253,89 @@ export default {
     },
     cancelChangeAddress () {
       this.ifChangeAddress = false
+    },
+    toChangeHomePic () {
+      this.ifChangeHomePic = true
+    },
+    handleBeforeUpload(event) {
+      var _this = this
+      var file = event
+      var reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = function(e){
+        _this.homePicture = this.result
+        let reg = /^data:image\/(jpeg|png|gif);base64,/
+        let jiequ = this.result.replace(reg, "")
+        // console.log(jiequ)
+        // _this.getImgName(jiequ)
+        send({
+          name: '/uploadBase64?imgStr=' + encodeURIComponent(jiequ),
+          method: 'POST',
+          data: {
+          }
+        }).then(_res => {
+          switch (_res.data.result) {
+            case 1:
+              // alert(_res.data.fileName)
+              _this.homeinfo.picture = _res.data.fileName
+              break
+            default:
+              _this.$Message.error(_res.data.message)
+          }
+        }).catch((res) => {
+          _this.$Message.error('Interface Error!')
+        })
+      }
+    },
+    getImgName (jiequ) {
+      debugger
+      axios.post(urlencoding(options.url), options.data
+        ).then((res) => {
+        resolve(res)
+      }).catch((error) => {
+        console.log(error)
+        this.$Message.error('Interface Error!')
+      })
+      send({
+        name: '/uploadBase64?imgStr=' + urlencoding(jiequ),
+        method: 'POST',
+        data: {
+        }
+      }).then(_res => {
+        // switch (_res.data.result) {
+        //   case 1:
+        //     alert(_res.data.fileName)
+        //     this.homeinfo.picture = _res.data.fileName
+        //     break
+        //   default:
+        //     this.$Message.error(_res.data.message)
+        // }
+      }).catch((res) => {
+        console.log('----------')
+        console.log(res)
+        this.$Message.error('Interface Error!')
+      })
+    },
+    handleFormatError (file) {
+      this.$Notice.warning({
+        title: '图片格式警告',
+        desc: '您上传的图片文件格式不支持!'
+      })
+    },
+    handleMaxSize (file) {
+      this.$Notice.warning({
+        title: '图片大小警告',
+        desc: '您上传的图片太大了, 请不要超过2M!'
+      })
+    },
+    handleView (name) {
+    },
+    handleRemove (file) {
+      this.homePicture = ''
+      this.homeinfo.picture = ''
+      this.ifChangeHomePic = false
+    },
+    handleSuccess (res, file) {
     }
   }
 }
@@ -1193,13 +1361,16 @@ export default {
     box-shadow: rgb(212, 211, 211) 0px 0px 5px 1px ;
 }
 .icon{
-    background-color: rgb(209, 207, 207);
+    /*background-color: rgb(209, 207, 207);*/
     width: 60px;
     height:60px;
     margin: auto;
-    margin-top:15px;
+    margin-top:15px !important;
     border-radius: 40px;
-    background: radial-gradient(#7bbafa,#faf7f7)
+    border: 1px solid #eee;
+    /*background: radial-gradient(#7bbafa,#faf7f7);*/
+    margin: 0 auto;
+    overflow: hidden;
 }
 .nametext{
     height:65px;

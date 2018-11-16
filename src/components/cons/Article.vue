@@ -28,7 +28,7 @@
           <Card class="CursorPointer" style="width: 100%;height: 135px;">
             <div style="text-align:left" @click="seeDetail(item)">
               <Row>
-                <Col span="8"><img style="width:90%;height: 100px;" :src="'http://www.smart-hox.com:8081/upFiles/' + item.play_pic"></Col>
+                <Col span="8"><img style="width:90%;height: 100px;" :src="urlPre_article + item.play_pic"></Col>
                 <Col span="16">
                   <h4 style="height: 20px;margin-bottom:5px;">{{item.play_title}}</h4>
                   <p class="introduceBlock">{{item.play_introduce}}</p>
@@ -55,7 +55,7 @@
 </template>
 
 <script>
-// import {mapState} from 'vuex'
+import {mapState} from 'vuex'
 import NoData from '../NoData.vue'
 import {send} from '../../util/send'
 import {secondToFormat} from '../../util/util'
@@ -84,6 +84,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      urlPre_article: state => state.urlPre_article
+    })
   },
   watch: {
   },

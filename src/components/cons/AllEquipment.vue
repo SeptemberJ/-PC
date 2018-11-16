@@ -2,43 +2,81 @@
   <div class="AllEquipment">
     <div v-if="EqList.length > 0" class="ListBox">
       <Row type="flex" justify="start" class="code-row-bg">
-        <Col span="8"  v-for="(EQ, idx) in EqList" :key="idx">
-          <Card style="width: 90%;margin-bottom:30px;">
-            <p style="font-size: 12px;" slot="title" v-if="EQ.default_device_type == 'HAir(有线)'" @click="showCharts(EQ)">
+        <Col span="12"  v-for="(EQ, idx) in EqList" :key="idx">
+          <Card style="width: 96%;margin-bottom:30px;">
+            <p style="font-size: 12px;" slot="title" v-if="EQ.default_device_type == '031'" @click="showCharts(EQ)">
               {{EQ.device_name}}
             </p>
-            <p slot="title" v-if="EQ.default_device_type != 'HAir(有线)'">
+            <p slot="title" v-if="EQ.default_device_type != '031'">
               {{EQ.device_name}}
             </p>
-            <p slot="extra" @click.prevent="changeLimit" v-if="EQ.default_device_type == 'HAir(有线)'">
+            <p slot="extra" @click.prevent="changeLimit" v-if="EQ.default_device_type == '031'">
               <Icon type="ios-loop-strong"></Icon>
               {{EQ.type == 0 ? '离线' : '在线'}}
             </p>
-            <i-switch slot="extra" title="设备开关" v-if="EQ.default_device_type== 'lamp'" style="float:right;margin-top:0px;" :value="EQ.device_status == 1? true: false" @on-change="OperationToggle(EQ, idx)">
+            <i-switch slot="extra" title="设备开关" v-if="EQ.default_device_type== '021'" style="float:right;margin-top:0px;" v-model="EQ.device_status" @on-change="OperationToggle(EQ, idx)">
               <span slot="open">ON</span>
               <span slot="close">OFF</span>
             </i-switch>
             <div style="text-align:left">
               <Row>
-                <Col span="8" class="eqIcon">
-                  <img v-if="EQ.default_device_type != 'HAir(有线)'" :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'">
-                  <img v-if="EQ.default_device_type == 'HAir(有线)'" class="CursorPointer"  @click="showCharts(EQ)" :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'">
+                <Col span="6" class="eqIcon">
+                  <img v-if="EQ.default_device_type != '031'" :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'">
+                  <img v-if="EQ.default_device_type == '031'" class="CursorPointer"  @click="showCharts(EQ)" :src="EQ.device_img ? EQ.device_img : '../../../static/img/icons/eqNormalIcon.png'">
+                  <!-- <p style="word-wrap:break-word;font-size: 12px;">位置: {{EQ.house_name}}</p> -->
                 </Col>
-                <Col span="16">
-                  <p class="smallP">位置: {{EQ.house_name}}</p>
+                <Col span="18">
+                  <Row>
+                    <Col :lg="{span: 6}"  :md="{span: 8}" :xs="{span: 8}">
+                      <p class="Bold smallSize ColorLightBlack">设备码: </p>
+                    </Col>
+                    <Col :lg="{span: 18}" :md="{span: 16}" :xs="{span: 16}">
+                      <p style="word-wrap:break-word;font-size: 12px;">{{EQ.device_code}}</p>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col :lg="{span: 6}"  :md="{span: 8}" :xs="{span: 8}">
+                      <p class="Bold smallSize ColorLightBlack">位置: </p>
+                    </Col>
+                    <Col :lg="{span: 18}" :md="{span: 16}" :xs="{span: 16}">
+                      <p style="word-wrap:break-word;font-size: 12px;">{{EQ.house_name}}</p>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col :lg="{span: 6}"  :md="{span: 8}" :xs="{span: 8}">
+                      <p class="Bold smallSize ColorLightBlack">所属主控: </p>
+                    </Col>
+                    <Col :lg="{span: 18}" :md="{span: 16}" :xs="{span: 16}">
+                      <p style="word-wrap:break-word;font-size: 12px;">{{EQ.main_control_name}}</p>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col :lg="{span: 6}"  :md="{span: 8}" :xs="{span: 8}">
+                      <p class="Bold smallSize ColorLightBlack">所属从控: </p>
+                    </Col>
+                    <Col :lg="{span: 18}" :md="{span: 16}" :xs="{span: 16}">
+                      <p style="word-wrap:break-word;font-size: 12px;">{{EQ.second_control_name}}</p>
+                    </Col>
+                  </Row>
+                  <!-- <p class="smallP">位置: {{EQ.house_name}}</p>
                   <p class="smallP">主控: {{EQ.main_control_name}}</p>
-                  <p class="smallP">从控: {{EQ.second_control_name}}</p>
+                  <p class="smallP">从控: {{EQ.second_control_name}}</p> -->
                 </Col>
               </Row>
               <Row class="operationIcon">
                 <Col span="24" class="TextAlignR">
                   <img title="移动设备" class="iconImg scaleAnimation" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
-                  <img title="查看数据" v-if="EQ.default_device_type == 'HAir(有线)'" class="iconImg scaleAnimation" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts(EQ)">
+                  <img title="查看数据" v-if="EQ.default_device_type == '031'" class="iconImg scaleAnimation" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts(EQ)">
+                  <!-- <img title="查看数据" v-if="EQ.default_device_type == '021'" class="iconImg scaleAnimation" src="../../../static/img/icons/yaokongqi.png" @click="showControlPanel(EQ)"> -->
                 </Col>
               </Row>
               <Row class="MarginT_10 PaddingT_16 BorderT_gray">
-                <Col span="12"><span class="hoverColor">
-<img class="iconImg" src="../../../static/img/icons/editor-line.png" @click="editEqInfo(EQ.id, EQ.device_name)"><span @click="editEqInfo(EQ.id, EQ.device_name)">编辑</span></span></Col>
+                <Col span="12">
+                  <span class="hoverColor">
+                    <img class="iconImg" src="../../../static/img/icons/editor-line.png" @click="editEqInfo(EQ.id, EQ.device_name)">
+                    <span @click="editEqInfo(EQ.id, EQ.device_name)">编辑</span>
+                  </span>
+                </Col>
                 <Col span="12" class="TextAlignR"><span class="hoverColor"><img @click="deleteEq(EQ)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteEq(EQ)">删除</span></span></Col>
               </Row>
             </div>
@@ -204,6 +242,18 @@
           <p>暂无数据</p>
         </div>
     </Modal>
+    <!-- 控制面板 -->
+    <Modal v-model="ifShowPanel" width="460" :mask-closable="false">
+        <p slot="header" style="color:#000;text-align:left">
+            <!-- <Icon type="ios-information-circle"></Icon> -->
+            <span>控制面板</span>
+        </p>
+        <div style="text-align:center">
+            <Control/>
+        </div>
+        <div slot="footer">
+        </div>
+    </Modal>
   </div>
 </template>
 
@@ -212,6 +262,7 @@ import {mapState, mapActions} from 'vuex'
 import {send} from '../../util/send'
 import {Decrypt} from '../../util/util'
 import NoData from '../NoData.vue'
+import Control from './Control/Control.vue'
 export default {
   name: 'AllEquipment',
   props: ['curHomeId', 'AddList', 'MasterControlList', 'deviceTypeList'],
@@ -228,6 +279,7 @@ export default {
       curEQName: '',
       curEQRoom: '',
       curEQId: '',
+      curEqCode: '',
       // add
       EqType: '无线设备',
       MasterList: [],
@@ -315,6 +367,14 @@ export default {
       set: function (newValue) {
         this.changeModalShow('Chart')
       }
+    },
+    ifShowPanel: {
+      get: function () {
+        return this.$store.state.ifShowPanel
+      },
+      set: function (newValue) {
+        this.changeModalShow('Panel')
+      }
     }
   },
   watch: {
@@ -356,7 +416,8 @@ export default {
     }
   },
   components: {
-    NoData
+    NoData,
+    Control
   },
   created () {
     this.getAllEq()
@@ -583,6 +644,7 @@ export default {
     },
     // 查看chart
     showCharts (EQ) {
+      this.curEqCode = EQ.device_code
       // 没配置过先配置
       if (EQ.device_config !== '1') {
         this.setConfig('chart', EQ)
@@ -608,7 +670,7 @@ export default {
       // 初始化echarts实例
       let myChart = this.$echarts.init(document.getElementById('myChart'))
       send({
-        name: '/hair?device_id=00123456&type=' + _THIS.curKindI + '&hh=' + _THIS.time,
+        name: '/hair?device_id=' + this.curEqCode + '&type=' + _THIS.curKindI + '&hh=' + _THIS.time,
         method: 'GET',
         data: {
         }
@@ -746,7 +808,10 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
-            setTimeout(() => { this.EqPlay(type, eqItem, sendCurCns, 'ConfigAck', '', eqIdx) }, 3000)
+            this.timer = setInterval(() => {
+              this.EqPlay(type, eqItem, sendCurCns, 'ConfigAck', '', eqIdx)
+            }, 1000)
+            //setTimeout(() => { this.EqPlay(type, eqItem, sendCurCns, 'ConfigAck', '', eqIdx) }, 1000)
             break
           case 0:
             this.$Message.error(_res.data.message)
@@ -766,10 +831,12 @@ export default {
         data: {
         }
       }).then(_res => {
+        let _THIS = this
         switch (_res.data.result.code) {
           case 1:
             if (switchStatus === '') { // 配置完去更新
               this.UpdateConfigStatus(type, eqItem, eqIdx)
+              clearInterval(this.timer)
             } else { // 开关操作
               // 页面上更新开关状态
               if (_res.data.result.payload === '00') {
@@ -791,14 +858,20 @@ export default {
             }
             break
           case 0:
-            this.$Message.error(_res.data.message)
+            this.getAllEq('', eqItem, eqIdx)
+            this.toggleSpin(false)
+            this.$Message.error(_res.data.result.result)
             break
           default:
-            this.$Message.error(_res.data.message)
+            this.$Message.error(_res.data.result.result)
         }
       }).catch((_res) => {
         console.log(_res)
-        this.$Message.error('Interface Error2222!')
+        this.$Message.error('Interface Error payload!')
+        // clearInterval(this.timer)
+        this.toggleSpin(false)
+        // this.getAllEq()
+        // this.toggleSpin(false)
       })
     },
     UpdateConfigStatus (type, eqItem, eqIdx) {
@@ -835,7 +908,7 @@ export default {
     async SwitchConfig (eqItem, eqIdx) {
       var sendCurCns = await this.getCurCNS(eqItem.master_control)
       send({
-        name: '/deviceControl?main_control_code=' + eqItem.master_control + '&sequence_number=' + sendCurCns + '&deivce_code=' + eqItem.device_code + '&control_type=01' + '&control_number=01' + '&control_data=' + (eqItem.device_status === '0' ? '00000000' : '447a0000'),
+        name: '/deviceControl?main_control_code=' + eqItem.master_control + '&sequence_number=' + sendCurCns + '&device_code=' + eqItem.device_code + '&control_type=01' + '&control_number=01' + '&control_data=' + (eqItem.device_status ? '00000000' : '447a0000'),
         method: 'GET',
         data: {
         }
@@ -843,7 +916,7 @@ export default {
         switch (_res.data.code) {
           case 1:
             this.timer = setInterval(() => {
-              this.EqPlay('switch', eqItem, sendCurCns, 'ControlAck', eqItem.device_status === '0' ? 1 : 0, eqIdx)
+              this.EqPlay('switch', eqItem, sendCurCns, 'ControlAck', eqItem.device_status ? 1 : 0, eqIdx)
             }, 1000)
             // setTimeout(() => { this.EqPlay('switch', eqItem, sendCurCns, 'ControlAck', eqItem.device_status === '0' ? 1 : 0, eqIdx) }, 3000)
             break
@@ -851,7 +924,7 @@ export default {
             this.$Message.error('Interface Error1!')
             break
           default:
-            this.$Message.error('Interface Error!2')
+            this.$Message.error('Interface Error!')
         }
       }).catch((_res) => {
         console.log(_res)
@@ -917,7 +990,7 @@ export default {
         }
       }).catch((_res) => {
         console.log(_res)
-        this.$Message.error('Interface Error22!')
+        this.$Message.error('Interface Error!')
       })
     },
     // 所有设备
@@ -931,6 +1004,9 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
+            _res.data.deviceHomeList.map((item) => {
+              item.device_status = item.device_status === '1' ? true : false
+            })
             this.EqList = _res.data.deviceHomeList
             if (type === 'switch') {
               this.SwitchConfig(eqItem, eqIdx)
@@ -995,7 +1071,7 @@ export default {
         if (valid) {
           this.addEQProduct()
         } else {
-          this.$Message.warning('请将信息填写完成!')
+          this.$Message.warning('请将信息填写完整!')
         }
       })
     },
@@ -1213,6 +1289,10 @@ export default {
         that.MasterControlList = []
       }
     },
+    // 控制面板
+    showControlPanel () {
+      this.changeModalShow('Panel')
+    },
     getMasterControl () {
       send({
         name: '/mainControl?home_id=' + this.curHomeId + '&register_id=' + this.$store.state.register_id,
@@ -1274,7 +1354,7 @@ export default {
     -webkit-animation:ScaleToggle2 2s infinite ease-in-out forwards;
   }
   .ivu-col-span-10{
-    margin-bottom: 30px;
+    margin-bottom: 0px;
   }
 
   .ivu-input-large {

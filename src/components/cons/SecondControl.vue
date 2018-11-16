@@ -2,13 +2,21 @@
   <div class="AllEquipment">
     <div class="ListBox" v-if="SecondControlList.length > 0">
       <Row type="flex" justify="start" class="code-row-bg">
-        <Col span="8"  v-for="(SecondControl, idx) in SecondControlList" :key="idx">
-          <Card style="width: 90%;margin:0 auto 30px auto;">
+        <Col span="12"  v-for="(SecondControl, idx) in SecondControlList" :key="idx">
+          <Card style="width: 96%;margin:0 auto 30px auto;">
             <div style="text-align:left">
               <Row>
-                <Col span="8"><img src="../../../static/img/icons/SecondControlNoraml.png"></Col>
-                <Col span="16">
+                <Col span="6"><img src="../../../static/img/icons/SecondControlNoraml.png"></Col>
+                <Col span="18">
                   <h4>{{SecondControl.second_control_name}}</h4>
+                  <Row class="MarginT_10">
+                    <Col :lg="{span: 4}"  :md="{span: 6}" :xs="{span: 6}">
+                      <p class="Bold smallSize ColorLightBlack">设备码：</p>
+                    </Col>
+                    <Col :lg="{span: 20}" :md="{span: 18}" :xs="{span: 18}">
+                      <p class="ColorLightBlack" style="word-wrap:break-word;font-size: 12px;">{{SecondControl.second_contrl_code}}</p>
+                    </Col>
+                  </Row>
                   <Row class="MarginT_20">
                     <Col span="12"><img @click="editSecondControl(SecondControl.id, SecondControl.second_control_name)" class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editSecondControl(SecondControl.id, SecondControl.second_control_name)">编辑</span></Col>
                     <Col span="12" class="TextAlignR"><img @click="deleteSecondControl(SecondControl)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteSecondControl(SecondControl)">删除</span></Col>
@@ -22,7 +30,7 @@
     </div>
     <NoData v-if="SecondControlList.length == 0"/>
     <!-- 添加主控 -->
-    <Modal v-model="ifAddSecond" width="850">
+    <Modal v-model="ifAddSecond" width="850" :mask-closable="false">
       <p slot="header" style="color:#333;text-align:left">
           <!-- <Icon type="ios-information-circle"></Icon> -->
           <span>添加{{addName}}产品</span>
@@ -148,7 +156,7 @@ export default {
   watch: {
     ifAddSecond: function (val) {
       if (!val) {
-        this.btLoading = true
+        this.btLoading = false
       }
     },
     curHomeId: function (val) {
@@ -431,6 +439,7 @@ export default {
     },
     // 添加从控
     addSecond () {
+      let _this = this
       if (this.btLoading) {
         return false
       }
@@ -455,6 +464,10 @@ export default {
             this.$refs['formSecond'].resetFields()
             this.getSecondControl()
             break
+          case 0:
+            this.btLoading = false
+            this.$Message.error(_res.data.message)
+            break
           default:
             // this.toggleSpin(false)
             this.btLoading = false
@@ -463,7 +476,6 @@ export default {
       }).catch((_res) => {
         // this.toggleSpin(false)
         this.btLoading = false
-        console.log(_res)
         this.$Message.error('Interface Error!')
       })
     },
@@ -491,6 +503,7 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
+            this.btLoading = false
             break
           default:
             this.$Message.error(_res.data.message)

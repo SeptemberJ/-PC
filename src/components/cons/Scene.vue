@@ -42,7 +42,7 @@
       </Row>
     </div>
     <NoData v-if="sceneList.length == 0"/>
-     <!-- 添加场景 -->
+    <!-- 添加场景 -->
     <Modal v-model="ifAddScene" scrollable width="850">
       <p slot="header" style="color:#333;text-align:left">
           <!-- <Icon type="ios-information-circle"></Icon> -->
@@ -227,7 +227,7 @@ export default {
       console.log(idx)
       console.log(val)
     },
-    // 所有设备
+    // 所有场景
     getAllEq () {
       send({
         name: '/selecteqlist?home_id=' + this.curHomeId,

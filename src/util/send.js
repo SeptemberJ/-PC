@@ -5,9 +5,13 @@ import axios from 'axios'
 
 const URL_PREFIX = 'http://www.smart-hox.com:8081/hoxJK'
 // const URL_PREFIX = 'http://205.168.1.104:8081/hoxJK'
+// const URL_PREFIX2 = 'http://192.168.10.55:8081/hoxJK'
+const URL_PREFIX2 = 'http://www.smart-hox.com:8081/hoxJK'
 
 let registerId = localStorage['registerId']
 let account = localStorage['account']
+let nickName = localStorage['nickname']
+let userAvatar = localStorage['avatar']
 
 /**
  * 获取registerId
@@ -46,6 +50,24 @@ export function setAccount (phone) {
 }
 
 /**
+ * 登陆后,注入NickName
+ */
+export function setNickName (nickname) {
+  'use strict'
+  userAvatar = nickname
+  localStorage['NickName'] = nickname
+}
+
+/**
+ * 登陆后,注入Avatar
+ */
+export function setAvatar (avatar) {
+  'use strict'
+  nickName = avatar
+  localStorage['Avatar'] = avatar
+}
+
+/**
  * 退出登录
  * 删除registerId和Account
  */
@@ -55,6 +77,10 @@ export function logout () {
   delete localStorage['registerId']
   account = undefined
   delete localStorage['account']
+  userAvatar = undefined
+  delete localStorage['Avatar']
+  nickName = undefined
+  delete localStorage['NickName']
 }
 
 export function send (options) {
@@ -73,7 +99,6 @@ export function send (options) {
           resolve(res)
         }).catch((error) => {
           console.log(error)
-          this.$Message.error('Interface Error!')
         })
         break
       case 'GET':
@@ -82,7 +107,6 @@ export function send (options) {
           resolve(res)
         }).catch((error) => {
           console.log(error)
-          this.$Message.error('Interface Error!')
         })
         break
       case 'DELETE':
@@ -91,7 +115,6 @@ export function send (options) {
           resolve(res)
         }).catch((error) => {
           console.log(error)
-          this.$Message.error('Interface Error!')
         })
         break
       case 'PUT':
@@ -100,7 +123,52 @@ export function send (options) {
           resolve(res)
         }).catch((error) => {
           console.log(error)
-          this.$Message.error('Interface Error!')
+        })
+        break
+    }
+  })
+}
+
+export function sendscene (options) {
+  const timestamp = Date.now()
+  // alert((URL_PREFIX + options.name))
+  // alert((URL_PREFIX + options.name).indexOf('?') == '-1')
+  // debugger
+  options.url = (URL_PREFIX2 + options.name).indexOf('?') == '-1' ? (URL_PREFIX2 + options.name + '?timestamp=' + timestamp) : (URL_PREFIX2 + options.name + '&timestamp=' + timestamp)
+  // options.url = URL_PREFIX + options.name  + '?&timestamp=' + timestamp
+  delete options.name
+  return new Promise(function (resolve, reject) {
+    switch (options.method) {
+      case 'POST':
+        axios.post(encodeURI(options.url), options.data
+        ).then((res) => {
+          resolve(res)
+        }).catch((error) => {
+          console.log(error)
+        })
+        break
+      case 'GET':
+        axios.get(encodeURI(options.url), {headers: {'X-Timestamp': timestamp}}
+        ).then((res) => {
+          resolve(res)
+        }).catch((error) => {
+          console.log(error)
+        })
+        break
+      case 'DELETE':
+        axios.delete(encodeURI(options.url)
+        ).then((res) => {
+          resolve(res)
+        }).catch((error) => {
+          console.log(error)
+        })
+        break
+      case 'PUT':
+        axios.put(encodeURI(options.url)
+        ).then((res) => {
+          resolve(res)
+        }).catch((error) => {
+          console.log(error)
         })
         break
     }

@@ -1,13 +1,18 @@
 <template>
   <div>
-    <HomeManage v-if="curMenuText === '家列表'"/>
+    <HomeManage v-if="curMenuText === '家管理'"/>
     <AllEquipment v-on:listenSpin="toggleSpin" :AddList="AddList" :deviceTypeList="deviceTypeList" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="curMenuText === '所有设备'"/>
     <EquipmentByRoom :curHomeId="curHomeId" v-if="curMenuText === '按房间分类'"/>
     <EquipmentByKind :curHomeId="curHomeId" v-if="curMenuText === '按类别分类'"/>
+    <Setting v-if="curMenuText === '个人设置'"/>
+    <Automation v-if="curMenuText === '自动化'" :curHomeId="curHomeId"/>
+    <Scene v-if="curMenuText === '场景'" :curHomeId="curHomeId"/>
     <FeedBack v-if="curMenuText === '意见反馈'"/>
     <Problem v-if="curMenuText === '常见问题'"/>
-    <Scene v-if="curMenuText === '场景'" :curHomeId="curHomeId"/>
+    <!-- <Automation v-if="curMenuText === '自动化'" :curHomeId="curHomeId"/>
+    <Scene v-if="curMenuText === '场景'" :curHomeId="curHomeId"/> -->
     <Article v-if="curMenuText === '适玩'"/>
+    <HaoPin v-if="curMenuText === '好品'"/>
     <SPIN v-if="ifSpin"/>
   </div>
 </template>
@@ -21,8 +26,13 @@ import EquipmentByRoom from './cons/EquipmentByRoom.vue'
 import EquipmentByKind from './cons/EquipmentByKind/EquipmentByKind.vue'
 import FeedBack from './cons/FeedBack.vue'
 import Problem from './cons/Problem.vue'
-import Scene from './cons/Scene.vue'
+// import Automation from './cons/Automation.vue'
+// import Scene from './cons/Scene.vue'
 import Article from './cons/Article.vue'
+import HaoPin from './cons/HaoPin.vue'
+import Setting from './cons/Center/Setting.vue'
+import Automation from './cons/Center/Automation.vue'
+import Scene from './cons/Center/Scene.vue'
 import SPIN from './Spin.vue'
 export default {
   name: 'Content',
@@ -38,6 +48,7 @@ export default {
     ...mapState({
       curHome: state => state.curHome,
       ifSpin: state => state.ifSpin,
+      curTab: state => state.sider.curTab,
       curMenu: state => state.sider.curMenu,
       curMenuText: state => state.sider.curMenuText
     })
@@ -54,8 +65,11 @@ export default {
     EquipmentByKind,
     FeedBack,
     Problem,
-    Scene,
     Article,
+    HaoPin,
+    Setting,
+    Automation,
+    Scene,
     SPIN
   },
   created () {

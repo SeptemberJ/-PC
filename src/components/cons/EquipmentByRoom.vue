@@ -135,12 +135,16 @@ export default {
       'changeRoomList',
       'changeModalShow'
     ]),
+    ...mapActions('sider', [
+      'changeCurMenu'
+    ]),
     back () {
       this.locationIdex = -1
       this.getAllRoom()
     },
     addEQ () {
-      this.changeModalShow('EQ')
+      this.changeCurMenu(3)
+      // this.changeModalShow('EQ')
     },
     SeeEqList (Idx, HouseId, HouseName) {
       this.locationIdex = Idx

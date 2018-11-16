@@ -5,6 +5,7 @@ import Login from '@/pages/login'
 import Sign from '@/pages/sign'
 import Guide from '@/pages/guide'
 import CreateHome from '@/pages/createHome'
+import Control from '@/components/cons/Control/Control'
 import {getCookie} from '@/util/util'
 
 Vue.use(VueRouter)
@@ -41,6 +42,11 @@ const router = new VueRouter({
       name: 'Login',
       component: Login
     },
+    {
+      path: '/Control',
+      name: 'Control',
+      component: Control
+    },
     {path: '*', redirect: '/Login'}
   ]
 })
@@ -48,7 +54,6 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   if (to.meta.requireAuth) {
     if (getCookie('btznkz')) {
-      console.log('has-----')
       next()
     } else {
       console.log('nohas-----')

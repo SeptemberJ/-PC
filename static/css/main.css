@@ -29,6 +29,9 @@ html, body{
 .ColorGray{
 	color: #ccc;
 }
+.ColorLightBlack{
+	color: #515a6e !important;
+}
 .ColorWhite{
 	color: white;
 }
@@ -36,7 +39,7 @@ html, body{
 	color: #2d8cf0;
 }
 .smallSize{
-	font-size: 12px;
+	font-size: 12px !important;
 }
 .Bold{
 	font-weight: bold;
@@ -70,7 +73,10 @@ html, body{
 	margin-top: 40px !important;
 }
 .MarginR_10{
-	margin-right: 10px;
+	margin-right: 10px !important;
+}
+.Margin_20{
+	margin: 20px !important;
 }
 .BorderT_gray{
 	border-top: 1px solid #dcdee2;
