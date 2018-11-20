@@ -7,13 +7,11 @@
       <Col span="12" style="background: #fff;padding: 20px 0;">
         <Row>
           <Col span="9">
-            <img class="Avatar CursorPointer" v-if="hasNewAvatar" :src="newAvatar" @click="changeAvatar">
-            <img class="Avatar CursorPointer" v-if="!hasNewAvatar" :src="Avatar" @click="changeAvatar">
+            <img class="Avatar CursorPointer" :src="Avatar" @click="changeAvatar">
             <p class="TextAlignC MarginT_10 CursorPointer" @click="changeAvatar">点击修改</p>
           </Col>
           <Col span="15">
-            <h3 class="CursorPointer" v-if="hasNewNickName">昵称：{{newNickName}} <span class="ColorRed MarginL_10" @click="changeNickName">编辑</span></h3>
-            <h3 class="CursorPointer" v-if="!hasNewNickName">昵称：{{NickName}} <span class="ColorRed MarginL_10" @click="changeNickName">编辑</span></h3>
+            <h3 class="CursorPointer">昵称：{{NickName}} <span class="ColorRed MarginL_10" @click="changeNickName">编辑</span></h3>
             <h3>账户：{{accountPhone}}</h3>
             <Button icon="ios-create-outline" type="primary" class="MarginT_20" @click="changePsd">修改密码</Button>
           </Col>
@@ -93,7 +91,7 @@
 <script>
 import {mapState} from 'vuex'
 import {Decrypt, Encrypt} from '../../../util/util'
-import {send, setAvatar, setNickName} from '../../../util/send'
+import {send} from '../../../util/send'
 // import NoData from '../../NoData.vue'
 export default {
   name: 'Setting',
@@ -108,21 +106,24 @@ export default {
       oldPsd: '',
       newPsd: '',
       newPsdAgain: '',
-      hasNewAvatar: false,
-      hasNewNickName: false
+      NickName: '',
+      Avatar: ''
+      // hasNewAvatar: false,
+      // hasNewNickName: false
     }
   },
   computed: {
     ...mapState({
       accountPhone: state => state.accountPhone,
+      register_id: state => state.register_id,
       urlPre_upload: state => state.urlPre_upload
-    }),
-    NickName: function () {
-      return localStorage['NickName']
-    },
-    Avatar: function () {
-      return localStorage['Avatar']
-    }
+    })
+    // NickName: function () {
+    //   return localStorage['NickName']
+    // },
+    // Avatar: function () {
+    //   return localStorage['Avatar']
+    // }
   },
   watch: {
     // NickName: function (val) {
@@ -133,6 +134,9 @@ export default {
     // }
   },
   components: {
+  },
+  created () {
+    this.getAccountInfo()
   },
   methods: {
     changeNickName () {
@@ -172,8 +176,9 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
-            setNickName(this.newNickName)
-            this.hasNewNickName = true
+            // setNickName(this.newNickName)
+            // this.hasNewNickName = true
+            this.getAccountInfo()
             this.$Message.success('昵称修改成功!')
             break
           default:
@@ -199,9 +204,11 @@ export default {
         let reg = /^data:image\/(jpeg|png|gif);base64,/
         let jiequ = this.result.replace(reg, '')
         send({
-          name: '/uploadBase64?imgStr=' + encodeURIComponent(jiequ),
+          // name: '/uploadBase64?imgStr=' + encodeURIComponent(jiequ),
+          name: '/uploadBase64',
           method: 'POST',
           data: {
+            'imgStr': encodeURIComponent(jiequ)
           }
         }).then(_res => {
           switch (_res.data.result) {
@@ -244,8 +251,9 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
-            setAvatar(this.newAvatar)
-            this.hasNewAvatar = true
+            // setAvatar(this.newAvatar)
+            // this.hasNewAvatar = true
+            this.getAccountInfo()
             this.ifChangeAvatar = false
             this.$Message.success('头像修改成功!')
             break
@@ -276,6 +284,25 @@ export default {
             localStorage['openCode'] = Encrypt(this.newPsd.toString())
             this.ifChangePsd = false
             this.$Message.success('密码修改成功!')
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((res) => {
+        this.$Message.error('Interface Error!')
+      })
+    },
+    getAccountInfo () {
+      send({
+        name: '/registerInfo?registerid=' + this.register_id,
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            this.Avatar = _res.data.registerInfo.head_pic
+            this.NickName = _res.data.registerInfo.fnickname
             break
           default:
             this.$Message.error(_res.data.message)

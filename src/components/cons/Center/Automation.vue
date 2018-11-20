@@ -17,7 +17,7 @@
                   <h4>{{Automation.auto_name}}</h4>
                   <Row class="operationIcon">
                     <Col span="24">
-                      <i-switch title="设备开关" style="float:left;margin-top:0px;" :value="Automation.status == 1? true: false">
+                      <i-switch title="设备开关" style="float:left;margin-top:0px;" v-model="Automation.auto_status" @on-change="OperationToggle(Automation, Automation.auto_status, idx)">
                         <span slot="open">ON</span>
                         <span slot="close">OFF</span>
                       </i-switch>
@@ -83,7 +83,7 @@
               <!-- <Button v-if="formAutomation.condition.sensor.length != 0" type="error" shape="circle" icon="md-add" size="small" style='float: right;' @click="addCondition">添加</Button> -->
             </FormItem>
             <FormItem label="">
-              <Row v-for="(sensor, sensorIdx) in formAutomation.condition.sensor" :key="sensorIdx" class="MarginB_10">
+              <Row v-for="(sensor, sensorIdx) in formAutomation.condition.sensor" :key="'sensor' + sensorIdx" class="MarginB_10">
                 <Col span="6">{{sensor.name}}</Col>
                 <Col span="6">
                   <Select v-model="sensor.measuringPoint" style="width:150px">
@@ -109,12 +109,16 @@
             </FormItem>
             <FormItem>
               <!-- 执行设备列表 -->
-              <Row v-for="(implement, implementIdx) in formAutomation.implements.eqList" :key="implementIdx" class="MarginB_10">
+              <Row v-for="(implement, implementIdx) in formAutomation.implements.eqList" :key="'implement' + implementIdx" class="MarginB_10">
                 <Col span="6">{{implement.eqName}}</Col>
                 <Col span="4">
                   <Select v-model="implement.device_status" style="width:100px">
-                    <Option v-for="(item, idx) in settingObj[implement.deviceType].switchArray" :value="item.val" :key="idx">{{ item.lab }}</Option>
+                    <Option value="0">关闭</Option>
+                    <Option value="1">打开</Option>
                   </Select>
+                  <!-- <Select v-model="implement.device_status.toString()" style="width:100px">
+                    <Option v-for="(item, idx) in settingObj[implement.deviceType].switchArray" :value="item.val" :key="idx">{{ item.lab }}</Option>
+                  </Select> -->
                 </Col>
                 <Col span="2">
                   <p v-if="implement.deviceType == '022'">亮度</p>
@@ -126,7 +130,7 @@
                 </Col> -->
                 <Col span="4" v-if="implement.deviceType == '022'">
                   <Select v-model="implement.device_value" style="width:100px">
-                    <Option v-for="(item, idx) in settingObj[implement.deviceType].valueArray" :value="item.val" :key="idx">{{ item.lab }}</Option>
+                    <Option v-for="(item, idx) in settingObj[implement.deviceType].valueArray" :value="item.fval" :key="idx">{{ item.fname }}</Option>
                   </Select>
                 </Col>
                 <!-- <Col span="4">
@@ -137,12 +141,12 @@
                 <Col span="3"><Icon type="ios-trash" size="18" class="CursorPointer hoverColor MarginL_10" @click="removerImplementEq(implementIdx, implement.id)"/></Col>
               </Row>
               <!-- 执行场景列表 -->
-              <Row v-for="(scene, sceneIdx) in formAutomation.implements.sceneList" :key="formAutomation.implements.sceneList.length + sceneIdx" class="MarginB_10">
+              <Row v-for="(scene, sceneIdx) in formAutomation.implements.sceneList" :key="'scene' + sceneIdx" class="MarginB_10">
                 <Col span="6">{{scene.sceneName}}</Col>
                 <Col span="4">
                   <Select v-model="scene.scene_status" style="width:100px">
-                    <Option :value="0">关闭</Option>
-                    <Option :value="1">打开</Option>
+                    <Option value="0">关闭</Option>
+                    <Option value="1">打开</Option>
                   </Select>
                 </Col>
                 <Col span="3"><Icon type="ios-trash" size="18" class="CursorPointer hoverColor MarginL_10" @click="removerImplementScene(sceneIdx, scene.id)"/></Col>
@@ -205,7 +209,7 @@
 
 <script>
 import {mapState, mapActions} from 'vuex'
-import {send, sendscene } from '../../../util/send'
+import {sendscene} from '../../../util/send'
 import {Decrypt} from '../../../util/util'
 import NoData from '../../NoData.vue'
 export default {
@@ -222,11 +226,6 @@ export default {
       compareArray: [{val: '大于', lab: '大于'}, {val: '小于', lab: '小于'}, {val: '等于', lab: '等于'}],
       delayArray: [{val: 0, lab: '立即'}, {val: 0, lab: '1'}, {val: 0, lab: '2'}],
       settingObj: {
-        '021': {
-          'switchArray': [{val: 0, lab: '关闭'}, {val: 1, lab: '打开'}],
-          'actionArray': [{val: 0, lab: '亮度'}, {val: 1, lab: '柔度'}],
-          'valueArray': [{val: 0, lab: '强'}, {val: 1, lab: '中'}, {val: 2, lab: '弱'}]
-        }
       },
       automationList: [], // 自动化列表
       conditionItemId: '', // 单次选择的启动条件（传感器）
@@ -289,12 +288,56 @@ export default {
     this.getNotSensorEq()
     this.getSensorEq()
     this.getAllScene()
+    this.getActionValue()
   },
   watch: {
     curHomeId: function (val) {
       this.getAllAutomation()
       this.getNotSensorEq()
       this.getSensorEq()
+    },
+    ifAddAutomation: function (val) {
+      if (!val) {
+        this.formScene = {
+          SceneName: '',
+          SceneIcon: '',
+          implements: []
+        }
+        this.isEdit = false
+      }
+    },
+    isEdit: function (val) {
+      if (!val) {
+        this.choosedEqList = []
+        this.choosedSceneList = []
+        this.formAutomation = {
+          AutomationName: '',
+          SceneTime: {
+            start: '',
+            end: ''
+          },
+          conditionKind: '0', // 0满足所有条件 1满足一个即可
+          SceneWeek: {
+            SingleTime: true,
+            Monday: false,
+            Tuesday: false,
+            Wednesday: false,
+            Thursday: false,
+            Friday: false,
+            Saturday: false,
+            Sunday: false
+          },
+          condition: {
+            timing: {},
+            sensor: []
+          },
+          implements: {
+            eqList: [],
+            sceneList: []
+          }
+          // Automation: []
+        }
+      }
     }
   },
   components: {
@@ -371,11 +414,10 @@ export default {
           let tempObj = {
             'eqName': newObj[0].device_name,
             'device_id': newObj[0].id,
+            'id': newObj[0].id,
             'deviceType': newObj[0].default_device_type,
-            'device_status': 0,
-            'action': 0,
-            'device_value': 1,
-            'delay': '立即'
+            'device_status': '1',
+            'device_value': this.settingObj[newObj[0].default_device_type].valueArray[0].fval
           }
           newEqListArray.push(tempObj)
         } else {
@@ -391,7 +433,8 @@ export default {
           let tempObj = {
             'sceneName': newObj[0].scene_name,
             'scene_id': newObj[0].id,
-            'scene_status': 0
+            'id': newObj[0].id,
+            'scene_status': '1'
           }
           newSceneListArray.push(tempObj)
         } else {
@@ -433,12 +476,13 @@ export default {
       })
       if (choosedItem[0]) {
         let newObj = {
-          if_type: '1', // 0-时间 1-设备
-          name: choosedItem[0].device_name,
-          id: choosedItem[0].id,
-          measuringPoint: '',
-          compare: '',
-          limitNumber: ''
+          'if_type': '1', // 0-时间 1-设备
+          'name': choosedItem[0].device_name,
+          // 'deviceType': choosedItem[0].default_device_type,
+          'id': choosedItem[0].id,
+          'measuringPoint': '',
+          'compare': '',
+          'limitNumber': ''
         }
         this.ifChooseCondition = false
         this.formAutomation.condition.sensor.push(newObj)
@@ -483,9 +527,11 @@ export default {
       })
     },
     postAumation (formAutomation) {
+      console.log('formAutomation--------------')
+      console.log(formAutomation)
       let conditionArray = []
       let weekArray = []
-      for (var key in formAutomation.SceneWeek){
+      for (var key in formAutomation.SceneWeek) {
         if (formAutomation.SceneWeek[key]) {
           switch (key) {
             case 'SingleTime':
@@ -518,26 +564,52 @@ export default {
       formAutomation.condition.sensor.map((implement) => {
         let obj = {
           'if_type': 1,
-          'if_ha3_id': implement.name,
+          'if_select_type': implement.measuringPoint,
+          'if_ha3_id': implement.id,
           'if_value': implement.limitNumber,
           'if_select': implement.compare
         }
         conditionArray.push(obj)
       })
-      conditionArray.push({'if_type': 0, 'if_begin_time': formAutomation.SceneTime.start, 'if_end_time': formAutomation.SceneTime.end})
+      let eqListArray = []
+      formAutomation.implements.eqList.map((EQ) => {
+        let obj = {
+          'device_id': EQ.id,
+          'device_status': EQ.device_status,
+          'device_value': EQ.device_value
+        }
+        eqListArray.push(obj)
+      })
+      let sceneListArray = []
+      formAutomation.implements.sceneList.map((SCENE) => {
+        let obj = {
+          'scene_id': SCENE.id,
+          'scene_status': SCENE.scene_status
+        }
+        sceneListArray.push(obj)
+      })
+      // conditionArray.push({'if_type': 0, 'if_begin_time': formAutomation.SceneTime.start, 'if_end_time': formAutomation.SceneTime.end})
+      if (eqListArray.length === 0 && sceneListArray.length === 0) {
+        this.$Message.warning('请至少选择一个自动化动作！')
+        return false
+      }
       let automation = {
+        id: formAutomation.AutomationId ? formAutomation.AutomationId : '',
+        auto_status: formAutomation.AutomationStatus ? formAutomation.AutomationStatus : '',
         home_id: this.curHomeId,
         auto_name: formAutomation.AutomationName,
         auto_type: formAutomation.conditionKind,
-        auto_if_list: conditionArray,
+        auto_iftime_list: [{'if_type': 0, 'if_begin_time': formAutomation.SceneTime.start, 'if_end_time': formAutomation.SceneTime.end}],
+        auto_ifha3_list: conditionArray,
+        // auto_if_list: conditionArray,
         auto_time_list: weekArray,
-        auto_execute_device: formAutomation.implements.eqList,
-        auto_execute_scene: formAutomation.implements.sceneList
+        auto_execute_device: eqListArray,
+        auto_execute_scene: sceneListArray
       }
       console.log('automation-------')
       console.log(automation)
       sendscene({
-        name: '/insertauto',
+        name: this.isEdit ? '/updateAuto' : '/insertauto',
         method: 'POST',
         data: {
           auto: automation
@@ -634,6 +706,9 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
+            // 更新已选择的id集合
+            this.choosedEqList = []
+            this.choosedSceneList = []
             // week
             let SceneWeek = {
               SingleTime: true,
@@ -681,51 +756,73 @@ export default {
               }
             })
             // condition
-            let  condition = {
-              timing: {},
-              sensor: []
-            }
+            // let condition = {
+            //   timing: {},
+            //   sensor: []
+            // }
             let SceneTime = {
               start: '',
               end: ''
             }
-            _res.data.auto_if_list.map((item) => {
-              if (item.if_type === '0') {
-                // 时间条件
-                SceneTime.start = item.if_begin_time
-                SceneTime.start = item.if_end_time
-              } else {
-                // 传感器条件
-              }
-            })
+            if (_res.data.auto_iftime_list[0]) {
+              SceneTime.start = _res.data.auto_iftime_list[0].if_begin_time
+              SceneTime.end = _res.data.auto_iftime_list[0].if_end_time
+            }
+            // 传感器条件列表
+            let sensors = []
+            if (_res.data.auto_ifha3_list.length > 0) {
+              _res.data.auto_ifha3_list.map((item) => {
+                let obj = {
+                  name: item.device_name,
+                  compare: item.if_select,
+                  limitNumber: item.if_value,
+                  measuringPoint: item.if_select_type,
+                  id: item.if_ha3_id,
+                  // deviceType: item.device_type,
+                  device_status: item.if_select
+                  // device_value: item.if_value
+                }
+                sensors.push(obj)
+              })
+            }
             // 执行的设备列表
             let eqList = []
-            _res.data.auto_execute_device_list.map((item) => {
-              let obj = {
-                eqName: '--',
-                device_status: item.device_status,
-                device_value: item.device_value
-              }
-              eqList.push(sceneList)
-            })
-            
+            if (_res.data.auto_execute_device_list.length > 0) {
+              _res.data.auto_execute_device_list.map((item) => {
+                let obj = {
+                  eqName: item.device_name,
+                  id: item.device_id,
+                  deviceType: item.deviceType,
+                  device_status: item.device_status,
+                  device_value: item.device_value
+                }
+                this.choosedEqList.push(item.device_id)
+                eqList.push(obj)
+              })
+            }
             // 执行的场景列表
             let sceneList = []
-            _res.data.auto_execute_device_list.map((item) => {
-              let obj = {
-                sceneName: '--',
-                scene_status: item.scene_status
-              }
-              sceneList.push(sceneList)
-            })
+            if (_res.data.auto_execute_scene_list.length > 0) {
+              _res.data.auto_execute_scene_list.map((item) => {
+                let obj = {
+                  sceneName: item.scene_name,
+                  id: item.scene_id,
+                  scene_status: item.scene_status
+                }
+                this.choosedSceneList.push(item.scene_id)
+                sceneList.push(obj)
+              })
+            }
             this.formAutomation = {
+              AutomationId: AutomationId,
+              AutomationStatus: _res.data.autodetail[0].auto_status,
               AutomationName: _res.data.autodetail[0].auto_name,
               SceneTime: SceneTime,
               conditionKind: _res.data.autodetail[0].auto_type, // 0满足所有条件 1满足一个即可
               SceneWeek: SceneWeek,
               condition: {
                 timing: {},
-                sensor: []
+                sensor: sensors
               },
               implements: {
                 eqList: eqList,
@@ -733,7 +830,29 @@ export default {
               }
               // Automation: []
             }
+            console.log('edit------------------')
+            console.log(this.formAutomation)
             this.changeModalShow('Automation')
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.$Message.error('Interface Error!')
+      })
+    },
+    // 自动化开关
+    OperationToggle (Automation, status, idx) {
+      sendscene({
+        name: '/updateAutoStatus?id=' + Automation.id + '&status=' + (status ? '1' : '0'),
+        method: 'PUT',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            this.getAllAutomation()
             break
           default:
             this.$Message.error(_res.data.message)
@@ -793,6 +912,9 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
+            _res.data.autolist.map((item) => {
+              item.auto_status = item.auto_status === '1'
+            })
             this.automationList = _res.data.autolist
             break
           default:
@@ -825,6 +947,34 @@ export default {
         this.$Message.error('Interface Error!')
       })
     },
+    // 所有执行操作值
+    getActionValue () {
+      sendscene({
+        name: '/deviceTypeValue',
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            let tempActionArray = {}
+            _res.data.deviceTypeValueList.typeList.map((item) => {
+              tempActionArray[item.device_code] = {
+                'switchArray': [{val: '0', lab: '关闭'}, {val: '1', lab: '打开'}],
+                'valueArray': item.typeValueList
+              }
+            })
+            console.log(tempActionArray)
+            this.settingObj = tempActionArray
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.$Message.error('Interface Error!')
+      })
+    }
   }
 }
 </script>

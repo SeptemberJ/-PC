@@ -53,7 +53,7 @@
             <FormItem label="场景名称" prop="SceneName">
               <Input v-model="formScene.SceneName" placeholder="输入场景名称" style="" />
             </FormItem>
-            <FormItem label="选择场景图标" prop="eqType">
+            <FormItem label="选择场景图标" prop="eqType" v-if="iconList.length > 0">
               <Button style="margin-top: -30px;" size="small" icon="ios-arrow-back" shape="circle" @click="preIcon"></Button>
               <img style="width: 40px;height: 40px;margin: auto 10px;" :src="urlPre_scene + iconList[iconIndex].fpic">
               <Button style="margin-top: -30px;" size="small" icon="ios-arrow-forward" shape="circle" @click="nextIcon"></Button>
@@ -76,7 +76,7 @@
                 </Col> -->
                 <Col span="4" v-if="implement.deviceType == '022'">
                   <Select v-model="implement.device_value" style="width:100px">
-                    <Option v-for="(item, idx) in settingObj[implement.deviceType].valueArray" :value="item.val" :key="idx">{{ item.lab }}</Option>
+                    <Option v-for="(item, idx) in settingObj[implement.deviceType].valueArray" :value="item.fval" :key="idx">{{ item.fname }}</Option>
                   </Select>
                 </Col>
                 <!-- <Col span="4">
@@ -121,7 +121,7 @@
 
 <script>
 import {mapState, mapActions} from 'vuex'
-import {send, sendscene} from '../../../util/send'
+import {sendscene} from '../../../util/send'
 import {Decrypt} from '../../../util/util'
 import NoData from '../../NoData.vue'
 export default {
@@ -137,7 +137,8 @@ export default {
       switchValue: true,
       iconIndex: 0,
       iconList: [],
-      settingObj: {
+      settingObj: {},
+      settingObj2: {
         '021': {
           'switchArray': [{val: '0', lab: '关闭'}, {val: '1', lab: '打开'}],
           'actionArray': [{val: '0', lab: '亮度'}, {val: '1', lab: '柔度'}],
@@ -188,6 +189,7 @@ export default {
           SceneIcon: '',
           implements: []
         }
+        this.isEdit = false
       }
     }
     // keyWord: function (val) {
@@ -205,6 +207,7 @@ export default {
     this.getAllScene()
     this.getNotSensorEq()
     this.getSceneIcon()
+    this.getActionValue()
   },
   components: {
     NoData
@@ -370,6 +373,11 @@ export default {
               item.device_status = item.device_status
               item.device_value = item.device_value
             })
+            this.iconList.filter((icon, idx) => {
+              if (_res.data.sceneDetail[0].scene_pic.indexOf(icon.fpic) !== -1) {
+                this.iconIndex = idx
+              }
+            })
             this.formScene = {
               SceneId: SceneId,
               SceneName: _res.data.sceneDetail[0].scene_name,
@@ -426,9 +434,9 @@ export default {
             'eqName': newObj[0].device_name,
             'device_id': newObj[0].id,
             'deviceType': newObj[0].default_device_type,
-            'device_status': '0',
+            'device_status': '1',
             // 'action': 0,
-            'device_value': '1'
+            'device_value': this.settingObj[newObj[0].default_device_type].valueArray[0].fval
             // 'delay': '立即'
           }
           newArray.push(tempObj)
@@ -476,7 +484,8 @@ export default {
         switch (_res.data.code) {
           case 1:
             _res.data.scenelist.map((item) => {
-              item.scene_status = item.scene_status === '1' ? true : false
+              item.scene_status = item.scene_status === '1'
+              // item.scene_status = item.scene_status === '1' ? true : false
             })
             this.sceneList = _res.data.scenelist
             break
@@ -499,6 +508,34 @@ export default {
         switch (_res.data.code) {
           case 1:
             this.iconList = _res.data.scenePiclist
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.$Message.error('Interface Error!')
+      })
+    },
+    // 所有执行操作值
+    getActionValue () {
+      sendscene({
+        name: '/deviceTypeValue',
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            let tempActionArray = {}
+            _res.data.deviceTypeValueList.typeList.map((item) => {
+              tempActionArray[item.device_code] = {
+                'switchArray': [{val: '0', lab: '关闭'}, {val: '1', lab: '打开'}],
+                'valueArray': item.typeValueList
+              }
+            })
+            console.log(tempActionArray)
+            this.settingObj = tempActionArray
             break
           default:
             this.$Message.error(_res.data.message)

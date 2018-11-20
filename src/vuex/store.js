@@ -11,7 +11,6 @@ const debug = process.env.NODE_ENV !== 'production'
 const state = {
   count: 10,
   PlainText: 'ZNKZ',
-  urlPre_scene: '',
   urlPre_article: 'http://www.smart-hox.com:8081/upFiles/',
   urlPre_scene: 'http://www.smart-hox.com:8081/upFiles/',
   urlPre_upload: 'http://112.90.178.68:8081/upFiles/',
@@ -170,6 +169,38 @@ const state = {
     }, {
       gt: 60,
       color: '#0000FF'
+    }],
+    '功率': [{
+      gt: 0,
+      lte: 40,
+      color: '#096'
+    }, {
+      gt: 40,
+      lte: 60,
+      color: '#ffde33'
+    }, {
+      gt: 60,
+      color: '#cc0033'
+    }],
+    '电量': [{
+      gt: 0,
+      lte: 40,
+      color: '#096'
+    }, {
+      gt: 40,
+      lte: 60,
+      color: '#ffde33'
+    }, {
+      gt: 60,
+      color: '#cc0033'
+    }],
+    '电压': [{
+      gt: 0,
+      lte: 220,
+      color: '#096'
+    }, {
+      gt: 220,
+      color: '#cc0033'
     }]
   }
 }

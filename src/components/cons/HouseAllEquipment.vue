@@ -14,7 +14,7 @@
               <Icon type="ios-loop-strong"></Icon>
               {{EQ.type == 0 ? '离线' : '在线'}}
             </p>
-            <i-switch slot="extra" title="设备开关" v-if="EQ.default_device_type== '021'" style="float:right;margin-top:0px;" v-model="EQ.device_status" @on-change="OperationToggle(EQ, idx)">
+            <i-switch slot="extra" title="设备开关" v-if="EQ.default_device_type== '021' || EQ.default_device_type == '022'" style="float:right;margin-top:0px;" v-model="EQ.device_status" @on-change="OperationToggle(EQ, idx)">
               <span slot="open">ON</span>
               <span slot="close">OFF</span>
             </i-switch>
@@ -65,7 +65,7 @@
               <Row class="operationIcon">
                 <Col span="24" class="TextAlignR">
                   <img title="移动设备" class="iconImg scaleAnimation" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
-                  <img title="查看数据" v-if="EQ.default_device_type == '031'" class="iconImg scaleAnimation" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts(EQ)">
+                  <img title="查看数据" v-if="EQ.default_device_type == '031' || EQ.default_device_type == '032' || EQ.default_device_type == '021' || EQ.default_device_type == '022'" class="iconImg scaleAnimation" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts(EQ)">
                   <!-- <img title="查看数据" v-if="EQ.default_device_type == '021'" class="iconImg scaleAnimation" src="../../../static/img/icons/yaokongqi.png" @click="showControlPanel(EQ)"> -->
                 </Col>
               </Row>
@@ -204,14 +204,19 @@
       </div>
     </Modal>
     <!-- chart -->
-    <Modal v-model="ifShowChart" fullscreen title="数据详情">
+    <Modal v-model="ifShowChart" fullscreen title="数据详情" footer-hide>
         <!-- <div class="MarginB_10">选择类型</div> -->
         <div class="kindBar" style="text-align:left">
           <Row>
             <Col span="4">选择类型</Col>
-            <Col span="20">
+            <Col span="20" v-if="curEqType == '031' || curEqType == '032'">
               <RadioGroup v-model="curKind" @on-change="changeKind">
                 <Radio v-for="(item, idx) in kind" :key="idx" :label="item"></Radio>
+              </RadioGroup>
+            </Col>
+            <Col span="20" v-if="curEqType == '021' || curEqType == '022'">
+              <RadioGroup v-model="curKind" @on-change="changeKindLight">
+                <Radio v-for="(item, idx) in kind_light" :key="idx" :label="item"></Radio>
               </RadioGroup>
             </Col>
           </Row>
@@ -226,7 +231,7 @@
             </Col>
           </Row>
         </div>
-        <div v-show="hasData" id="myChart" :style="{width: '1024px', height: '300px', margin: '0 auto'}"></div>
+        <div v-show="hasData" id="myChart" :style="{width: '1024px', height: '450px', margin: '0 auto'}"></div>
         <div class="TextAlignC MarginT_30" v-show="!hasData && !ifSpin">
           <img style="width:100px;height:100px;margin:30px auto;" src="../../../static/img/icons/nodata.png">
           <p>暂无数据</p>
@@ -258,6 +263,7 @@ export default {
       curEQRoom: '',
       curEQId: '',
       curEqCode: '',
+      curEqType: '',
       // add
       EqType: '无线设备',
       MasterList: [],
@@ -320,6 +326,8 @@ export default {
       time: '6',
       kindI: ['pm25', 'temperature', 'humidity', 'pm100', 'formaldehyde', 'voc', 'co2', 'co'],
       kind: ['PM2.5', '温度', '湿度', 'PM10', '甲醛', 'VOCs', 'CO2', 'CO'],
+      kindI_light: ['power', 'electric_quantity', 'voltage'],
+      kind_light: ['功率', '电量', '电压'],
       hasData: false,
       openCode: '',
       ifShowControlPanel: false
@@ -579,6 +587,15 @@ export default {
     // 查看chart
     showCharts (EQ) {
       this.curEqCode = EQ.device_code
+      this.curEqType = EQ.default_device_type
+      if (EQ.default_device_type === '031' || EQ.default_device_type === '032') {
+        this.curKind = 'PM2.5'
+        this.curKindI = 'pm25'
+      }
+      if (EQ.default_device_type === '021' || EQ.default_device_type === '022') {
+        this.curKind = '功率'
+        this.curKindI = 'power'
+      }
       // 没配置过先配置
       if (EQ.device_config !== '1') {
         this.setConfig('chart', EQ)
@@ -594,6 +611,13 @@ export default {
         }
       })
     },
+    changeKindLight (val) {
+      this.kind_light.map((item, idx) => {
+        if (item === val) {
+          this.curKindI = this.kindI_light[idx]
+        }
+      })
+    },
     changeTime (val) {
       this.time = val
       console.log(val)
@@ -603,13 +627,23 @@ export default {
       let _THIS = this
       // 初始化echarts实例
       let myChart = this.$echarts.init(document.getElementById('myChart'))
+      let urlKind = ''
+      let backDataProperty = ''
+      if (this.curEqType === '031' || this.curEqType === '032') {
+        urlKind = '/hair'
+        backDataProperty = 'hairList'
+      }
+      if (this.curEqType === '021' || this.curEqType === '022') {
+        urlKind = '/energy'
+        backDataProperty = 'energyList'
+      }
       send({
-        name: '/hair?device_id=' + this.curEqCode + '&type=' + _THIS.curKindI + '&hh=' + _THIS.time,
+        name: urlKind + '?device_id=' + this.curEqCode + '&type=' + _THIS.curKindI + '&hh=' + _THIS.time,
         method: 'GET',
         data: {
         }
       }).then(_res => {
-        if (_res.data.hairList.length === 0) {
+        if (_res.data[backDataProperty].length === 0) {
           _THIS.hasData = false
           this.toggleSpin(false)
           return false
@@ -618,7 +652,7 @@ export default {
         }
         switch (_res.data.code) {
           case 1:
-            let tempData = _res.data.hairList
+            let tempData = _res.data[backDataProperty]
             let option = {
               title: {
                 text: ''
@@ -775,17 +809,20 @@ export default {
               if (_res.data.result.payload === '00') {
                 clearInterval(this.timer)
                 this.getAllEq('', eqItem, eqIdx)
-                // console.log(this.EqList[eqIdx].device_status)
-                // console.log(switchStatus)
-                // debugger
-                // this.EqList[eqIdx].device_status = switchStatus
-                // debugger
-                // console.log(this.EqList[eqIdx].device_status)
+              } else if (_res.data.result.payload === '01') {
+                clearInterval(this.timer)
+                this.$Message.error('设备不存在')
+                this.getAllEq('', eqItem, eqIdx)
+              } else if (_res.data.result.payload === '02') {
+                clearInterval(this.timer)
+                this.$Message.error('控制点不存在')
+                this.getAllEq('', eqItem, eqIdx)
+              } else if (_res.data.result.payload === '03') {
+                clearInterval(this.timer)
+                this.$Message.error('控制类型不存在')
+                this.getAllEq('', eqItem, eqIdx)
               } else {
-                this.$invoke('toast', 'show', {
-                  title: _res.data.result.result,
-                  img: '../images/icons/attention.png'
-                })
+                this.$Message.error(_res.data.result.result)
               }
               this.toggleSpin(false)
             }
@@ -936,7 +973,8 @@ export default {
         switch (_res.data.code) {
           case 1:
             _res.data.deviceHouseList.map((item) => {
-              item.device_status = item.device_status === '1' ? true : false
+              item.device_status = item.device_status === '1'
+              // item.device_status = item.device_status === '1' ? true : false
             })
             this.EqList = _res.data.deviceHouseList
             if (type === 'switch') {

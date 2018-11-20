@@ -27,7 +27,7 @@
 		</div> -->
 	</div>
 </template>
-
+<script type="text/javascript"  charset="utf-8" src="http://connect.qq.com/qc_jssdk.js" data-appid="101518980" data-redirecturi="http://btzoon.com/api/oauth/QQ/callback.php"></script>
 <script>
 import { mapState, mapActions } from 'vuex'
 import {send, setRegisterId, setAccount, setNickName, setAvatar} from '../util/send'

@@ -377,9 +377,10 @@ export default {
         let reg = /^data:image\/(jpeg|png|gif);base64,/
         let jiequ = this.result.replace(reg, '')
         send({
-          name: '/uploadBase64?imgStr=' + encodeURIComponent(jiequ),
+          name: '/uploadBase64',
           method: 'POST',
           data: {
+            'imgStr': encodeURIComponent(jiequ)
           }
         }).then(_res => {
           switch (_res.data.result) {

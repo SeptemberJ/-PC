@@ -439,7 +439,6 @@ export default {
     },
     // 添加从控
     addSecond () {
-      let _this = this
       if (this.btLoading) {
         return false
       }
