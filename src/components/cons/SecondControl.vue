@@ -17,6 +17,13 @@
                       <p class="ColorLightBlack" style="word-wrap:break-word;font-size: 12px;">{{SecondControl.second_contrl_code}}</p>
                     </Col>
                   </Row>
+                   <Row class="MarginT_10" v-if="addKind == '051' || addKind == '052'">
+                    <Col span="6"><p class="Bold smallSize ColorLightBlack">面板数：</p></Col>
+                    <Col span="6"><p class="ColorLightBlack" style="font-size: 12px;">12</p></Col>
+                    <Col span="12" class="TextAlignR" style="font-size: 12px;">
+                      <Button shape="circle" icon="md-add" size="small" @click="addPanel(SecondControl)">添加面板</Button>
+                    </Col>
+                   </Row>
                   <Row class="MarginT_20">
                     <Col span="12"><img @click="editSecondControl(SecondControl.id, SecondControl.second_control_name)" class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editSecondControl(SecondControl.id, SecondControl.second_control_name)">编辑</span></Col>
                     <Col span="12" class="TextAlignR"><img @click="deleteSecondControl(SecondControl)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteSecondControl(SecondControl)">删除</span></Col>
@@ -77,6 +84,32 @@
         <!-- <Button type="error" size="large" @click="handleSubmit('formSecond')">确认添加</Button> -->
       </div>
     </Modal>
+    <!-- 添加面板 -->
+    <Modal v-model="ifAddPanel" width="850" :mask-closable="false">
+      <p slot="header" style="color:#333;text-align:left">
+          <span>添加面板</span>
+      </p>
+      <div style="text-align:left">
+        <!-- <Control :curEqType="addKind"/> -->
+        <Form :model="formPanel" ref="formPanel" :rules="ruleValidatePanel" label-position="left" :label-width="100">
+          <FormItem label="从控名称" prop="panelName">
+            <Input v-model="formPanel.panelName" placeholder="请输入面板名称" style="" />
+          </FormItem>
+          <FormItem label="选择面板类型" prop="panelKind" v-if="PanelList.length > 0">
+            <Select v-model="formPanel.panelKind">
+              <Option v-for="item in PanelList" :value="item.val" :key="item.val">{{ item.name }}</Option>
+            </Select>
+          </FormItem>
+        </Form>
+        <Control :curEqType="formPanel.panelKind"/>
+      </div>
+      <div slot="footer" class="TextAlignC">
+        <Button type="error" size="large" :loading="btLoading" @click="handleAddPanel('formPanel')">
+          <span v-if="!btLoading">确认添加</span>
+          <span v-else>Loading...</span>
+        </Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -85,6 +118,7 @@ import {mapState, mapActions} from 'vuex'
 import {send} from '../../util/send'
 import {Decrypt} from '../../util/util'
 import NoData from '../NoData.vue'
+import Control from './Control/Control.vue'
 export default {
   name: 'AllEquipment',
   props: ['curHomeId', 'addKind', 'addType', 'addName', 'addKindId', 'MasterControlList'],
@@ -102,6 +136,7 @@ export default {
     }
     return {
       btLoading: false,
+      PanelList: [{name: '空调', val: 0}, {name: '灯', val: '022'}, {name: '智能开关', val: '081'}],
       SecondControlList: [],
       newSecondControlName: '',
       // addSecondList: [],
@@ -136,7 +171,17 @@ export default {
           { validator: validateRoom, trigger: 'change' }
         ]
       },
-      openCode: ''
+      formPanel: {
+        panelName: '',
+        panelKind: '022'
+      },
+      ruleValidatePanel: {
+        panelName: [
+          { required: true, message: '请输入面板名称！', trigger: 'change' }
+        ]
+      },
+      openCode: '',
+      ifAddPanel: false
     }
   },
   computed: {
@@ -172,7 +217,8 @@ export default {
     }
   },
   components: {
-    NoData
+    NoData,
+    Control
   },
   created () {
     this.getSecondControl()
@@ -251,6 +297,10 @@ export default {
           ])
         }
       })
+    },
+    // 添加控制面板
+    addPanel () {
+      this.ifAddPanel = true
     },
     // 更新从控名称
     sureModify (SecondControlId) {
@@ -427,6 +477,16 @@ export default {
     //   this.choosedSecond = Second
     //   console.log(Second)
     // },
+    // 添加面板
+    handleAddPanel (name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          console.log(this.formPanel)
+        } else {
+          this.$Message.warning('请将信息填写完成!')
+        }
+      })
+    },
     // 提交
     handleSubmit (name) {
       this.$refs[name].validate((valid) => {

@@ -10,14 +10,18 @@
             <p slot="title">
               {{EQ.device_name}}
             </p>
-            <p slot="extra" @click.prevent="changeLimit" v-if="EQ.default_device_type == '031'">
+            <!-- <p slot="extra" @click.prevent="changeLimit">
               <Icon type="ios-loop-strong"></Icon>
               {{EQ.type == 0 ? '离线' : '在线'}}
-            </p>
+            </p> -->
             <i-switch slot="extra" title="设备开关" v-if="EQ.default_device_type== '021' || EQ.default_device_type == '022'" style="float:right;margin-top:0px;" v-model="EQ.device_status" @on-change="OperationToggle(EQ, idx)">
               <span slot="open">ON</span>
               <span slot="close">OFF</span>
             </i-switch>
+            <!-- <i-switch slot="extra" title="设备开关" v-if="EQ.default_device_type== '021' || EQ.default_device_type == '022'" style="float:right;margin-top:0px;" :disabled="EQ.type == 0 && EQ.device_config == '1'" v-model="EQ.device_status" @on-change="OperationToggle(EQ, idx)">
+              <span slot="open">ON</span>
+              <span slot="close">OFF</span>
+            </i-switch> -->
             <div style="text-align:left">
               <Row>
                 <Col span="6" class="eqIcon">
@@ -28,18 +32,26 @@
                 <Col span="18">
                   <Row>
                     <Col :lg="{span: 6}"  :md="{span: 8}" :xs="{span: 8}">
-                      <p class="Bold smallSize ColorLightBlack">设备码: </p>
+                      <p class="Bold smallSize ColorLightBlack">设备状态: </p>
                     </Col>
                     <Col :lg="{span: 18}" :md="{span: 16}" :xs="{span: 16}">
-                      <p style="word-wrap:break-word;font-size: 12px;">{{EQ.device_code}}</p>
+                      <p style="word-wrap:break-word;font-size: 12px;">{{EQ.type == 0 ? '离线' : '在线'}}</p>
                     </Col>
                   </Row>
                   <Row>
                     <Col :lg="{span: 6}"  :md="{span: 8}" :xs="{span: 8}">
-                      <p class="Bold smallSize ColorLightBlack">位置: </p>
+                      <p class="Bold smallSize ColorLightBlack">所属房间: </p>
                     </Col>
                     <Col :lg="{span: 18}" :md="{span: 16}" :xs="{span: 16}">
                       <p style="word-wrap:break-word;font-size: 12px;">{{EQ.house_name}}</p>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col :lg="{span: 6}"  :md="{span: 8}" :xs="{span: 8}">
+                      <p class="Bold smallSize ColorLightBlack">设备码: </p>
+                    </Col>
+                    <Col :lg="{span: 18}" :md="{span: 16}" :xs="{span: 16}">
+                      <p style="word-wrap:break-word;font-size: 12px;">{{EQ.device_code}}</p>
                     </Col>
                   </Row>
                   <Row>
@@ -67,7 +79,7 @@
                 <Col span="24" class="TextAlignR">
                   <img title="移动设备" class="iconImg scaleAnimation" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
                   <img title="查看数据" v-if="EQ.default_device_type == '031' || EQ.default_device_type == '032' || EQ.default_device_type == '021' || EQ.default_device_type == '022'" class="iconImg scaleAnimation" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts(EQ)">
-                  <img title="控制面板mian" v-if="EQ.default_device_type == '021' || EQ.default_device_type == '022' || EQ.default_device_type == '051' || EQ.default_device_type == '052'" class="iconImg scaleAnimation" src="../../../static/img/icons/yaokongqi.png" @click="showControlPanel(EQ)">
+                  <!-- <img title="控制面板" v-if="EQ.default_device_type == '022' || EQ.default_device_type == '051' || EQ.default_device_type == '052'" class="iconImg scaleAnimation" src="../../../static/img/icons/yaokongqi.png" @click="showControlPanel(EQ, idx)"> -->
                 </Col>
               </Row>
               <Row class="MarginT_10 PaddingT_16 BorderT_gray">
@@ -254,7 +266,7 @@
             <span>控制面板</span>
         </p>
         <div style="text-align:center">
-            <Control :curEqType="curEqType"/>
+            <Control :curEqType="curEqType" :curEqIndex="curEqIndex" :curEq="curEq"/>
         </div>
         <div slot="footer">
         </div>
@@ -286,6 +298,8 @@ export default {
       curEQId: '',
       curEqCode: '',
       curEqType: '',
+      curEqIndex: '', // 当前设备index
+      curEq: '', // 当前设备
       // add
       EqType: '无线设备',
       MasterList: [],
@@ -796,6 +810,11 @@ export default {
     // 开关
     OperationToggle (eqItem, eqIdx) {
       if (eqItem.device_config === '1') {
+        // if (eqItem.type.toString() === '0') {
+        //   this.$Message.error('您的设备处于离线状态!')
+        //   this.getAllEq()
+        //   return false
+        // }
         this.toggleSpin(true)
         this.SwitchConfig(eqItem, eqIdx)
       } else {
@@ -858,6 +877,14 @@ export default {
               } else if (_res.data.result.payload === '03') {
                 clearInterval(this.timer)
                 this.$Message.error('控制类型不存在')
+                this.getAllEq('', eqItem, eqIdx)
+              } else if (_res.data.result.payload === '04') {
+                clearInterval(this.timer)
+                this.$Message.error('控制数据错误')
+                this.getAllEq('', eqItem, eqIdx)
+              } else if (_res.data.result.payload === '255') {
+                clearInterval(this.timer)
+                this.$Message.error('数据包太短')
                 this.getAllEq('', eqItem, eqIdx)
               } else {
                 this.$Message.error(_res.data.result.result)
@@ -1297,7 +1324,9 @@ export default {
       }
     },
     // 控制面板
-    showControlPanel (EQ) {
+    showControlPanel (EQ, idx) {
+      this.curEq = EQ // 用于子组件触发父组件事件
+      this.curEqIndex = idx // 用于子组件触发父组件事件
       this.curEqType = EQ.default_device_type
       this.changeModalShow('Panel')
     },

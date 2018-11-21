@@ -1,7 +1,8 @@
 <template>
   <div class="Control">
-    <Light v-if="curEqType == '021' || curEqType == '022'"/>
-    <AirControl v-if="curEqType == '051' || curEqType == '052'"/>
+    <Light v-if="curEqType == '022'" :curEq="curEq" @toggleSwitchFn="toggleSwitch"/>
+    <AirControl v-if="curEqType == '051' || curEqType == '052'" :curEq="curEq"/>
+    <Socket v-if="curEqType == '081' || curEqType == '082'" :curEq="curEq"/>
   </div>
 </template>
 
@@ -9,9 +10,10 @@
 // import {mapState} from 'vuex'
 import Light from './Light.vue'
 import AirControl from './AirControl.vue'
+import Socket from './Socket.vue'
 export default {
   name: 'Control',
-  props: ['curEqType'],
+  props: ['curEqType', 'curEqIndex', 'curEq'],
   data () {
     return {
     }
@@ -22,9 +24,13 @@ export default {
   },
   components: {
     Light,
-    AirControl
+    AirControl,
+    Socket
   },
   methods: {
+    toggleSwitch () {
+      // this.$emit('toggleSwitchFunction', this.curEq, this.curEqIndex)
+    }
   }
 }
 </script>

@@ -1,37 +1,22 @@
 <template>
-  <div class="Light">
+  <div class="Socket">
     <Row>
       <Col span="24">
-        <div :class="SocketStatus == 0?'switchBox switchBoxNoraml':'switchBox switchBoxActive'" @click="toggleSwitch">
+        <div :class="SocketStatus == 0?'switchBox switchBoxNoraml':'switchBox switchBoxActive'">
           <h2>{{SocketStatus == 0 ? '关' : '开'}}</h2>
         </div>
       </Col>
-    </Row>
-    <Row>
-      <Col span="24">
-        <p class="TextAlignC">当前亮度： {{lightValue}}</p>
-      </Col>
-    </Row>
-    <Row class="footerBox">
-      <Col span="4" class="TextAlignC"><img src="../../../../static/img/icons/lightWeak.png"></Col>
-      <Col span="16">
-        <Slider style="margin-top: 30px;" class="slider" v-model="lightValue" :step="10" show-stops @on-change="setLightValue"></Slider>
-      </Col>
-      <Col span="4" class="TextAlignC"><img src="../../../../static/img/icons/lightStrong.png"></Col>
     </Row>
   </div>
 </template>
 
 <script>
 // import {mapState} from 'vuex'
-// import NoData from '../../NoData.vue'
 export default {
-  name: 'Light',
-  props: ['curEq'],
+  name: 'Socket',
   data () {
     return {
-      SocketStatus: 1,
-      lightValue: 30
+      SocketStatus: 1 // 0-close 1-open
     }
   },
   computed: {
@@ -44,10 +29,6 @@ export default {
   components: {
   },
   methods: {
-    // 开关
-    toggleSwitch () {
-      this.$emit('toggleSwitchFn')
-    },
     setLightValue (val) {
       console.log(val)
     },
@@ -57,7 +38,7 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-.Light{
+.Socket{
   width: 250px;
   height: 350px;
   background: #f0f0f0;
@@ -68,7 +49,7 @@ export default {
     height: 100px;
     line-height: 100px;
     text-align: center;
-    margin: 20px auto;
+    margin: 125px auto;
     border-radius: 50%;
     cursor: pointer;
   }
@@ -89,19 +70,6 @@ export default {
   .switchBoxActive:hover{
     font-size: 16px;
     box-shadow: 0px 0px 10px #13227a;
-  }
-  .footerBox{
-    width: 100%;
-    height: 80px;
-    line-height: 80px;
-    background: #d9d9d9;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    img{
-      width: 20px;
-      height: 20px;
-    }
   }
 }
 </style>

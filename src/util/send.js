@@ -3,10 +3,10 @@ import axios from 'axios'
 // import * as CryptoJS from 'crypto-js'
 // import _ from 'underscore'
 
-// const URL_PREFIX = 'http://www.smart-hox.com:8081/hoxJK'
-const URL_PREFIX = 'http://205.168.1.104:8081/hoxJK'
-const URL_PREFIX2 = 'http://192.168.10.55:8081/hoxJK'
-// const URL_PREFIX2 = 'http://www.smart-hox.com:8081/hoxJK'
+const URL_PREFIX = 'http://www.smart-hox.com:8081/hoxJK'
+// const URL_PREFIX = 'http://205.168.1.104:8081/hoxJK'
+// const URL_PREFIX2 = 'http://192.168.10.55:8081/hoxJK'
+const URL_PREFIX2 = 'http://www.smart-hox.com:8081/hoxJK'
 
 let registerId = localStorage['registerId']
 let account = localStorage['account']

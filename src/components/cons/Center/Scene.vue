@@ -106,6 +106,7 @@
           <span>选择设备</span>
       </p>
       <div style="text-align:left">
+        <p v-if="NotSensorEqList.length == 0" class="ColorRed">您还没有添加过<span class="Bold CursorPointer" @click="toEqList"> 设备 </span>，请先去添加</p>
         <Row>
           <CheckboxGroup v-model="choosedEqList" @on-change="changeEqList">
             <Checkbox style="display: block;margin-bottom:10px;" v-for="(item, idx) in NotSensorEqList" :key="idx" :label="item.id">{{item.device_name}}</Checkbox>
@@ -216,6 +217,15 @@ export default {
     ...mapActions([
       'changeModalShow'
     ]),
+    ...mapActions('sider', [
+      'changeCurTab',
+      'changeCurMenu'
+    ]),
+    toEqList () {
+      this.changeModalShow('Scene')
+      this.changeCurTab(0)
+      this.changeCurMenu(3)
+    },
     preIcon () {
       if (this.iconIndex === 0) {
         this.iconIndex = this.iconList.length - 1
@@ -234,17 +244,22 @@ export default {
     removerImplement (IDX, ID) {
       this.formScene.implements.splice(IDX, 1)
       this.choosedEqList.filter((id, idx) => {
+        console.log(ID === id)
+        console.log(ID)
+        console.log(id)
         if (ID === id) {
           this.choosedEqList.splice(idx, 1)
         }
       })
+      console.log('this.choosedEqList----------------')
+      console.log(this.choosedEqList)
     },
     // 添加场景
     handleEditScene (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
           if (this.formScene.implements.length === 0) {
-            this.$Message.warning('请添加执行任务!')
+            this.$Message.warning('请至少添加一个执行任务!')
             return false
           }
           let scene = {
@@ -273,16 +288,17 @@ export default {
                 }
                 this.iconIndex = 0
                 this.isEdit = false
-                // 清空输入框
+                this.btLoading = false
                 break
               default:
+                this.btLoading = false
                 this.$Message.error(_res.data.message)
             }
           }).catch((_res) => {
             console.log(_res)
+            this.btLoading = false
             this.$Message.error('Interface Error!')
           })
-          this.btLoading = false
         } else {
           this.$Message.warning('请将信息填写完整!')
         }
@@ -433,6 +449,7 @@ export default {
           let tempObj = {
             'eqName': newObj[0].device_name,
             'device_id': newObj[0].id,
+            'id': newObj[0].id,
             'deviceType': newObj[0].default_device_type,
             'device_status': '1',
             // 'action': 0,
@@ -444,6 +461,10 @@ export default {
           newArray.push(this.filterEq(ID)[0])
         }
       })
+      if (newArray.length === 0) {
+        this.$Message.warning('请选择一个执行设备!')
+        return false
+      }
       this.formScene.implements = newArray
       this.ifChoose = false
     },

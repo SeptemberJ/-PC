@@ -146,7 +146,7 @@ export default {
   }
   .introduceBlock{
     height: 60px;
-    font-size: 13px;
+    font-size: 12px;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;

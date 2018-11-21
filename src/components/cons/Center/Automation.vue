@@ -11,7 +11,7 @@
             <div style="text-align:left">
               <Row>
                 <Col span="8" class="eqIcon">
-                  <img :src="Automation.img ? Automation.img : '../../../static/img/icons/eqNormalIcon.png'">
+                  <img :src="Automation.img ? Automation.img : '../../../static/img/icons/automaticNormalIcon.png'">
                 </Col>
                 <Col span="12">
                   <h4>{{Automation.auto_name}}</h4>
@@ -169,7 +169,7 @@
       </p>
       <div style="text-align:left">
         <Row>
-          <p v-if="sensorList.length == 0" class="ColorRed">您还没有添加过传感器，请先去添加</p>
+          <p v-if="sensorList.length == 0" class="ColorRed">您还没有添加过<span class="Bold CursorPointer" @click="toEqList"> 传感器 </span>，请先去添加</p>
           <RadioGroup v-model="conditionItemId">
             <Radio :label="sensor.id" v-for="(sensor, idx) in sensorList" :key="idx" style="display: block;">
               <span>{{sensor.device_name}}</span>
@@ -178,15 +178,16 @@
         </Row>
       </div>
       <div slot="footer" class="TextAlignC">
-          <Button type="error" size="large" @click="updateCondition">确认添加</Button>
+          <Button type="error" size="large" @click="updateCondition">确认选择</Button>
       </div>
     </Modal>
     <!--  -->
     <Modal v-model="ifChooseAction" scrollable width="350" :mask-closable="false">
       <p slot="header" style="color:#333;text-align:left">
-        <span>选择设备活场景</span>
+        <span>选择设备或场景</span>
       </p>
       <div style="text-align:left">
+        <p v-if="NotSensorEqList.length == 0 && sceneList.length == 0" class="ColorRed">您还没有添加过<span class="Bold CursorPointer" @click="toEqList"> 设备 </span>和<span class="Bold CursorPointer" @click="toAddScene"> 场景 </span>，请先去添加</p>
         <!-- 设备 -->
         <Row>
           <CheckboxGroup v-model="choosedEqList" @on-change="changeEqList">
@@ -201,7 +202,7 @@
         </Row>
       </div>
       <div slot="footer" class="TextAlignC">
-          <Button type="error" size="large" @click="updateChoosedImplements">确认添加</Button>
+          <Button type="error" size="large" @click="updateChoosedImplements">确认选择</Button>
       </div>
     </Modal>
   </div>
@@ -295,6 +296,8 @@ export default {
       this.getAllAutomation()
       this.getNotSensorEq()
       this.getSensorEq()
+      this.getAllScene()
+      this.getActionValue()
     },
     ifAddAutomation: function (val) {
       if (!val) {
@@ -347,6 +350,20 @@ export default {
     ...mapActions([
       'changeModalShow'
     ]),
+    ...mapActions('sider', [
+      'changeCurTab',
+      'changeCurMenu'
+    ]),
+    toEqList () {
+      this.changeModalShow('Automation')
+      this.changeCurTab(0)
+      this.changeCurMenu(3)
+    },
+    toAddScene () {
+      this.changeModalShow('Automation')
+      this.changeCurTab(3)
+      this.changeCurMenu(2)
+    },
     chooseWeek (week) {
       switch (week) {
         case 0:
@@ -441,6 +458,10 @@ export default {
           newSceneListArray.push(this.filterEq(ID, 'sceneList')[0])
         }
       })
+      if (newEqListArray.length === 0 && newSceneListArray.length === 0) {
+        this.$Message.warning('请选择一个执行设备或场景!')
+        return false
+      }
       this.formAutomation.implements.eqList = newEqListArray
       this.formAutomation.implements.sceneList = newSceneListArray
       this.ifChooseAction = false
@@ -463,9 +484,9 @@ export default {
     // 移除执行场景
     removerImplementScene (IDX, ID) {
       this.formAutomation.implements.sceneList.splice(IDX, 1)
-      this.choosedsSceneList.filter((id, idx) => {
+      this.choosedSceneList.filter((id, idx) => {
         if (ID === id) {
-          this.choosedsSceneList.splice(idx, 1)
+          this.choosedSceneList.splice(idx, 1)
         }
       })
     },
@@ -590,7 +611,7 @@ export default {
       })
       // conditionArray.push({'if_type': 0, 'if_begin_time': formAutomation.SceneTime.start, 'if_end_time': formAutomation.SceneTime.end})
       if (eqListArray.length === 0 && sceneListArray.length === 0) {
-        this.$Message.warning('请至少选择一个自动化动作！')
+        this.$Message.warning('请至少添加一个自动化动作！')
         return false
       }
       let automation = {
@@ -608,6 +629,7 @@ export default {
       }
       console.log('automation-------')
       console.log(automation)
+      this.btLoading = true
       sendscene({
         name: this.isEdit ? '/updateAuto' : '/insertauto',
         method: 'POST',
@@ -619,12 +641,15 @@ export default {
           case 1:
             this.getAllAutomation()
             this.changeModalShow('Automation')
+            this.btLoading = false
             break
           default:
+            this.btLoading = false
             this.$Message.error(_res.data.message)
         }
       }).catch((_res) => {
         console.log(_res)
+        this.btLoading = false
         this.$Message.error('Interface Error!')
       })
     },

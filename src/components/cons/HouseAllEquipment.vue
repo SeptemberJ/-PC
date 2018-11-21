@@ -10,10 +10,10 @@
             <p slot="title" v-if="EQ.default_device_type != '031'">
               {{EQ.device_name}}
             </p>
-            <p slot="extra" @click.prevent="changeLimit" v-if="EQ.default_device_type == '031'">
+            <!-- <p slot="extra" @click.prevent="changeLimit" v-if="EQ.default_device_type == '031'">
               <Icon type="ios-loop-strong"></Icon>
               {{EQ.type == 0 ? '离线' : '在线'}}
-            </p>
+            </p> -->
             <i-switch slot="extra" title="设备开关" v-if="EQ.default_device_type== '021' || EQ.default_device_type == '022'" style="float:right;margin-top:0px;" v-model="EQ.device_status" @on-change="OperationToggle(EQ, idx)">
               <span slot="open">ON</span>
               <span slot="close">OFF</span>
@@ -27,18 +27,26 @@
                 <Col span="18">
                   <Row>
                     <Col :lg="{span: 6}"  :md="{span: 8}" :xs="{span: 8}">
-                      <p class="Bold smallSize">设备码: </p>
+                      <p class="Bold smallSize ColorLightBlack">设备状态: </p>
                     </Col>
                     <Col :lg="{span: 18}" :md="{span: 16}" :xs="{span: 16}">
-                      <p style="word-wrap:break-word;font-size: 12px;">{{EQ.device_code}}</p>
+                      <p style="word-wrap:break-word;font-size: 12px;">{{EQ.type == 0 ? '离线' : '在线'}}</p>
                     </Col>
                   </Row>
                   <Row>
                     <Col :lg="{span: 6}"  :md="{span: 8}" :xs="{span: 8}">
-                      <p class="Bold smallSize">位置: </p>
+                      <p class="Bold smallSize">所属房间: </p>
                     </Col>
                     <Col :lg="{span: 18}" :md="{span: 16}" :xs="{span: 16}">
                       <p style="word-wrap:break-word;font-size: 12px;">{{choosedHouseName}}</p>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col :lg="{span: 6}"  :md="{span: 8}" :xs="{span: 8}">
+                      <p class="Bold smallSize">设备码: </p>
+                    </Col>
+                    <Col :lg="{span: 18}" :md="{span: 16}" :xs="{span: 16}">
+                      <p style="word-wrap:break-word;font-size: 12px;">{{EQ.device_code}}</p>
                     </Col>
                   </Row>
                   <Row>
@@ -66,7 +74,7 @@
                 <Col span="24" class="TextAlignR">
                   <img title="移动设备" class="iconImg scaleAnimation" src="../../../static/img/icons/move-up.png" @click="moveEq(EQ)">
                   <img title="查看数据" v-if="EQ.default_device_type == '031' || EQ.default_device_type == '032' || EQ.default_device_type == '021' || EQ.default_device_type == '022'" class="iconImg scaleAnimation" src="../../../static/img/icons/AnalysisBlue.png" @click="showCharts(EQ)">
-                  <!-- <img title="查看数据" v-if="EQ.default_device_type == '021'" class="iconImg scaleAnimation" src="../../../static/img/icons/yaokongqi.png" @click="showControlPanel(EQ)"> -->
+                  <!-- <img title="控制面板" v-if="EQ.default_device_type == '022' || EQ.default_device_type == '051' || EQ.default_device_type == '052'" class="iconImg scaleAnimation" src="../../../static/img/icons/yaokongqi.png" @click="showControlPanel(EQ)"> -->
                 </Col>
               </Row>
               <Row class="MarginT_10 PaddingT_16 BorderT_gray">
@@ -238,6 +246,17 @@
         </div>
     </Modal>
     <!-- 控制面板 -->
+    <Modal v-model="ifShowPanel" width="460" :mask-closable="false">
+        <p slot="header" style="color:#000;text-align:left">
+            <!-- <Icon type="ios-information-circle"></Icon> -->
+            <span>控制面板</span>
+        </p>
+        <div style="text-align:center">
+            <Control :curEqType="curEqType"/>
+        </div>
+        <div slot="footer">
+        </div>
+    </Modal>
   </div>
 </template>
 
@@ -246,6 +265,7 @@ import {mapState, mapActions} from 'vuex'
 import {send} from '../../util/send'
 import {Decrypt} from '../../util/util'
 import NoData from '../NoData.vue'
+import Control from './Control/Control.vue'
 export default {
   name: 'AllEquipment',
   props: ['curHomeId', 'locationIdex', 'choosedHouseId', 'choosedHouseName', 'AddList', 'MasterControlList', 'deviceTypeList'],
@@ -329,8 +349,7 @@ export default {
       kindI_light: ['power', 'electric_quantity', 'voltage'],
       kind_light: ['功率', '电量', '电压'],
       hasData: false,
-      openCode: '',
-      ifShowControlPanel: false
+      openCode: ''
     }
   },
   computed: {
@@ -353,6 +372,14 @@ export default {
       },
       set: function (newValue) {
         this.changeModalShow('Chart')
+      }
+    },
+    ifShowPanel: {
+      get: function () {
+        return this.$store.state.ifShowPanel
+      },
+      set: function (newValue) {
+        this.changeModalShow('Panel')
       }
     }
   },
@@ -395,7 +422,8 @@ export default {
     }
   },
   components: {
-    NoData
+    NoData,
+    Control
   },
   created () {
     this.getAllEq()
@@ -820,6 +848,14 @@ export default {
               } else if (_res.data.result.payload === '03') {
                 clearInterval(this.timer)
                 this.$Message.error('控制类型不存在')
+                this.getAllEq('', eqItem, eqIdx)
+              } else if (_res.data.result.payload === '04') {
+                clearInterval(this.timer)
+                this.$Message.error('控制数据错误')
+                this.getAllEq('', eqItem, eqIdx)
+              } else if (_res.data.result.payload === '255') {
+                clearInterval(this.timer)
+                this.$Message.error('数据包太短')
                 this.getAllEq('', eqItem, eqIdx)
               } else {
                 this.$Message.error(_res.data.result.result)
@@ -1251,8 +1287,9 @@ export default {
       }
     },
     // 控制面板
-    showControlPanel () {
-      this.ifShowControlPanel = true
+    showControlPanel (EQ) {
+      this.curEqType = EQ.default_device_type
+      this.changeModalShow('Panel')
     },
     getMasterControl () {
       send({

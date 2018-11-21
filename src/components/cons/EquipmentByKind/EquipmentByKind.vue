@@ -14,6 +14,13 @@
         </Breadcrumb>
       </Col>
       <Col span="12" class="TextAlignR PaddingR_16">
+        <Tooltip max-width="200" placement="left" v-if="addType == -1">
+          <img class="helpIcon" src="../../../../static/img/icons/helpWhite.png">
+          <div slot="content">
+              <p>添加说明</p>
+              <p>请在下面列表中选择你要添加的产品，进入下一步后填入相关设备编码后实现添加。</p>
+          </div>
+        </Tooltip>
         <Button v-if="addType != -1" type="primary" icon="ios-undo" @click="back" class="MarginR_10">返回上级</Button>
         <Button v-if="addType == 0" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addMasterControl">添加</Button>
         <Button v-if="addType == 1 || addType == 3" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addSecondControl">添加</Button>
@@ -25,7 +32,7 @@
         <Card class="CursorPointer" style="width: 90%;margin-bottom: 30px;">
           <div style="text-align:left" @click="toKindList(item.devcieType, item.deviceTypeName, item.deviceDescibe, item.id)">
             <Row>
-              <Col span="8"><img :src="item.devcieTypePic ? 'http://112.90.178.68:8083/upFiles/' + item.devcieTypePic : '../../../static/img/icons/eqNormalIcon.png'"></Col>
+              <Col span="8"><img :src="item.devcieTypePic ? 'http://112.90.178.68:8083/upFiles/' + item.devcieTypePic : '../../../../static/img/icons/eqNormalIcon.png'"></Col>
               <Col span="16">
                 <h4 style="padding-top:2px;">{{item.deviceDescibe}}</h4>
                 <p style="padding-top:5px;">类型: {{item.devcieType == 0 ? '主控' : (item.devcieType == 2 ? '单品' : (item.devcieType == 4 ? '三级设备' : '从控'))}}</p>
@@ -89,7 +96,7 @@ export default {
       kindList: [],
       addType: -1,
       addName: '',
-      addKind: '',
+      addKind: '', // 类型码
       addKindId: '',
       AddList: [],
       MasterControlList: [],
@@ -155,6 +162,9 @@ export default {
     back () {
       this.addType = -1
     },
+    showHelpInfo () {
+
+    },
     addMasterControl () {
       this.changeModalShow('Master')
     },
@@ -218,6 +228,12 @@ export default {
     width: 60px;
     height: 60px;
     border-radius: 50%;
+  }
+  .helpIcon{
+    width: 65px;
+    height: 25px;
+    padding: 0 20px 0 20px;
+    cursor: pointer;
   }
   .modules{
     margin: 40px 20px;
