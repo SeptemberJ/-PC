@@ -13,6 +13,7 @@
     <Scene v-if="curMenuText === '场景'" :curHomeId="curHomeId"/> -->
     <Article v-if="curMenuText === '适玩'"/>
     <HaoPin v-if="curMenuText === '好品'"/>
+    <Message v-if="curMenuText === '我的消息'" :curHomeId="curHomeId"/>
     <SPIN v-if="ifSpin"/>
   </div>
 </template>
@@ -33,6 +34,7 @@ import HaoPin from './cons/HaoPin.vue'
 import Setting from './cons/Center/Setting.vue'
 import Automation from './cons/Center/Automation.vue'
 import Scene from './cons/Center/Scene.vue'
+import Message from './cons/Center/Message.vue'
 import SPIN from './Spin.vue'
 export default {
   name: 'Content',
@@ -70,6 +72,7 @@ export default {
     Setting,
     Automation,
     Scene,
+    Message,
     SPIN
   },
   created () {

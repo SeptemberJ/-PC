@@ -80,14 +80,14 @@
                     <span>任一条件时</span>
                 </Radio>
               </RadioGroup>
-              <!-- <Button v-if="formAutomation.condition.sensor.length != 0" type="error" shape="circle" icon="md-add" size="small" style='float: right;' @click="addCondition">添加</Button> -->
+              <Button v-if="formAutomation.condition.sensor.length != 0" type="error" shape="circle" icon="md-add" size="small" style='float: right;' @click="addConditionItem">添加条件</Button>
             </FormItem>
             <FormItem label="">
               <Row v-for="(sensor, sensorIdx) in formAutomation.condition.sensor" :key="'sensor' + sensorIdx" class="MarginB_10">
                 <Col span="6">{{sensor.name}}</Col>
                 <Col span="6">
                   <Select v-model="sensor.measuringPoint" style="width:150px">
-                    <Option v-for="(item, idx) in measuringPointArray" :value="item.lab" :key="idx">{{ item.lab }}</Option>
+                    <Option v-for="(item, idx) in measuringPointArray" :value="item.fval" :key="idx">{{ item.fname }}</Option>
                   </Select>
                 </Col>
                 <Col span="4">
@@ -101,7 +101,7 @@
                 <Col span="3"><Icon type="ios-trash" size="18" class="CursorPointer hoverColor MarginL_10 MarginT_10" @click="removerCondition(sensorIdx, sensor.id)"/></Col>
               </Row>
             </FormItem>
-            <Button type="dashed" long class="MarginB_10" icon="ios-add-circle-outline" @click="addCondition">添加自动化条件</Button>
+            <Button type="dashed" long class="MarginB_10" icon="ios-add-circle-outline" @click="addCondition">选择监测设备</Button>
 
             <!-- action -->
             <FormItem label="就执行">
@@ -144,7 +144,7 @@
               <Row v-for="(scene, sceneIdx) in formAutomation.implements.sceneList" :key="'scene' + sceneIdx" class="MarginB_10">
                 <Col span="6">{{scene.sceneName}}</Col>
                 <Col span="4">
-                  <Select v-model="scene.scene_status" style="width:100px">
+                  <Select v-model="scene.scene_status" disabled style="width:100px">
                     <Option value="0">关闭</Option>
                     <Option value="1">打开</Option>
                   </Select>
@@ -165,7 +165,7 @@
     <!-- choose condition -->
     <Modal v-model="ifChooseCondition" scrollable width="350" :mask-closable="false">
       <p slot="header" style="color:#333;text-align:left">
-        <span>选择启动条件</span>
+        <span>选择监测的传感器</span>
       </p>
       <div style="text-align:left">
         <Row>
@@ -223,7 +223,8 @@ export default {
       ifChooseCondition: false,
       ifChooseAction: false,
       actionArray: [{val: 0, lab: '关闭'}, {val: 0, lab: '打开'}],
-      measuringPointArray: [{val: 'PM2.5', lab: 'PM2.5'}, {val: '温度', lab: '温度'}, {val: '湿度', lab: '湿度'}, {val: 'PM10', lab: 'PM10'}, {val: '甲醛', lab: '甲醛'}, {val: 'VOCs', lab: 'VOCs'}, {val: 'CO2', lab: 'CO2'}, {val: 'CO', lab: 'CO'}],
+      measuringPointArray: [],
+      measuringPointArray2: [{val: 'PM2.5', lab: 'PM2.5'}, {val: '温度', lab: '温度'}, {val: '湿度', lab: '湿度'}, {val: 'PM10', lab: 'PM10'}, {val: '甲醛', lab: '甲醛'}, {val: 'VOCs', lab: 'VOCs'}, {val: 'CO2', lab: 'CO2'}, {val: 'CO', lab: 'CO'}],
       compareArray: [{val: '大于', lab: '大于'}, {val: '小于', lab: '小于'}, {val: '等于', lab: '等于'}],
       delayArray: [{val: 0, lab: '立即'}, {val: 0, lab: '1'}, {val: 0, lab: '2'}],
       settingObj: {
@@ -290,6 +291,7 @@ export default {
     this.getSensorEq()
     this.getAllScene()
     this.getActionValue()
+    this.getSensorPoint()
   },
   watch: {
     curHomeId: function (val) {
@@ -307,6 +309,7 @@ export default {
           implements: []
         }
         this.isEdit = false
+        this.btLoading = false
       }
     },
     isEdit: function (val) {
@@ -490,6 +493,7 @@ export default {
         }
       })
     },
+    // 切换监测设备
     updateCondition () {
       let temp = this.sensorList.slice(0)
       let choosedItem = temp.filter((sensor) => {
@@ -500,6 +504,48 @@ export default {
           'if_type': '1', // 0-时间 1-设备
           'name': choosedItem[0].device_name,
           // 'deviceType': choosedItem[0].default_device_type,
+          'deviceCode': choosedItem[0].device_code,
+          'id': choosedItem[0].id,
+          'measuringPoint': '',
+          'compare': '',
+          'limitNumber': ''
+        }
+        this.ifChooseCondition = false
+        this.formAutomation.condition.sensor = [newObj]
+        console.log(this.formAutomation.condition.sensor)
+      } else {
+        this.$Message.warning('请选择一个监测设备!')
+      }
+    },
+    // 添加监测条件
+    addConditionItem () {
+      let temp = this.sensorList.slice(0)
+      let choosedItem = temp.filter((sensor) => {
+        return (sensor.id === this.conditionItemId)
+      })
+      let newObj = {
+        'if_type': '1', // 0-时间 1-设备
+        'name': choosedItem[0].device_name,
+        // 'deviceType': choosedItem[0].default_device_type,
+        'deviceCode': choosedItem[0].device_code,
+        'id': choosedItem[0].id,
+        'measuringPoint': '',
+        'compare': '',
+        'limitNumber': ''
+      }
+      this.formAutomation.condition.sensor.push(newObj)
+    },
+    updateCondition2 () {
+      let temp = this.sensorList.slice(0)
+      let choosedItem = temp.filter((sensor) => {
+        return (sensor.id === this.conditionItemId)
+      })
+      if (choosedItem[0]) {
+        let newObj = {
+          'if_type': '1', // 0-时间 1-设备
+          'name': choosedItem[0].device_name,
+          // 'deviceType': choosedItem[0].default_device_type,
+          'deviceCode': choosedItem[0].device_code,
           'id': choosedItem[0].id,
           'measuringPoint': '',
           'compare': '',
@@ -525,6 +571,7 @@ export default {
             // 有条件可以不定时 判断条件是否填写完整
             for (let i = 0; i < len; i++) {
               for (let key in sensorList[i]) {
+                console.log(sensorList[i])
                 console.log(sensorList[i][key])
                 if (sensorList[i][key].trim() === '') {
                   this.$Message.warning('请将条件信息填写完整!')
@@ -587,6 +634,7 @@ export default {
           'if_type': 1,
           'if_select_type': implement.measuringPoint,
           'if_ha3_id': implement.id,
+          'if_ha3_code': implement.deviceCode,
           'if_value': implement.limitNumber,
           'if_select': implement.compare
         }
@@ -655,6 +703,7 @@ export default {
     },
     // 删除场景
     deleteAutomation (AutomationId) {
+      console.log(AutomationId)
       if (!this.curHome.isCreater) {
         this.$Message.warning('您不是管理员不能进行该操作！')
         return false
@@ -796,10 +845,12 @@ export default {
             // 传感器条件列表
             let sensors = []
             if (_res.data.auto_ifha3_list.length > 0) {
+              this.conditionItemId = _res.data.auto_ifha3_list[0].if_ha3_id
               _res.data.auto_ifha3_list.map((item) => {
                 let obj = {
                   name: item.device_name,
                   compare: item.if_select,
+                  deviceCode: item.device_code,
                   limitNumber: item.if_value,
                   measuringPoint: item.if_select_type,
                   id: item.if_ha3_id,
@@ -963,6 +1014,7 @@ export default {
             //   item.scene_status = item.scene_status === '1' ? true : false
             // })
             this.sceneList = _res.data.scenelist
+            console.log(this.sceneList)
             break
           default:
             this.$Message.error(_res.data.message)
@@ -991,6 +1043,26 @@ export default {
             })
             console.log(tempActionArray)
             this.settingObj = tempActionArray
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.$Message.error('Interface Error!')
+      })
+    },
+    // 传感器测量值
+    getSensorPoint () {
+      sendscene({
+        name: '/queryHa3TypeVlaueList',
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            this.measuringPointArray = _res.data.ha3TypeVlaueList
             break
           default:
             this.$Message.error(_res.data.message)

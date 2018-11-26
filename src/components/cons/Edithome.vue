@@ -632,7 +632,7 @@ export default {
           return false
         }
       }
-      axios.put(encodeURI(this.$store.state.home.app_URL + 'home?id=' + this.home_id + '&home_name=' + this.form.fname + '&faddress=' + (this.ifChangeAddress ? this.homeinfo.address : this.form.faddress) + '&home_pic=' + (this.homeinfo.picture !== '' ? this.homeinfo.picture : this.form.picture) + '&isdefault=' + this.isdefault + '&register_id=' + this.register_id + '&timestamp=' + Date.now())
+      axios.put(encodeURI(this.$store.state.home.app_URL + 'home?id=' + this.home_id + '&home_name=' + this.form.fname + '&faddress=' + (this.ifChangeAddress ? this.homeinfo.address : this.form.faddress) + '&home_pic=' + (this.homeinfo.picture !== '' && this.homeinfo.picture !== 'undefined' ? this.homeinfo.picture : this.form.picture) + '&isdefault=' + this.isdefault + '&register_id=' + this.register_id + '&timestamp=' + Date.now())
       ).then((res) => {
         if (res.data.code == 1){
           this.$Message.success('修改成功!')
@@ -683,6 +683,7 @@ export default {
       ).then((res) => {
         this.openCode = ''
         this.gethomelistinfo()
+        this.updateHomeList()
       //   axios.get(encodeURI(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid + '&timestamp=' + Date.now())
       // ).then((res) => {
       //     if (res.data.code ==1 ){
@@ -1142,10 +1143,33 @@ export default {
             this.homeinfo.picture = ''
             this.homePicture = ''
             this.ifChangeHomePic = false
-            // this.updateCurHome(_res.data.home_id)
+            this.updateHomeList()
             break
           default:
             this.$Message.error(_res.data.message)
+        }
+      }).catch((res) => {
+        this.$Message.error('Interface Error!')
+      })
+    },
+    updateHomeList () {
+      send({
+        name: '/home?register_id=' + this.$store.state.register_id,
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        if (_res.data.homeList.length > 0) {
+          this.changeHomeList(_res.data.homeList)
+          // _res.data.homeList.map((item, idx) => {
+          //   item.isCreater = item.register_id === this.$store.state.register_id
+          //   if (item.isdefault === '1') {
+          //     this.changeCurHome(item)
+          //     this.getAllRoom(item.home_id)
+          //   }
+          // })
+        } else {
+          this.$router.push({name: 'Guide'})
         }
       }).catch((res) => {
         this.$Message.error('Interface Error!')
@@ -1269,9 +1293,10 @@ export default {
         // console.log(jiequ)
         // _this.getImgName(jiequ)
         send({
-          name: '/uploadBase64?imgStr=' + encodeURIComponent(jiequ),
+          name: '/uploadBase64',
           method: 'POST',
           data: {
+            'imgStr': encodeURIComponent(jiequ)
           }
         }).then(_res => {
           switch (_res.data.result) {

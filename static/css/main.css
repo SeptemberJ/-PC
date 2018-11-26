@@ -33,7 +33,7 @@ html, body{
 	color: #515a6e !important;
 }
 .ColorWhite{
-	color: white;
+	color: white !important;
 }
 .colorPrimary{
 	color: #2d8cf0;

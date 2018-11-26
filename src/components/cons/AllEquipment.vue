@@ -416,6 +416,7 @@ export default {
       if (!val) {
         this.$refs['formEQNormal'].resetFields()
         this.$refs['formSingle'].resetFields()
+        // this.btLoading =  false
       }
     },
     EqType: function (val) {
@@ -858,7 +859,7 @@ export default {
       }).then(_res => {
         switch (_res.data.result.code) {
           case 1:
-            if (switchStatus === '') { // 配置完去更新
+            if (switchStatus === '' && _res.data.result.payload === '00') { // 配置完去更新
               this.UpdateConfigStatus(type, eqItem, eqIdx)
               clearInterval(this.timer)
             } else { // 开关操作
@@ -891,6 +892,39 @@ export default {
               }
               this.toggleSpin(false)
             }
+            // if (switchStatus === '') { // 配置完去更新
+            //   this.UpdateConfigStatus(type, eqItem, eqIdx)
+            //   clearInterval(this.timer)
+            // } else { // 开关操作
+            //   // 页面上更新开关状态
+            //   if (_res.data.result.payload === '00') {
+            //     clearInterval(this.timer)
+            //     this.getAllEq('', eqItem, eqIdx)
+            //   } else if (_res.data.result.payload === '01') {
+            //     clearInterval(this.timer)
+            //     this.$Message.error('设备不存在')
+            //     this.getAllEq('', eqItem, eqIdx)
+            //   } else if (_res.data.result.payload === '02') {
+            //     clearInterval(this.timer)
+            //     this.$Message.error('控制点不存在')
+            //     this.getAllEq('', eqItem, eqIdx)
+            //   } else if (_res.data.result.payload === '03') {
+            //     clearInterval(this.timer)
+            //     this.$Message.error('控制类型不存在')
+            //     this.getAllEq('', eqItem, eqIdx)
+            //   } else if (_res.data.result.payload === '04') {
+            //     clearInterval(this.timer)
+            //     this.$Message.error('控制数据错误')
+            //     this.getAllEq('', eqItem, eqIdx)
+            //   } else if (_res.data.result.payload === '255') {
+            //     clearInterval(this.timer)
+            //     this.$Message.error('数据包太短')
+            //     this.getAllEq('', eqItem, eqIdx)
+            //   } else {
+            //     this.$Message.error(_res.data.result.result)
+            //   }
+            //   this.toggleSpin(false)
+            // }
             break
           case 0:
             this.getAllEq('', eqItem, eqIdx)

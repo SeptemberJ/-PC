@@ -54,7 +54,8 @@ const state = {
         {'icon': 'ios-bulb', 'text': '自动化'},
         {'icon': 'md-cloudy-night', 'text': '场景'},
         {'icon': 'ios-mail', 'text': '意见反馈'},
-        {'icon': 'md-help', 'text': '常见问题'}
+        {'icon': 'md-help', 'text': '常见问题'},
+        {'icon': 'ios-notifications', 'text': '我的消息'}
       ]
     }
   ]

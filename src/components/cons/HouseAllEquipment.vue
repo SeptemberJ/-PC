@@ -829,7 +829,7 @@ export default {
       }).then(_res => {
         switch (_res.data.result.code) {
           case 1:
-            if (switchStatus === '') { // 配置完去更新
+            if (switchStatus === '' && _res.data.result.payload === '00') { // 配置完去更新
               this.UpdateConfigStatus(type, eqItem, eqIdx)
               clearInterval(this.timer)
             } else { // 开关操作

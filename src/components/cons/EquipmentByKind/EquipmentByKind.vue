@@ -1,33 +1,78 @@
 <template>
   <div class="eqByKind">
     <Row style="margin: 20px 0px;">
-      <Col span="12" class="">
+      <Col span="16" class="">
         <Breadcrumb>
-          <span @click="back">
+          <span @click="back(0)">
             <BreadcrumbItem to="/Home">
               <Icon type="md-bookmark"></Icon> 所有类别
             </BreadcrumbItem>
           </span>
-          <BreadcrumbItem v-if="addType != -1">
-              <Icon type="logo-buffer"></Icon>{{addName}}
+          <span @click="back(1)">
+            <BreadcrumbItem v-if="locationIdex != 0" class="ColorWhite CursorPointer">
+              <Icon type="logo-buffer"></Icon>{{kindName}}
+            </BreadcrumbItem>
+          </span>
+          <BreadcrumbItem v-if="locationIdex == 2">
+            <Icon type="logo-buffer"></Icon>{{addName}}
           </BreadcrumbItem>
         </Breadcrumb>
       </Col>
-      <Col span="12" class="TextAlignR PaddingR_16">
-        <Tooltip max-width="200" placement="left" v-if="addType == -1">
+      <Col span="8" class="TextAlignR PaddingR_16">
+        <!-- <Tooltip max-width="200" placement="left" v-if="locationIdex != 2">
           <img class="helpIcon" src="../../../../static/img/icons/helpWhite.png">
           <div slot="content">
-              <p>添加说明</p>
-              <p>请在下面列表中选择你要添加的产品，进入下一步后填入相关设备编码后实现添加。</p>
+            <p>添加说明</p>
+            <p>请在下面列表中选择你要添加的产品，进入下一步后填入相关设备编码后实现添加。</p>
           </div>
-        </Tooltip>
-        <Button v-if="addType != -1" type="primary" icon="ios-undo" @click="back" class="MarginR_10">返回上级</Button>
-        <Button v-if="addType == 0" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addMasterControl">添加</Button>
-        <Button v-if="addType == 1 || addType == 3" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addSecondControl">添加</Button>
-        <Button v-if="addType == 2" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addEQ">添加</Button>
+        </Tooltip> -->
+        <Button v-if="locationIdex == 1 || locationIdex == 2" type="primary" icon="ios-undo" @click="back('step')" class="MarginR_10">返回上级</Button>
+        <Button v-if="locationIdex == 2 && addType == 0" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addMasterControl">添加</Button>
+        <Button v-if="locationIdex == 2 && (addType == 1 || addType == 3)" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addSecondControl">添加</Button>
+        <Button v-if="locationIdex == 2 && addType == 2" type="error" :disabled="!curHome.isCreater" icon="md-add" @click="addSingleTip">添加</Button>
       </Col>
     </Row>
-    <Row type="flex" justify="start" class="code-row-bg" v-if="addType == -1">
+    <!-- 一级目录 -->
+    <Row type="flex" justify="start" class="code-row-bg" v-if="locationIdex == 0">
+      <Col span="8">
+        <Card class="CursorPointer" style="width: 90%;margin-bottom: 30px;">
+          <div style="text-align:center"  @click="toSecondCatalog(0)">
+            <Row>
+              <Col span="24"><img style="border-radius: 0;" src="../../../../static/img/icons/kzq.png"></Col>
+              <Col span="24">
+                <h4 style="padding-top:2px;">中央控制器</h4>
+              </Col>
+            </Row>
+          </div>
+        </Card>
+      </Col>
+      <Col span="8">
+        <Card class="CursorPointer" style="width: 90%;margin-bottom: 30px;">
+          <div style="text-align:center" @click="toSecondCatalog(1)">
+            <Row>
+              <Col span="24"><img style="border-radius: 0;" src="../../../../static/img/icons/MasterControlNoraml.png"></Col>
+              <Col span="24">
+                <h4 style="padding-top:2px;">无线设备</h4>
+              </Col>
+            </Row>
+          </div>
+        </Card>
+      </Col>
+      <Col span="8">
+        <Card class="CursorPointer" style="width: 90%;margin-bottom: 30px;">
+          <div style="text-align:center" @click="toSecondCatalog(2)">
+            <Row>
+              <Col span="24"><img style="border-radius: 0;" src="../../../../static/img/icons/secondControl.png"></Col>
+              <Col span="24">
+                <h4 style="padding-top:2px;">所有设备</h4>
+              </Col>
+            </Row>
+          </div>
+        </Card>
+      </Col>
+    </Row>
+    <!-- 二级目录 -->
+    <Row type="flex" justify="start" class="code-row-bg" v-if="locationIdex == 1">
       <Col span="8"  v-for="(item, idx) in kindList" :key="idx">
         <Card class="CursorPointer" style="width: 90%;margin-bottom: 30px;">
           <div style="text-align:left" @click="toKindList(item.devcieType, item.deviceTypeName, item.deviceDescibe, item.id)">
@@ -42,22 +87,10 @@
         </Card>
       </Col>
     </Row>
-   <!--  <div class="modules">
-      <Row type="flex" justify="start" class="code-row-bg" v-if="locationIdex == -1">
-        <Col span="8" v-for="(Module, idx) in modules" :key="idx">
-          <Card :style="{width: '80%', margin: '0 auto 30px 0', background: Module.bgColor, cursor: 'pointer'}">
-            <div style="text-align:center" @click="toModule(idx)">
-              <img class="moduleImg" :src="'../../../../static/img/icons/' + Module.iocn + '.png'">
-              <h3>{{Module.name}}</h3>
-            </div>
-          </Card>
-        </Col>
-      </Row>
-    </div> -->
 
-    <MasterControl :addName="addName" :addKind="addKind" :addKindId="addKindId" :curHomeId="curHomeId" v-if="addType == 0"/>
-    <SecondControl @watchBack="back" :addName="addName" :addKind="addKind" :addKindId="addKindId" :addType="addType" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="addType == 1 || addType == 3"/>
-    <SingleProduct @watchBack="back" :addName="addName" :addKind="addKind" :addKindId="addKindId" :curHomeId="curHomeId" v-if="addType == 2"/>
+    <MasterControl :addName="addName" :addKind="addKind" :addKindId="addKindId" :curHomeId="curHomeId" v-if="locationIdex == 2 && addType == 0"/>
+    <SecondControl @watchBack="back(0)" :addName="addName" :addKind="addKind" :addKindId="addKindId" :addType="addType" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="locationIdex == 2 && (addType == 1 || addType == 3)"/>
+    <SingleProduct @watchBack="back(0)" :addName="addName" :addKind="addKind" :addKindId="addKindId" :curHomeId="curHomeId" v-if=" locationIdex == 2 && addType == 2"/>
     <!-- <AllEquipment :AddList="AddList" :deviceTypeList="deviceTypeList" :MasterControlList="MasterControlList" :curHomeId="curHomeId" v-if="locationIdex == 2"/> -->
 
   </div>
@@ -75,7 +108,7 @@ export default {
   props: ['curHomeId'],
   data () {
     return {
-      locationIdex: -1,
+      locationIdex: 0, // 0-一级目录 1-对应类别列表 2-设备列表
       modules: [
         {
           name: '主控',
@@ -94,8 +127,9 @@ export default {
         }
       ],
       kindList: [],
-      addType: -1,
-      addName: '',
+      addType: -1, // 1-中央控制器 1-无线 2-所有
+      kindName: '', // 中央控制器 无线 所有
+      addName: '', // 具体设备名称
       addKind: '', // 类型码
       addKindId: '',
       AddList: [],
@@ -117,15 +151,34 @@ export default {
       }
     }
   },
+  watch: {
+    curHomeId: function (val) {
+      this.locationIdex = 0
+      // switch (this.locationIdex) {
+      //   case 1:
+      //     if (this.kindName === '中央控制器') {
+      //       this.toSecondCatalog(0)
+      //     }
+      //     if (this.kindName === '无线设备') {
+      //       this.toSecondCatalog(1)
+      //     }
+      //     if (this.kindName === '所有设备') {
+      //       this.toSecondCatalog(2)
+      //     }
+      //     this.toSecondCatalog()
+      //   break
+      // }
+    }
+  },
+  created () {
+    // this.getKindList()
+    // this.getEQType()
+  },
   components: {
     MasterControl,
     SecondControl,
     SingleProduct,
     AllEquipment
-  },
-  created () {
-    this.getKindList()
-    this.getEQType()
   },
   methods: {
     ...mapActions([
@@ -151,6 +204,7 @@ export default {
       })
     },
     toKindList (type, deviceTypeName, deviceDescibe, id) {
+      this.locationIdex = 2
       this.addType = type
       this.addKind = deviceTypeName
       this.addName = deviceDescibe
@@ -159,11 +213,55 @@ export default {
     toModule (Idx) {
       this.locationIdex = Idx
     },
-    back () {
-      this.addType = -1
+    back (IDX) {
+      switch (IDX) {
+        case 'step':
+          this.locationIdex--
+          break
+        default:
+          this.locationIdex = IDX
+      }
     },
-    showHelpInfo () {
-
+    showHelpInfo (addType) {
+    },
+    toSecondCatalog (addType) {
+      this.locationIdex = 1
+      switch (addType) {
+        case 0:
+          this.kindName = '中央控制器'
+          break
+        case 1:
+          this.kindName = '无线设备'
+          break
+        case 2:
+          this.kindName = '所有设备'
+          break
+      }
+      this.getCurTypeEq(addType)
+    },
+    // 对应类型设备列表
+    getCurTypeEq (TYPE) {
+      send({
+        name: '/deviceTypeNew?flag=' + TYPE,
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            if (TYPE === 2) {
+              this.kindList = _res.data.deviceTypeList.data
+            } else {
+              this.kindList = _res.data.deviceTypeList
+            }
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.$Message.error('Interface Error!')
+      })
     },
     addMasterControl () {
       this.changeModalShow('Master')
@@ -171,6 +269,13 @@ export default {
     addSecondControl () {
       this.getMasterControl()
       this.changeModalShow('Second')
+    },
+    addSingleTip () {
+      this.$Modal.info({
+        title: '提示',
+        okText: '知道了',
+        content: '请在APP上添加无线设备'
+      })
     },
     addEQ () {
       this.getMasterControl()

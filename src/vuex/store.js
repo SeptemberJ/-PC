@@ -224,6 +224,8 @@ const actions = {
     commit('setCurHome', CURHOME)
   },
   changeHomeList ({commit, state}, HOMELIST) {
+    console.log('changeHomeList-------------')
+    console.log(HOMELIST)
     commit('setHomeList', HOMELIST)
   },
   changeModalShow ({commit, state}, TYPE) {

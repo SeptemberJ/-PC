@@ -191,6 +191,7 @@ export default {
           implements: []
         }
         this.isEdit = false
+        this.btLoading = false
       }
     }
     // keyWord: function (val) {
