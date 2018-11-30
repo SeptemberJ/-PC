@@ -17,7 +17,7 @@
                   <h4>{{Automation.auto_name}}</h4>
                   <Row class="operationIcon">
                     <Col span="24">
-                      <i-switch title="设备开关" style="float:left;margin-top:0px;" v-model="Automation.auto_status" @on-change="OperationToggle(Automation, Automation.auto_status, idx)">
+                      <i-switch title="自动化开关" style="float:left;margin-top:0px;" v-model="Automation.auto_status" @on-change="OperationToggle(Automation, Automation.auto_status, idx, Automation.main_control_code)">
                         <span slot="open">ON</span>
                         <span slot="close">OFF</span>
                       </i-switch>
@@ -27,7 +27,7 @@
                 <Col span="4" class="eqIcon">
                   <Row type="flex">
                     <Col span="24" class="eqIcon">
-                      <Button type="success" size="small" @click="EditAutomation(Automation.id)">编辑</Button>
+                      <Button type="success" size="small" @click="EditAutomation(Automation.id, Automation.auto_status)">编辑</Button>
                     </Col>
                     <Col span="24" class="eqIcon MarginT_10">
                       <Button type="error" size="small" @click="deleteAutomation(Automation.id)">删除</Button>
@@ -105,7 +105,14 @@
 
             <!-- action -->
             <FormItem label="就执行">
-              <!-- <Button v-if="formAutomation.implements.length != 0" type="error" shape="circle" icon="md-add" size="small" style='float: right;' @click="addImplement">添加</Button> -->
+              <div style="float:right">
+                <span class="PaddingR_16">是否允许推送通知</span>
+                <i-switch v-model="formAutomation.ifNotice" @on-change="changeNotice">
+                  <span slot="open">允许</span>
+                  <span slot="close">禁止</span>
+                </i-switch>
+              </div>
+              <!-- <i-switch slot="extra" title="允许通知"  @on-change="changeNotice"> -->
             </FormItem>
             <FormItem>
               <!-- 执行设备列表 -->
@@ -238,6 +245,7 @@ export default {
       choosedSceneList: [], // 所选择的要执行动作的场景
       formAutomation: {
         AutomationName: '',
+        ifNotice: true,
         SceneTime: {
           start: '',
           end: ''
@@ -366,6 +374,10 @@ export default {
       this.changeModalShow('Automation')
       this.changeCurTab(3)
       this.changeCurMenu(2)
+    },
+    // 切换通知
+    changeNotice () {
+      this.formAutomation.ifNotice = !this.formAutomation.ifNotice
     },
     chooseWeek (week) {
       switch (week) {
@@ -502,6 +514,7 @@ export default {
       if (choosedItem[0]) {
         let newObj = {
           'if_type': '1', // 0-时间 1-设备
+          'main_control_code': choosedItem[0].main_control_code,
           'name': choosedItem[0].device_name,
           // 'deviceType': choosedItem[0].default_device_type,
           'deviceCode': choosedItem[0].device_code,
@@ -635,6 +648,7 @@ export default {
           'if_select_type': implement.measuringPoint,
           'if_ha3_id': implement.id,
           'if_ha3_code': implement.deviceCode,
+          'main_control_code': implement.main_control_code,
           'if_value': implement.limitNumber,
           'if_select': implement.compare
         }
@@ -667,6 +681,7 @@ export default {
         auto_status: formAutomation.AutomationStatus ? formAutomation.AutomationStatus : '',
         home_id: this.curHomeId,
         auto_name: formAutomation.AutomationName,
+        ifNotice: formAutomation.ifNotice,
         auto_type: formAutomation.conditionKind,
         auto_iftime_list: [{'if_type': 0, 'if_begin_time': formAutomation.SceneTime.start, 'if_end_time': formAutomation.SceneTime.end}],
         auto_ifha3_list: conditionArray,
@@ -770,7 +785,11 @@ export default {
       })
     },
     // 编辑自动化
-    EditAutomation (AutomationId) {
+    EditAutomation (AutomationId, AutomationStatus) {
+      if (AutomationStatus) {
+        this.$Message.warning('编辑前请先关闭自动化！')
+        return false
+      }
       this.isEdit = true
       sendscene({
         name: '/queryAutoDetial?id=' + AutomationId,
@@ -851,6 +870,7 @@ export default {
                   name: item.device_name,
                   compare: item.if_select,
                   deviceCode: item.device_code,
+                  main_control_code: item.main_control_code,
                   limitNumber: item.if_value,
                   measuringPoint: item.if_select_type,
                   id: item.if_ha3_id,
@@ -891,6 +911,7 @@ export default {
             }
             this.formAutomation = {
               AutomationId: AutomationId,
+              ifNotice: _res.data.autodetail[0].ifNotice ? _res.data.autodetail[0].auto_notice : true,
               AutomationStatus: _res.data.autodetail[0].auto_status,
               AutomationName: _res.data.autodetail[0].auto_name,
               SceneTime: SceneTime,
@@ -919,9 +940,9 @@ export default {
       })
     },
     // 自动化开关
-    OperationToggle (Automation, status, idx) {
+    OperationToggle (Automation, status, idx, mainControlCode) {
       sendscene({
-        name: '/updateAutoStatus?id=' + Automation.id + '&status=' + (status ? '1' : '0'),
+        name: '/updateAutoStatus?id=' + Automation.id + '&status=' + (status ? '1' : '0') + '&main_control_code=' + mainControlCode,
         method: 'PUT',
         data: {
         }

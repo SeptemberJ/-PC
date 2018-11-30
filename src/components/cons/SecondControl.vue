@@ -25,8 +25,23 @@
                     </Col>
                    </Row>
                   <Row class="MarginT_20">
-                    <Col span="12"><img @click="editSecondControl(SecondControl.id, SecondControl.second_control_name)" class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editSecondControl(SecondControl.id, SecondControl.second_control_name)">编辑</span></Col>
-                    <Col span="12" class="TextAlignR"><img @click="deleteSecondControl(SecondControl)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteSecondControl(SecondControl)">删除</span></Col>
+                    <Col span="6">
+                  <span class="hoverColor">
+                    <img class="iconImg" src="../../../static/img/icons/genghuan.png" @click="changeCode(SecondControl.id, SecondControl.second_contrl_code)">
+                    <span @click="changeCode(SecondControl.id, SecondControl.second_contrl_code)">更换</span>
+                  </span>
+                </Col>
+                <Col span="6">
+                  <span class="hoverColor">
+                    <img class="iconImg" src="../../../static/img/icons/zengsong.png" @click="deleteSecondControl(SecondControl)">
+                    <span @click="deleteSecondControl(SecondControl)">赠送</span>
+                  </span>
+                </Col>
+                    <Col span="6" class="TextAlignR">
+                      <img @click="editSecondControl(SecondControl, SecondControl.id, SecondControl.second_control_name)" class="iconImg" src="../../../static/img/icons/editor-line.png">
+                      <span @click="editSecondControl(SecondControl, SecondControl.id, SecondControl.second_control_name)">编辑</span>
+                    </Col>
+                    <Col span="6" class="TextAlignR"><img @click="deleteSecondControl(SecondControl)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteSecondControl(SecondControl)">删除</span></Col>
                   </Row>
                 </Col>
               </Row>
@@ -139,6 +154,8 @@ export default {
       PanelList: [{name: '空调', val: 0}, {name: '灯', val: '022'}, {name: '智能开关', val: '081'}],
       SecondControlList: [],
       newSecondControlName: '',
+      newSecondControlCode: '',
+      curSecondControl: '',
       // addSecondList: [],
       choosedMaster: {},
       // choosedSecond: {},
@@ -261,7 +278,7 @@ export default {
         this.formSecond.selectRoomId = this.roomList[0].id
       }
     },
-    editSecondControl (SecondControlId, SecondControlName) {
+    editSecondControl (SecondControl, SecondControlId, SecondControlName) {
       if (!this.curHome.isCreater) {
         this.$Message.warning('您不是管理员不能进行该操作！')
         return false
@@ -269,10 +286,10 @@ export default {
       this.$Modal.confirm({
         onOk: () => {
           if (this.newSecondControlName.trim() === '') {
-            this.$Message.error('从控名称不能为空!')
+            this.$Message.error('新的从控名称不能为空!')
             return false
           }
-          this.sureModify(SecondControlId)
+          this.sureModify(SecondControlId, 'name')
         },
         render: (h) => {
           return h('div', [
@@ -298,14 +315,52 @@ export default {
         }
       })
     },
+    changeCode (SecondControlId, SecondControlCode) {
+      alert(SecondControlCode)
+      if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
+      this.$Modal.confirm({
+        onOk: () => {
+          if (this.newSecondControlCode.trim() === '') {
+            this.$Message.error('新的从控码不能为空!')
+            return false
+          }
+          this.sureModify(SecondControlId, 'code')
+        },
+        render: (h) => {
+          return h('div', [
+            h('h4', {
+              style: {
+                marginBottom: '10px'
+              }
+
+            }, '新的从控码'),
+            h('Input', {
+              props: {
+                value: this.newSecondControlCode === '' ? SecondControlCode : this.newSecondControlCode,
+                autofocus: true,
+                placeholder: '请输入新的从控码...'
+              },
+              on: {
+                input: (val) => {
+                  this.newSecondControlCode = val
+                }
+              }
+            })
+          ])
+        }
+      })
+    },
     // 添加控制面板
     addPanel () {
       this.ifAddPanel = true
     },
     // 更新从控名称
-    sureModify (SecondControlId) {
+    sureModify (SecondControlId, Type) {
       send({
-        name: '/secondControl?second_control_name=' + this.newSecondControlName + '&id=' + SecondControlId,
+        name: '/secondControl?id=' + SecondControlId + (Type === 'name' ? '&second_control_name=' + this.newSecondControlName : '&device_code=' + this.newSecondControlCode),
         method: 'PUT',
         data: {
         }
@@ -315,6 +370,7 @@ export default {
             this.$Message.success('修改成功!')
             this.getSecondControl()
             this.newSecondControlName = ''
+            this.newSecondControlCode = ''
             break
           default:
             this.$Message.error(_res.data.message)
@@ -384,7 +440,7 @@ export default {
     sureDel (SecondControl) {
       this.toggleSpin(true)
       send({
-        name: '/secondControl?id=' + SecondControl.id + '&home_id=' + this.curHomeId + '&register_id=' + this.$store.state.register_id,
+        name: '/secondControl?id=' + SecondControl.id + '&home_id=' + this.curHomeId + '&register_id=' + this.$store.state.register_id + '&device_code=' + SecondControl.second_contrl_code,
         method: 'DELETE',
         data: {
         }

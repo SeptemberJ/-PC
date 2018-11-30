@@ -78,9 +78,25 @@
                 </Col>
               </Row>
               <Row class="MarginT_10 PaddingT_16 BorderT_gray">
-                <Col span="12"><span class="hoverColor">
-<img class="iconImg" src="../../../static/img/icons/editor-line.png" @click="editEqInfo(EQ.id, EQ.device_name)"><span @click="editEqInfo(EQ.id, EQ.device_name)">编辑</span></span></Col>
-                <Col span="12" class="TextAlignR"><span class="hoverColor"><img @click="deleteEq(EQ)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteEq(EQ)">删除</span></span></Col>
+                <Col span="6">
+                  <span class="hoverColor">
+                    <img class="iconImg" src="../../../static/img/icons/genghuan.png" @click="changeCode(EQ, EQ.id, EQ.device_code)">
+                    <span @click="changeCode(EQ, EQ.id, EQ.device_code)">更换</span>
+                  </span>
+                </Col>
+                <Col span="6">
+                  <span class="hoverColor">
+                    <img class="iconImg" src="../../../static/img/icons/zengsong.png" @click="deleteEq(EQ)">
+                    <span @click="deleteEq(EQ)">赠送</span>
+                  </span>
+                </Col>
+                <Col span="6" class="TextAlignR">
+                  <span class="hoverColor">
+                    <img class="iconImg" src="../../../static/img/icons/editor-line.png" @click="editEqInfo(EQ, EQ.id, EQ.device_name)">
+                    <span @click="editEqInfo(EQ, EQ.id, EQ.device_name)">编辑</span>
+                  </span>
+                </Col>
+                <Col span="6" class="TextAlignR"><span class="hoverColor"><img @click="deleteEq(EQ)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteEq(EQ)">删除</span></span></Col>
               </Row>
             </div>
           </Card>
@@ -279,6 +295,7 @@ export default {
       EqList: [],
       // HouseList: [],
       newEqName: '',
+      newEqCode: '',
       curEQName: '',
       curEQRoom: '',
       curEQId: '',
@@ -484,14 +501,19 @@ export default {
         this.choosedSecond = {}
       }
     },
-    editEqInfo (EqId, EqName) {
+    editEqInfo (EQ, EqId, EqName) {
+      this.curEq = EQ
       if (!this.curHome.isCreater) {
         this.$Message.warning('您不是管理员不能进行该操作！')
         return false
       }
       this.$Modal.confirm({
         onOk: () => {
-          this.sureModify(EqId)
+          if (this.newEqName.trim() === '') {
+            this.$Message.error('新的设备名称不能为空!')
+            return false
+          }
+          this.sureModify(EqId, 'name')
         },
         render: (h) => {
           return h('div', [
@@ -510,6 +532,44 @@ export default {
               on: {
                 input: (val) => {
                   this.newEqName = val
+                }
+              }
+            })
+          ])
+        }
+      })
+    },
+    changeCode (EQ, EqId, DeviceCode) {
+      this.curEq = EQ
+      if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
+      this.$Modal.confirm({
+        onOk: () => {
+          if (this.newEqCode.trim() === '') {
+            this.$Message.error('新的设备码不能为空!')
+            return false
+          }
+          this.sureModify(EqId, 'code')
+        },
+        render: (h) => {
+          return h('div', [
+            h('h4', {
+              style: {
+                marginBottom: '10px'
+              }
+
+            }, '新的设备码'),
+            h('Input', {
+              props: {
+                value: this.newEqCode === '' ? DeviceCode : this.newEqCode,
+                autofocus: true,
+                placeholder: '请输入新的设备码...'
+              },
+              on: {
+                input: (val) => {
+                  this.newEqCode = val
                 }
               }
             })
@@ -577,7 +637,7 @@ export default {
     sureDel (EQ) {
       this.toggleSpin(true)
       send({
-        name: '/device?id=' + EQ.id + '&device_type=' + EQ.deviceType + '&second_control_id=' + EQ.second_control_id + '&home_id=' + this.curHomeId + '&register_id=' + this.$store.state.register_id,
+        name: '/device?id=' + EQ.id + '&device_type=' + EQ.deviceType + '&second_control_id=' + EQ.second_control_id + '&home_id=' + this.curHomeId + '&register_id=' + this.$store.state.register_id + '&device_code=' + EQ.device_code,
         method: 'DELETE',
         data: {
         }
@@ -680,7 +740,7 @@ export default {
         }
         switch (_res.data.code) {
           case 1:
-            let tempData = _res.data[backDataProperty]
+            let tempData = _res.data[backDataProperty].reverse()
             let option = {
               title: {
                 text: ''
@@ -975,10 +1035,11 @@ export default {
       })
     },
     // 更新设备名称
-    sureModify (EqId) {
+    sureModify (EqId, Type) {
       console.log(EqId)
       send({
-        name: '/device?device_name=' + this.newEqName + '&id=' + EqId + '&house_id=' + this.curHomeId,
+        name: '/device?id=' + EqId + '&house_id=' + this.curHomeId + '&second_control_id=' + this.curEq.second_control_id + (Type === 'name' ? '&device_name=' + this.newEqName : '&device_code=' + this.newEqCode),
+        // name: '/device?device_name=' + this.newEqName + '&id=' + EqId + '&house_id=' + this.curHomeId,
         method: 'PUT',
         data: {
         }

@@ -199,6 +199,13 @@ export default {
       var file = event
       var reader = new FileReader()
       reader.readAsDataURL(file)
+      if (file.size > 1024000 * 2) {
+        this.$Notice.warning({
+          title: '图片大小警告',
+          desc: '您上传的图片太大了, 请不要超过2M!'
+        })
+        return false
+      }
       reader.onload = function (e) {
         _this.newAvatarBase64 = this.result
         let reg = /^data:image\/(jpeg|png|gif);base64,/
@@ -230,10 +237,10 @@ export default {
       })
     },
     handleMaxSize (file) {
-      this.$Notice.warning({
-        title: '图片大小警告',
-        desc: '您上传的图片太大了, 请不要超过2M!'
-      })
+      // this.$Notice.warning({
+      //   title: '图片大小警告',
+      //   desc: '您上传的图片太大了, 请不要超过2M!'
+      // })
     },
     handleView (name) {
     },

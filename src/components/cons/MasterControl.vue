@@ -19,8 +19,20 @@
                   </Row>
                   <!-- <p>设备码：{{MasterControl.main_control_code}}F8AC786A1E694BA893CDB5CEDF1AB308</p> -->
                   <Row class="MarginT_20">
-                    <Col span="12"><img @click="editMasterInfo(MasterControl.id, MasterControl.main_control_name)" class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editMasterInfo(MasterControl.id, MasterControl.main_control_name)">编辑</span></Col>
-                    <Col span="12" class="TextAlignR"><img @click="deleteMaster(MasterControl)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteMaster(MasterControl)">删除</span></Col>
+                    <Col span="6">
+                      <span class="hoverColor">
+                        <img class="iconImg" src="../../../static/img/icons/genghuan.png" @click="changeCode(MasterControl.id, MasterControl.main_control_code)">
+                        <span @click="changeCode(MasterControl.id, MasterControl.main_control_code)">更换</span>
+                      </span>
+                    </Col>
+                    <Col span="6">
+                      <span class="hoverColor">
+                        <img class="iconImg" src="../../../static/img/icons/zengsong.png" @click="deleteMaster(MasterControl)">
+                        <span @click="deleteMaster(MasterControl)">赠送</span>
+                      </span>
+                    </Col>
+                    <Col span="6"><img @click="editMasterInfo(MasterControl.id, MasterControl.main_control_name)" class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editMasterInfo(MasterControl.id, MasterControl.main_control_name)">编辑</span></Col>
+                    <Col span="6" class="TextAlignR"><img @click="deleteMaster(MasterControl)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteMaster(MasterControl)">删除</span></Col>
                   </Row>
                 </Col>
               </Row>
@@ -78,6 +90,7 @@ export default {
       btLoading: false,
       MasterControlList: [],
       newMasterControlName: '',
+      newMasterControlCode: '',
       addMasterList: [],
       formMaster: {
         masterCode: '',
@@ -172,6 +185,43 @@ export default {
         }
       })
     },
+    changeCode (MasterControlId, MasterControlCode) {
+      if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
+      this.$Modal.confirm({
+        onOk: () => {
+          if (this.newMasterControlCode.trim() === '') {
+            this.$Message.error('新的主控码不能为空!')
+            return false
+          }
+          this.sureModifyCode(MasterControlId, MasterControlCode)
+        },
+        render: (h) => {
+          return h('div', [
+            h('h4', {
+              style: {
+                marginBottom: '10px'
+              }
+
+            }, '新名称'),
+            h('Input', {
+              props: {
+                value: this.newMasterControlCode === '' ? MasterControlCode : this.newMasterControlCode,
+                autofocus: true,
+                placeholder: '请输入新的主控名称...'
+              },
+              on: {
+                input: (val) => {
+                  this.newMasterControlCode = val
+                }
+              }
+            })
+          ])
+        }
+      })
+    },
     // 更新主控名称
     sureModify (MasterControlId) {
       send({
@@ -185,6 +235,28 @@ export default {
             this.$Message.success('修改成功!')
             this.getMasterControl()
             this.newMasterControlName = ''
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.$Message.error('Interface Error!')
+      })
+    },
+    // 更新主控code
+    sureModifyCode (MasterControlId, MasterControlCode) {
+      send({
+        name: '/mainControlCode?main_control_code_old=' + MasterControlCode + '&main_control_code=' + this.newMasterControlCode + '&id=' + MasterControlId,
+        method: 'PUT',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            this.$Message.success('修改成功!')
+            this.getMasterControl()
+            this.newMasterControlCode = ''
             break
           default:
             this.$Message.error(_res.data.message)

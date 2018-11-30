@@ -59,7 +59,7 @@
         <Card class="tabCard" style="width:90%;margin: 0px auto 0px auto;background: #2b85e4;color: #fff;cursor: pointer;">
           <div style="text-align:center">
             <img class="tabIcon" src="../../static/img/icons/tab_set.png">
-            <h3>个人中心</h3>
+            <h3>我的</h3>
           </div>
         </Card>
       </span>

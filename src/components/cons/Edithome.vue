@@ -98,6 +98,7 @@
                   :max-size="2048"
                   :on-format-error="handleFormatError"
                   :on-exceeded-size="handleMaxSize"
+                  :on-error="handleError"
                   :before-upload="handleBeforeUpload"
                   action=""
                   style="display: inline-block;">
@@ -211,6 +212,7 @@
                     :max-size="2048"
                     :on-format-error="handleFormatError"
                     :on-exceeded-size="handleMaxSize"
+                    :on-error="handleError"
                     :before-upload="handleBeforeUpload"
                     action=""
                     style="display: inline-block;">
@@ -1286,6 +1288,15 @@ export default {
       var file = event
       var reader = new FileReader()
       reader.readAsDataURL(file)
+      console.log('-----------------------')
+      console.log(file)
+      if (file.size > 1024000 * 2) {
+        this.$Notice.warning({
+          title: '图片大小警告',
+          desc: '您上传的图片太大了, 请不要超过2M!'
+        })
+        return false
+      }
       reader.onload = function(e){
         _this.homePicture = this.result
         let reg = /^data:image\/(jpeg|png|gif);base64,/
@@ -1313,7 +1324,6 @@ export default {
       }
     },
     getImgName (jiequ) {
-      debugger
       axios.post(urlencoding(options.url), options.data
         ).then((res) => {
         resolve(res)
@@ -1347,11 +1357,15 @@ export default {
         desc: '您上传的图片文件格式不支持!'
       })
     },
-    handleMaxSize (file) {
-      this.$Notice.warning({
-        title: '图片大小警告',
-        desc: '您上传的图片太大了, 请不要超过2M!'
-      })
+    handleMaxSize (file,fileList) {
+      // this.$Notice.warning({
+      //   title: '图片大小警告',
+      //   desc: '您上传的图片太大了, 请不要超过2M!'
+      // })
+      console.log(file)
+      console.log(fileList)
+    },
+    handleError () {
     },
     handleView (name) {
     },
@@ -1389,6 +1403,7 @@ export default {
     /*background-color: rgb(209, 207, 207);*/
     width: 60px;
     height:60px;
+    display: inline-block;
     margin: auto;
     margin-top:15px !important;
     border-radius: 40px;

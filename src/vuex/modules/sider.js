@@ -48,7 +48,7 @@ const state = {
     //   ]
     // },
     {
-      'tit': '个人中心',
+      'tit': '我的',
       'menu': [
         {'icon': 'md-settings', 'text': '个人设置'},
         {'icon': 'ios-bulb', 'text': '自动化'},

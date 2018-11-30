@@ -83,13 +83,30 @@
                 </Col>
               </Row>
               <Row class="MarginT_10 PaddingT_16 BorderT_gray">
-                <Col span="12">
+                <Col span="6">
                   <span class="hoverColor">
-                    <img class="iconImg" src="../../../static/img/icons/editor-line.png" @click="editEqInfo(EQ.id, EQ.device_name)">
-                    <span @click="editEqInfo(EQ.id, EQ.device_name)">编辑</span>
+                    <img class="iconImg" src="../../../static/img/icons/genghuan.png" @click="changeCode(EQ, EQ.id, EQ.device_code)">
+                    <span @click="changeCode(EQ, EQ.id, EQ.device_code)">更换</span>
                   </span>
                 </Col>
-                <Col span="12" class="TextAlignR"><span class="hoverColor"><img @click="deleteEq(EQ)" class="iconImg" src="../../../static/img/icons/delete.png"><span @click="deleteEq(EQ)">删除</span></span></Col>
+                <Col span="6">
+                  <span class="hoverColor">
+                    <img class="iconImg" src="../../../static/img/icons/zengsong.png" @click="deleteEq(EQ)">
+                    <span @click="deleteEq(EQ)">赠送</span>
+                  </span>
+                </Col>
+                <Col span="6" class="TextAlignR">
+                  <span class="hoverColor">
+                    <img class="iconImg" src="../../../static/img/icons/editor-line.png" @click="editEqInfo(EQ, EQ.id, EQ.device_name)">
+                    <span @click="editEqInfo(EQ, EQ.id, EQ.device_name)">编辑</span>
+                  </span>
+                </Col>
+                <Col span="6" class="TextAlignR">
+                  <span class="hoverColor">
+                    <img @click="deleteEq(EQ)" class="iconImg" src="../../../static/img/icons/delete.png">
+                    <span @click="deleteEq(EQ)">删除</span>
+                  </span>
+                </Col>
               </Row>
             </div>
           </Card>
@@ -227,7 +244,197 @@
     </Modal>
     <!-- chart -->
     <Modal v-model="ifShowChart" fullscreen title="数据详情" footer-hide cancel-text="关闭">
-        <!-- <div class="MarginB_10">选择类型</div> -->
+      <Tabs v-show="curEqType == '031' || curEqType == '032'" @on-click="getCurSensorData">
+        <TabPane label="当前数据">
+          <!-- 当前数据 -->
+          <div class="curDataBlock">
+            <Row>
+              <Col span="12" class="listenKindBlock">
+                <h2 class="TextAlignC MarginB_10">PM2.5</h2>
+                <!-- 彩条 -->
+                <div class="levelBlock">
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="4" :class="'level level' + (idx+1)" v-for="(item, idx) in 6" :key="idx">{{idx+1}}</Col>
+                  </Row>
+                </div>
+                <!-- 三角 -->
+                <div class="trangleBlock">
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="4" :offset="(curDatas.PM25.level - 1) * 4" :class="'trangleBox trangleBox' + curDatas.PM25.level"></Col>
+                  </Row>
+                </div>
+                <!-- 数值 -->
+                <div class="dataBlock">
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="24" :class="curDatas.PM25.level>3?'TextAlignR':(curDatas.PM25.level>1?'TextAlignC':'TextAlignL')">
+                      <h3 :class="'MarginT_10 color' + curDatas.PM25.level">{{curDatas.PM25.data}} μg/m3</h3>
+                    </Col>
+                  </Row>
+                </div>
+                <!-- 污染程度 -->
+                <h3 :class="'MarginT_10 color' + curDatas.PM25.level">{{curDatas.PM25.quantity}}</h3>
+              </Col>
+
+              <Col span="12" class="listenKindBlock">
+                <h2 class="TextAlignC MarginB_10">HCHO</h2>
+                <!-- 彩条 -->
+                <div class="levelBlock">
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="4" :class="'level level' + (idx+1)" v-for="(item, idx) in 6" :key="idx">{{idx+1}}</Col>
+                  </Row>
+                </div>
+                <!-- 三角 -->
+                <div class="trangleBlock">
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="4" :offset="(curDatas.HCHO.level - 1) * 4" :class="'trangleBox trangleBox' + curDatas.HCHO.level"></Col>
+                  </Row>
+                </div>
+                <!-- 数值 -->
+                <div class="dataBlock">
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="24" :class="curDatas.HCHO.level>3?'TextAlignR':(curDatas.HCHO.level>1?'TextAlignC':'TextAlignL')">
+                      <h3 :class="'MarginT_10 color' + curDatas.HCHO.level">{{curDatas.HCHO.data}} μg/m3</h3>
+                    </Col>
+                  </Row>
+                </div>
+                <!-- 污染程度 -->
+                <h3 :class="'MarginT_10 color' + curDatas.HCHO.level">{{curDatas.HCHO.quantity}}</h3>
+              </Col>
+
+              <Col span="12" class="listenKindBlock">
+                <h2 class="TextAlignC MarginB_10">CO</h2>
+                <!-- 彩条 -->
+                <div class="levelBlock">
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="4" :class="'level level' + (idx+1)" v-for="(item, idx) in 6" :key="idx">{{idx+1}}</Col>
+                  </Row>
+                </div>
+                <!-- 三角 -->
+                <div class="trangleBlock">
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="4" :offset="(curDatas.CO.level - 1) * 4" :class="'trangleBox trangleBox' + curDatas.CO.level"></Col>
+                  </Row>
+                </div>
+                <!-- 数值 -->
+                <div class="dataBlock">
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="24" :class="curDatas.CO.level>3?'TextAlignR':(curDatas.CO.level>1?'TextAlignC':'TextAlignL')">
+                      <h3 :class="'MarginT_10 color' + curDatas.CO.level">{{curDatas.CO.data}} μg/m3</h3>
+                    </Col>
+                  </Row>
+                </div>
+                <!-- 污染程度 -->
+                <h3 :class="'MarginT_10 color' + curDatas.CO.level">{{curDatas.CO.quantity}}</h3>
+              </Col>
+
+              <Col span="12" class="listenKindBlock">
+                <h2 class="TextAlignC MarginB_10">CO2</h2>
+                <!-- 彩条 -->
+                <div class="levelBlock">
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="4" :class="'level level' + (idx+1)" v-for="(item, idx) in 6" :key="idx">{{idx+1}}</Col>
+                  </Row>
+                </div>
+                <!-- 三角 -->
+                <div class="trangleBlock">
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="4" :offset="(curDatas.CO2.level - 1) * 4" :class="'trangleBox trangleBox' + curDatas.CO2.level"></Col>
+                  </Row>
+                </div>
+                <!-- 数值 -->
+                <div class="dataBlock">
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="24" :class="curDatas.CO2.level>3?'TextAlignR':(curDatas.CO2.level>1?'TextAlignC':'TextAlignL')">
+                      <h3 :class="'MarginT_10 color' + curDatas.CO2.level">{{curDatas.CO2.data}} μg/m3</h3>
+                    </Col>
+                  </Row>
+                </div>
+                <!-- 污染程度 -->
+                <h3 :class="'MarginT_10 color' + curDatas.CO2.level">{{curDatas.CO2.quantity}}</h3>
+              </Col>
+
+              <Col span="12" class="listenKindBlock">
+                <h2 class="TextAlignC MarginB_10">温度/湿度</h2>
+                <h3 class="TextAlignC color1 MarginT_30 MarginB_40">{{curDatas.Temperature.data}} / {{curDatas.Humidity.data}}%</h3>
+                <!-- 污染程度 -->
+                <div class="MarginT_40 color1">
+                  <span style="float:left">
+                    <h3>{{curDatas.Temperature.quantity}}</h3>
+                  </span>
+                  <span style="float:right">
+                    <h3>{{curDatas.Humidity.quantity}}</h3>
+                  </span>
+                </div>
+              </Col>
+
+              <Col span="12" class="listenKindBlock">
+                <h2 class="TextAlignC MarginB_10">VOC</h2>
+                <!-- 彩条 -->
+                <div class="levelBlock">
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="4" :class="'level level' + (idx+1)" v-for="(item, idx) in 6" :key="idx">{{idx+1}}</Col>
+                  </Row>
+                </div>
+                <!-- 三角 -->
+                <div class="trangleBlock">
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="4" :offset="(curDatas.VOC.level - 1) * 4" :class="'trangleBox trangleBox' + curDatas.VOC.level"></Col>
+                  </Row>
+                </div>
+                <!-- 数值 -->
+                <div class="dataBlock">
+                  <Row type="flex" justify="start" class="code-row-bg">
+                    <Col span="24" :class="curDatas.VOC.level>3?'TextAlignR':(curDatas.VOC.level>1?'TextAlignC':'TextAlignL')">
+                      <h3 :class="'MarginT_10 color' + curDatas.VOC.level">{{curDatas.VOC.data}} μg/m3</h3>
+                    </Col>
+                  </Row>
+                </div>
+                <!-- 污染程度 -->
+                <h3 :class="'MarginT_10 color' + curDatas.VOC.level">{{curDatas.VOC.quantity}}</h3>
+              </Col>
+
+              <!-- <Col span="24" style="height: 40px;background:#000;padding:10px;color: rgb(112,173,71);">
+                <h4>温馨提示： 空气质量良好</h4>
+              </Col> -->
+            </Row>
+          </div>
+        </TabPane>
+        <TabPane label="历史数据">
+          <!-- <div class="MarginB_10">选择类型</div> -->
+          <div class="kindBar" style="text-align:left;">
+            <Row>
+              <Col span="4">选择类型</Col>
+              <Col span="20" v-if="curEqType == '031' || curEqType == '032'">
+                <RadioGroup v-model="curKind" @on-change="changeKind">
+                  <Radio v-for="(item, idx) in kind" :key="idx" :label="item"></Radio>
+                </RadioGroup>
+              </Col>
+              <Col span="20" v-if="curEqType == '021' || curEqType == '022'">
+                <RadioGroup v-model="curKind" @on-change="changeKindLight">
+                  <Radio v-for="(item, idx) in kind_light" :key="idx" :label="item"></Radio>
+                </RadioGroup>
+              </Col>
+            </Row>
+            <Row class="MarginB_10">
+              <Col span="4">选择时间间隔</Col>
+              <Col span="20">
+                <RadioGroup v-model="time" @on-change="changeTime">
+                  <Radio label="6"></Radio>
+                  <Radio label="12"></Radio>
+                  <Radio label="24"></Radio>
+                </RadioGroup>
+              </Col>
+            </Row>
+          </div>
+          <div v-show="hasData" id="myChart" :style="{width: '1024px !important', height: '450px', margin: '0 auto'}"></div>
+          <div class="TextAlignC MarginT_30" v-show="!hasData && !ifSpin">
+            <img style="width:100px;height:100px;margin:30px auto;" src="../../../static/img/icons/nodata.png">
+            <p>暂无数据</p>
+          </div>
+        </TabPane>
+      </Tabs>
+      <div v-show="curEqType != '031' && curEqType != '032'">
+        <div class="MarginB_10">选择类型</div>
         <div class="kindBar" style="text-align:left;">
           <Row>
             <Col span="4">选择类型</Col>
@@ -253,17 +460,18 @@
             </Col>
           </Row>
         </div>
-        <div v-show="hasData" id="myChart" :style="{width: '1024px !important', height: '450px', margin: '0 auto'}"></div>
+        <div v-show="hasData" id="myChart2" :style="{width: '1024px !important', height: '450px', margin: '0 auto'}"></div>
         <div class="TextAlignC MarginT_30" v-show="!hasData && !ifSpin">
           <img style="width:100px;height:100px;margin:30px auto;" src="../../../static/img/icons/nodata.png">
           <p>暂无数据</p>
         </div>
+      </div>
     </Modal>
     <!-- 控制面板 -->
     <Modal v-model="ifShowPanel" width="460" :mask-closable="false">
         <p slot="header" style="color:#000;text-align:left">
-            <!-- <Icon type="ios-information-circle"></Icon> -->
-            <span>控制面板</span>
+          <!-- <Icon type="ios-information-circle"></Icon> -->
+          <span>控制面板</span>
         </p>
         <div style="text-align:center">
             <Control :curEqType="curEqType" :curEqIndex="curEqIndex" :curEq="curEq"/>
@@ -293,6 +501,7 @@ export default {
       EqList: [],
       // HouseList: [],
       newEqName: '',
+      newEqCode: '',
       curEQName: '',
       curEQRoom: '',
       curEQId: '',
@@ -365,7 +574,17 @@ export default {
       kindI_light: ['power', 'electric_quantity', 'voltage'],
       kind_light: ['功率', '电量', '电压'],
       hasData: false,
-      openCode: ''
+      openCode: '',
+      // 当前数据
+      curDatas: {
+        PM25: {data: 0, quantity: '0', level: 1},
+        HCHO: {data: 0, quantity: '0', level: 1},
+        CO: {data: 0, quantity: '0', level: 1},
+        CO2: {data: 0, quantity: '0', level: 1},
+        Temperature: {data: 0, quantity: ''},
+        Humidity: {data: 0, quantity: ''},
+        VOC: {data: 0, quantity: '0', level: 1}
+      }
     }
   },
   computed: {
@@ -485,14 +704,19 @@ export default {
         this.choosedSecond = {}
       }
     },
-    editEqInfo (EqId, EqName) {
+    editEqInfo (EQ, EqId, EqName) {
+      this.curEq = EQ
       if (!this.curHome.isCreater) {
         this.$Message.warning('您不是管理员不能进行该操作！')
         return false
       }
       this.$Modal.confirm({
         onOk: () => {
-          this.sureModify(EqId)
+          if (this.newEqName.trim() === '') {
+            this.$Message.error('新的设备名称不能为空!')
+            return false
+          }
+          this.sureModify(EqId, 'name')
         },
         render: (h) => {
           return h('div', [
@@ -511,6 +735,44 @@ export default {
               on: {
                 input: (val) => {
                   this.newEqName = val
+                }
+              }
+            })
+          ])
+        }
+      })
+    },
+    changeCode (EQ, EqId, DeviceCode) {
+      this.curEq = EQ
+      if (!this.curHome.isCreater) {
+        this.$Message.warning('您不是管理员不能进行该操作！')
+        return false
+      }
+      this.$Modal.confirm({
+        onOk: () => {
+          if (this.newEqCode.trim() === '') {
+            this.$Message.error('新的设备码不能为空!')
+            return false
+          }
+          this.sureModify(EqId, 'code')
+        },
+        render: (h) => {
+          return h('div', [
+            h('h4', {
+              style: {
+                marginBottom: '10px'
+              }
+
+            }, '新的设备码'),
+            h('Input', {
+              props: {
+                value: this.newEqCode === '' ? DeviceCode : this.newEqCode,
+                autofocus: true,
+                placeholder: '请输入新的设备码...'
+              },
+              on: {
+                input: (val) => {
+                  this.newEqCode = val
                 }
               }
             })
@@ -602,7 +864,7 @@ export default {
     sureDel (EQ) {
       this.toggleSpin(true)
       send({
-        name: '/device?id=' + EQ.id + '&device_type=' + EQ.deviceType + '&second_control_id=' + EQ.second_control_id + '&home_id=' + this.curHomeId + '&register_id=' + this.$store.state.register_id,
+        name: '/device?id=' + EQ.id + '&device_type=' + EQ.deviceType + '&second_control_id=' + EQ.second_control_id + '&home_id=' + this.curHomeId + '&register_id=' + this.$store.state.register_id + '&device_code=' + EQ.device_code,
         method: 'DELETE',
         data: {
         }
@@ -641,6 +903,7 @@ export default {
     showCharts (EQ) {
       this.curEqCode = EQ.device_code
       this.curEqType = EQ.default_device_type
+      this.curEq = EQ
       if (EQ.default_device_type === '031' || EQ.default_device_type === '032') {
         this.curKind = 'PM2.5'
         this.curKindI = 'pm25'
@@ -653,6 +916,7 @@ export default {
       if (EQ.device_config !== '1') {
         this.setConfig('chart', EQ)
       } else {
+        this.getCurSensorData()
         this.changeModalShow('Chart')
         this.drawLine()
       }
@@ -675,11 +939,44 @@ export default {
       this.time = val
       console.log(val)
     },
+    // 获取传感器当前7个数值
+    getCurSensorData () {
+      send({
+        name: '/hair_current?device_id=' + this.curEq.device_code,
+        method: 'GET',
+        data: {
+        }
+      }).then(_res => {
+        switch (_res.data.code) {
+          case 1:
+            let HairData = _res.data.hair
+            this.curDatas = {
+              PM25: {data: HairData.pm25, quantity: HairData.pm25Type + 1 === 1 ? '优' : (HairData.pm25Type + 1 === 2 ? '良' : (HairData.pm25Type + 1 === 3 ? '轻度污染' : (HairData.pm25Type + 1 === 4 ? '中度污染' : (HairData.pm25Type + 1 === 5 ? '中度污染' : (HairData.pm25Type + 1 === 6 ? '重度污染' : '严重污染'))))), level: HairData.pm25Type + 1},
+              HCHO: {data: HairData.formaldehyde, quantity: HairData.formaldehydeType + 1 === 1 ? '优' : (HairData.formaldehydeType + 1 === 2 ? '良' : (HairData.formaldehydeType + 1 === 3 ? '轻度污染' : (HairData.formaldehydeType + 1 === 4 ? '中度污染' : (HairData.formaldehydeType + 1 === 5 ? '中度污染' : (HairData.formaldehydeType + 1 === 6 ? '重度污染' : '严重污染'))))), level: HairData.formaldehydeType + 1},
+              CO: {data: HairData.co, quantity: HairData.coType + 1 === 1 ? '优' : (HairData.coType + 1 === 2 ? '良' : (HairData.pm25Type + 1 === 3 ? '轻度中毒' : (HairData.coType + 1 === 4 ? '中度中毒' : (HairData.coType + 1 === 5 ? '中度中毒' : (HairData.coType + 1 === 6 ? '重度中毒' : '严重中毒'))))), level: HairData.coType + 1},
+              CO2: {data: HairData.co2, quantity: HairData.co2Type + 1 === 1 ? '优' : (HairData.co2Type + 1 === 2 ? '良' : (HairData.co2Type + 1 === 3 ? '轻度缺氧' : (HairData.co2Type + 1 === 4 ? '中度缺氧' : (HairData.co2Type + 1 === 5 ? '中度缺氧' : (HairData.co2Type + 1 === 6 ? '重度缺氧' : '严重缺氧'))))), level: HairData.co2Type + 1},
+              Temperature: {data: HairData.temperature, quantity: HairData.temperatureType + 1 === 1 ? '寒冷' : (HairData.temperatureType + 1 === 6 ? '炎热' : '舒适'), level: HairData.temperatureType + 1},
+              Humidity: {data: HairData.humidity, quantity: HairData.humidityType + 1 === 1 ? '干燥' : (HairData.humidityType + 1 === 6 ? '潮湿' : '舒适'), level: HairData.humidityType + 1},
+              VOC: {data: HairData.voc, quantity: HairData.vocType + 1 === 1 ? '优' : (HairData.vocType + 1 === 2 ? '良' : (HairData.vocType + 1 === 3 ? '轻度异味' : (HairData.vocType + 1 === 4 ? '中度异味' : (HairData.vocType + 1 === 5 ? '中度异味' : (HairData.vocType + 1 === 6 ? '重度异味' : '严重异味'))))), level: HairData.vocType + 1}
+            }
+            break
+          case 0:
+            this.$Message.error(_res.data.message)
+            break
+          default:
+            this.$Message.error(_res.data.message)
+        }
+      }).catch((_res) => {
+        console.log(_res)
+        this.$Message.error('Interface Error!')
+      })
+    },
     drawLine () {
       this.toggleSpin(true)
       let _THIS = this
       // 初始化echarts实例
       let myChart = this.$echarts.init(document.getElementById('myChart'))
+      let myChart2 = this.$echarts.init(document.getElementById('myChart2'))
       let urlKind = ''
       let backDataProperty = ''
       if (this.curEqType === '031' || this.curEqType === '032') {
@@ -705,7 +1002,7 @@ export default {
         }
         switch (_res.data.code) {
           case 1:
-            let tempData = _res.data[backDataProperty]
+            let tempData = _res.data[backDataProperty].reverse()
             let option = {
               title: {
                 text: ''
@@ -769,6 +1066,7 @@ export default {
               }
             }
             myChart.setOption(option)
+            myChart2.setOption(option)
             this.toggleSpin(false)
             break
           default:
@@ -1038,10 +1336,11 @@ export default {
       })
     },
     // 更新设备名称
-    sureModify (EqId) {
+    sureModify (EqId, Type) {
       console.log(EqId)
       send({
-        name: '/device?device_name=' + this.newEqName + '&id=' + EqId + '&house_id=' + this.curHomeId,
+        name: '/device?id=' + EqId + '&house_id=' + this.curHomeId + '&second_control_id=' + this.curEq.second_control_id + (Type === 'name' ? '&device_name=' + this.newEqName : '&device_code=' + this.newEqCode),
+        // name: '/device?device_name=' + this.newEqName + '&id=' + EqId + '&house_id=' + this.curHomeId,
         method: 'PUT',
         data: {
         }
@@ -1051,6 +1350,7 @@ export default {
             this.$Message.success('修改成功!')
             this.getAllEq()
             this.newEqName = ''
+            this.newEqCode = ''
             break
           default:
             this.$Message.error(_res.data.message)
@@ -1224,18 +1524,6 @@ export default {
         }
       })
       this.initialSelect(Master)
-      // if (Master[0]) {
-      //   this.choosedMaster = Master[0]
-      //   this.getSecondControlList(Master[0].main_control_code)
-      //   temp.selectSecondId = ''
-      //   this.formEQNormal = temp
-      // } else {
-      //   this.formEQNormal.selectMasterId = ''
-      //   this.choosedMaster = []
-      //   this.SecondControlList = []
-      //   this.formEQNormal.selectSecondId = ''
-      //   this.choosedSecond = []
-      // }
     },
     // 获取该主控下所有从控
     getSecondControlList (MasterCode) {
@@ -1432,6 +1720,103 @@ export default {
     border-top: 0px !important;
     order-left: 0px;
     order-right: 0px;
+  }
+}
+.curDataBlock{
+  width: 300px;
+  height: 450px;
+  background: #000;
+  margin: 20px auto;
+  .listenKindBlock{
+    height: 150px;
+    padding: 10px;
+    border-bottom: 1px solid rgb(112,173,71);
+    &:nth-of-type(odd){
+      border-right: 1px solid rgb(112,173,71);
+    }
+    h2{
+      color: rgb(112,173,71);
+    }
+    .levelBlock{
+      width: 130px;
+      height: 20px;
+    }
+    .level{
+      flex: 1;
+      height: 100%;
+    }
+    .level1{
+      background: rgb(112,173,71);
+      color: rgb(112,173,71);
+    }
+    .level2{
+      background: rgb(255,217,102);
+      color: rgb(255,217,102);
+    }
+    .level3{
+      background: rgb(237,125,49);
+      color: rgb(237,125,49);
+    }
+    .level4{
+      background: rgb(255,0,0);
+      color: rgb(255,0,0);
+    }
+    .level5{
+      background: rgb(192,0,0);
+      color: rgb(192,0,0);
+    }
+    .level6{
+      background: rgb(102,51,0);
+      color: rgb(102,51,0);
+    }
+    .trangleBox{
+      width:20px;
+      height:20px;
+    }
+    .trangleBox::before{
+      content: '';
+      position: absolute;
+      border-left: 10px solid transparent;
+      border-top: 10px solid transparent;
+      border-right: 10px solid transparent;
+      margin-top: -5px;
+    }
+    .trangleBox1::before{
+      border-bottom: 10px solid rgb(112,173,71);
+    }
+    .trangleBox2::before{
+      border-bottom: 10px solid rgb(255,217,102);
+    }
+    .trangleBox3::before{
+      border-bottom: 10px solid rgb(237,125,49);
+    }
+    .trangleBox4::before{
+      border-bottom: 10px solid rgb(255,0,0);
+    }
+    .trangleBox5::before{
+      border-bottom: 10px solid rgb(192,0,0);
+    }
+    .trangleBox6::before{
+      border-bottom: 10px solid rgb(102,51,0);
+    }
+    .color1{
+      color: rgb(112,173,71);
+    }
+    .color2{
+      color: rgb(255,217,102);
+    }
+    .color3{
+      color: rgb(237,125,49);
+    }
+    .color4{
+      color: rgb(255,0,0);
+    }
+    .color5{
+      color: rgb(192,0,0);
+    }
+    .color6{
+      color: rgb(102,51,0);
+    }
   }
 }
 @keyframes ScaleToggle
