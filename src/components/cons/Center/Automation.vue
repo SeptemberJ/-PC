@@ -446,6 +446,7 @@ export default {
           let tempObj = {
             'eqName': newObj[0].device_name,
             'device_id': newObj[0].id,
+            'main_control_code': newObj[0].main_control_code,
             'id': newObj[0].id,
             'deviceType': newObj[0].default_device_type,
             'device_status': '1',
@@ -658,6 +659,8 @@ export default {
       formAutomation.implements.eqList.map((EQ) => {
         let obj = {
           'device_id': EQ.id,
+          'deviceType': EQ.deviceType,
+          'main_control_code': EQ.main_control_code,
           'device_status': EQ.device_status,
           'device_value': EQ.device_value
         }
@@ -888,6 +891,7 @@ export default {
                 let obj = {
                   eqName: item.device_name,
                   id: item.device_id,
+                  main_control_code: item.main_control_code,
                   deviceType: item.deviceType,
                   device_status: item.device_status,
                   device_value: item.device_value

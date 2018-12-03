@@ -145,10 +145,10 @@ export default {
     },
     // 设置密码
     setPsd () {
-      let url = this.sourceType === 0 ? '/userInsertPC' : '/backFpasswordByMobile'
+      let url = this.sourceType === 0 ? ('/userInsertPC?fpassword=' + this.psd) : '/backFpasswordByMobile?fpasswordNew=' + this.psd
       send({
         // name: '/userInsertPC?mobile=' + this.phone + '&fpassword=' + this.psd,
-        name: url + '?mobile=' + this.phone + '&fpasswordNew=' + this.psd,
+        name: url + '&mobile=' + this.phone,
         method: 'POST',
         data: {
         }

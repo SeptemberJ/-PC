@@ -924,6 +924,7 @@ export default {
             }
             break
           case 0:
+            clearInterval(this.timer)
             this.getAllEq('', eqItem, eqIdx)
             this.toggleSpin(false)
             this.$Message.error(_res.data.result.result)
@@ -949,6 +950,7 @@ export default {
           case 1:
             // 图表类配置成功跳转图表
             if (type === 'chart') {
+              this.getCurSensorData()
               this.changeModalShow('Chart')
               this.drawLine()
               this.getAllEq('chart', eqItem, eqIdx)

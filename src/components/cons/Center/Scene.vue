@@ -389,6 +389,7 @@ export default {
               item.deviceType = item.default_device_type
               item.device_status = item.device_status
               item.device_value = item.device_value
+              item.main_control_code = item.main_control_code
             })
             this.iconList.filter((icon, idx) => {
               if (_res.data.sceneDetail[0].scene_pic.indexOf(icon.fpic) !== -1) {
@@ -451,6 +452,7 @@ export default {
             'eqName': newObj[0].device_name,
             'device_id': newObj[0].id,
             'id': newObj[0].id,
+            'main_control_code': newObj[0].main_control_code,
             'deviceType': newObj[0].default_device_type,
             'device_status': '1',
             // 'action': 0,

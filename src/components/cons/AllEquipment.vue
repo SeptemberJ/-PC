@@ -494,6 +494,7 @@ export default {
   data () {
     return {
       timer: '',
+      playRoadCounter: 0,
       btLoading: false,
       moveDestination: '',
       moveDestinationId: '',
@@ -1133,6 +1134,7 @@ export default {
         switch (_res.data.code) {
           case 1:
             this.timer = setInterval(() => {
+              this.playRoadCounter++
               this.EqPlay(type, eqItem, sendCurCns, 'ConfigAck', '', eqIdx)
             }, 1000)
             // setTimeout(() => { this.EqPlay(type, eqItem, sendCurCns, 'ConfigAck', '', eqIdx) }, 1000)
@@ -1164,6 +1166,7 @@ export default {
               // 页面上更新开关状态
               if (_res.data.result.payload === '00') {
                 clearInterval(this.timer)
+                this.playRoadCounter = 0
                 this.getAllEq('', eqItem, eqIdx)
               } else if (_res.data.result.payload === '01') {
                 clearInterval(this.timer)
@@ -1250,6 +1253,7 @@ export default {
           case 1:
             // 图表类配置成功跳转图表
             if (type === 'chart') {
+              this.getCurSensorData()
               this.changeModalShow('Chart')
               this.drawLine()
               this.getAllEq('chart', eqItem, eqIdx)
