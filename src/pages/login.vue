@@ -16,15 +16,15 @@
 		<div class="loginItem" style="margin-top: 5px;">
 			<div class="loginBt"><Button style="background: yellow;width: 100%; font-weight: bold;" shape="circle" @click="goLogin">登陆</Button></div>
 		</div>
-		<!-- <div class="loginItem">
-      <div class="operationBar">
+		<div class="loginItem">
+      <!-- <div class="operationBar">
         <p class="">其他方式登陆</p>
         <p class="MarginT_10">
           <img class="ThirdIcon" src="../../static//img/icons/qq.png" @click="QQLogin">
           <img style="width:30px;height:30px;" src="../../static//img/icons/wechat.png">
         </p>
-      </div>
-		</div> -->
+      </div> -->
+		</div>
 	</div>
 </template>
 <script type="text/javascript"  charset="utf-8" src="http://connect.qq.com/qc_jssdk.js" data-appid="101518980" data-redirecturi="http://btzoon.com/api/oauth/QQ/callback.php"></script>
@@ -147,7 +147,7 @@ export default {
     QQLogin () {
       const oOpts = {
         appId: '101518980',
-        redirectURI: 'http://btzoon.com/dist/znkz'
+        redirectURI: 'http://znkz.btzoon.com'
       }
       QC.Login.showPopup(oOpts)
     }

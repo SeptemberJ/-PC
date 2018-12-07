@@ -87,7 +87,7 @@
                 <Col span="6">
                   <span class="hoverColor">
                     <img class="iconImg" src="../../../static/img/icons/zengsong.png" @click="deleteEq(EQ)">
-                    <span @click="deleteEq(EQ)">赠送</span>
+                    <span @click="deleteEq(EQ)">注销</span>
                   </span>
                 </Col>
                 <Col span="6" class="TextAlignR">

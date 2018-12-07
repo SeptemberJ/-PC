@@ -143,7 +143,9 @@
         <Col span="8" class="col" v-for="item in fnamelist" :key="item.id">
             <div class="list" style="width: 90%;">
                 <Col span="7">
-                    <div class="icon"></div>
+                    <div class="icon">
+                      <img style="width:60px;height: 60px;" :src="item.head_pic">
+                    </div>
                 </Col>
                 <Col span="11">
                     <div class="nametext">

@@ -34,7 +34,7 @@
                 <Col span="6">
                   <span class="hoverColor">
                     <img class="iconImg" src="../../../static/img/icons/zengsong.png" @click="deleteSecondControl(SecondControl)">
-                    <span @click="deleteSecondControl(SecondControl)">赠送</span>
+                    <span @click="deleteSecondControl(SecondControl)">注销</span>
                   </span>
                 </Col>
                     <Col span="6" class="TextAlignR">
@@ -51,7 +51,7 @@
       </Row>
     </div>
     <NoData v-if="SecondControlList.length == 0"/>
-    <!-- 添加主控 -->
+    <!-- 添加从控 -->
     <Modal v-model="ifAddSecond" width="850" :mask-closable="false">
       <p slot="header" style="color:#333;text-align:left">
           <!-- <Icon type="ios-information-circle"></Icon> -->

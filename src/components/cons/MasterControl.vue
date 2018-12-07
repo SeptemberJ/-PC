@@ -28,7 +28,7 @@
                     <Col span="6">
                       <span class="hoverColor">
                         <img class="iconImg" src="../../../static/img/icons/zengsong.png" @click="deleteMaster(MasterControl)">
-                        <span @click="deleteMaster(MasterControl)">赠送</span>
+                        <span @click="deleteMaster(MasterControl)">注销</span>
                       </span>
                     </Col>
                     <Col span="6"><img @click="editMasterInfo(MasterControl.id, MasterControl.main_control_name)" class="iconImg" src="../../../static/img/icons/editor-line.png"><span @click="editMasterInfo(MasterControl.id, MasterControl.main_control_name)">编辑</span></Col>
