@@ -194,16 +194,6 @@ export default {
         this.btLoading = false
       }
     }
-    // keyWord: function (val) {
-    //   console.log(val)
-    //   if (val.trim() !== '') {
-    //     this.ifSearch = true
-    //     this.search()
-    //   } else {
-    //     this.ifSearch = false
-    //     this.resultList = []
-    //   }
-    // }
   },
   created () {
     this.getAllScene()
@@ -245,15 +235,10 @@ export default {
     removerImplement (IDX, ID) {
       this.formScene.implements.splice(IDX, 1)
       this.choosedEqList.filter((id, idx) => {
-        console.log(ID === id)
-        console.log(ID)
-        console.log(id)
         if (ID === id) {
           this.choosedEqList.splice(idx, 1)
         }
       })
-      console.log('this.choosedEqList----------------')
-      console.log(this.choosedEqList)
     },
     // 添加场景
     handleEditScene (name) {
@@ -436,7 +421,6 @@ export default {
       this.ifChoose = true
     },
     changeEqList () {
-      console.log(this.choosedEqList)
     },
     // 更新执行设备列表
     updateChoosedEqList () {
@@ -558,7 +542,6 @@ export default {
                 'valueArray': item.typeValueList
               }
             })
-            console.log(tempActionArray)
             this.settingObj = tempActionArray
             break
           default:

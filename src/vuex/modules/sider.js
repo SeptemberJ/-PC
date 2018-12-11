@@ -82,9 +82,6 @@ const actions = {
     }
   },
   changeCurMenu ({commit, state}, CURMENU) {
-    console.log(CURMENU)
-    console.log(state.menuList[state.curTab].menu[CURMENU])
-    // debugger
     commit('setCurMenu', CURMENU)
     commit('setCurMenuText', state.menuList[state.curTab].menu[CURMENU].text)
   }

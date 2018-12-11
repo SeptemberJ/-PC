@@ -179,16 +179,6 @@ export default {
     curHomeId: function (val) {
       this.getAllScene()
     }
-    // keyWord: function (val) {
-    //   console.log(val)
-    //   if (val.trim() !== '') {
-    //     this.ifSearch = true
-    //     this.search()
-    //   } else {
-    //     this.ifSearch = false
-    //     this.resultList = []
-    //   }
-    // }
   },
   created () {
     this.getAllEq()
@@ -216,16 +206,11 @@ export default {
       this.formScene.items[index].status = 0
     },
     changeEqList (item) {
-      console.log(item)
     },
     changeEq (idx) {
       this.EqList[idx].choosed = true
-      console.log(this.EqList[idx])
-      console.log(this.formScene.items)
     },
     changeOperation (idx, val) {
-      console.log(idx)
-      console.log(val)
     },
     // 所有场景
     getAllEq () {

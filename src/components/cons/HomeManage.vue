@@ -34,10 +34,7 @@ export default {
       'changeHomeList'
     ]),
     gethomeshowtype () {
-      console.log(11111)
-      console.log(this.$store.state.home.CurType)
       this.homeshowtype = this.$store.state.home.CurType
-      console.log(this.homeshowtype === 5)
       if (this.homeshowtype === 0) {
         this.isshow = true
         this.show = false
@@ -48,8 +45,6 @@ export default {
     },
     changetype () {
       this.changehomeshowtype(this.homeshowtype)
-      console.log(1111)
-      console.log(this.$store.state.homeshowtype)
     }
   }
 }

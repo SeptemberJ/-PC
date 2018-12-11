@@ -100,8 +100,18 @@
                 </Col>
                 <Col span="3"><Icon type="ios-trash" size="18" class="CursorPointer hoverColor MarginL_10 MarginT_10" @click="removerCondition(sensorIdx, sensor.id)"/></Col>
               </Row>
+              <Row v-for="(eq, eqIdx) in formAutomation.condition.eq" :key="eq.id" class="MarginB_10">
+                <Col span="6">{{eq.name}}</Col>
+                <Col span="4">
+                  <Select v-model="eq.whenStatus" style="width:100px">
+                    <Option value="0">关闭</Option>
+                    <Option value="1">打开</Option>
+                  </Select>
+                </Col>
+                <Col span="3"><Icon type="ios-trash" size="18" class="CursorPointer hoverColor MarginL_10 MarginT_10" @click="removerConditionEQ(eqIdx, eq.groupIdx)"/></Col>
+              </Row>
             </FormItem>
-            <Button type="dashed" long class="MarginB_10" icon="ios-add-circle-outline" @click="addCondition">选择监测设备</Button>
+            <Button type="dashed" long class="MarginB_10" icon="ios-add-circle-outline" @click="addCondition">添加自动化条件</Button>
 
             <!-- action -->
             <FormItem label="就执行">
@@ -113,6 +123,23 @@
                 </i-switch>
               </div>
               <!-- <i-switch slot="extra" title="允许通知"  @on-change="changeNotice"> -->
+            </FormItem>
+            <FormItem label="延迟" class="MarginB_20">
+              <Select v-model="formAutomation.delayTime" style="width:100px">
+                <Option value="0">立即</Option>
+                <Option value="1">1秒</Option>
+                <Option value="2">2秒</Option>
+                <Option value="3">3秒</Option>
+                <Option value="4">4秒</Option>
+                <Option value="5">5秒</Option>
+                <Option value="6">6秒</Option>
+                <Option value="7">7秒</Option>
+                <Option value="8">8秒</Option>
+                <Option value="9">9秒</Option>
+                <Option value="10">10秒</Option>
+                <Option value="60">一分钟</Option>
+              </Select>
+              <span class="MarginL_10">执行</span>
             </FormItem>
             <FormItem>
               <!-- 执行设备列表 -->
@@ -172,16 +199,21 @@
     <!-- choose condition -->
     <Modal v-model="ifChooseCondition" scrollable width="350" :mask-closable="false">
       <p slot="header" style="color:#333;text-align:left">
-        <span>选择监测的传感器</span>
+        <span>选择自动化条件</span>
       </p>
       <div style="text-align:left">
         <Row>
-          <p v-if="sensorList.length == 0" class="ColorRed">您还没有添加过<span class="Bold CursorPointer" @click="toEqList"> 传感器 </span>，请先去添加</p>
-          <RadioGroup v-model="conditionItemId">
+          <p v-if="sensorList.length == 0 && NotSensorEqList.length == 0" class="ColorRed">您还没有添加过<span class="Bold CursorPointer" @click="toEqList"> 任何设备 </span>，请先去添加</p>
+          <p class="MarginB_10 colorPrimary Bold" v-if="sensorList.length > 0">您的传感器</p>
+          <RadioGroup v-model="conditionItemId" v-if="sensorList.length > 0">
             <Radio :label="sensor.id" v-for="(sensor, idx) in sensorList" :key="idx" style="display: block;">
               <span>{{sensor.device_name}}</span>
             </Radio>
           </RadioGroup>
+          <p class="MarginT_20 MarginB_10 colorPrimary Bold" v-if="NotSensorEqList.length > 0">您的设备</p>
+          <CheckboxGroup v-model="conditionEQ" @on-change="changeConditionEqList" v-if="NotSensorEqList.length > 0">
+            <Checkbox style="display: block;margin-bottom:10px;" v-for="(item, idx) in NotSensorEqList" :key="idx" :label="idx">{{item.device_name}}</Checkbox>
+          </CheckboxGroup>
         </Row>
       </div>
       <div slot="footer" class="TextAlignC">
@@ -238,6 +270,7 @@ export default {
       },
       automationList: [], // 自动化列表
       conditionItemId: '', // 单次选择的启动条件（传感器）
+      conditionEQ: [], // 所选择的条件设备
       sensorList: [{'name': '哨兵1', 'id': 'b842d2edccbc4eb698b9c23a962ea30d'}], // 用户传感器列表
       NotSensorEqList: [], // 所有可执行动作的设备
       sceneList: [], // 所有可执行动作的场景
@@ -246,6 +279,7 @@ export default {
       formAutomation: {
         AutomationName: '',
         ifNotice: true,
+        delayTime: '0',
         SceneTime: {
           start: '',
           end: ''
@@ -263,7 +297,8 @@ export default {
         },
         condition: {
           timing: {},
-          sensor: []
+          sensor: [],
+          eq: []
         },
         implements: {
           eqList: [],
@@ -427,11 +462,11 @@ export default {
     addImplement () {
       this.ifChooseAction = true
     },
+    changeConditionEqList () {
+    },
     changeEqList () {
-      console.log(this.choosedEqList)
     },
     changeSceneList () {
-      console.log(this.choosedSceneList)
     },
     // 更新执行设备和场景列表
     updateChoosedImplements () {
@@ -508,9 +543,25 @@ export default {
     },
     // 切换监测设备
     updateCondition () {
-      let temp = this.sensorList.slice(0)
-      let choosedItem = temp.filter((sensor) => {
+      let tempSensor = this.sensorList.slice(0)
+      let tempEQList = this.NotSensorEqList.slice(0)
+      let conditionEqTemp = []
+      let choosedItem = tempSensor.filter((sensor) => {
         return (sensor.id === this.conditionItemId)
+      })
+      this.conditionEQ.map((EQIDX) => {
+        conditionEqTemp.push({
+          'if_type': '1', // 0-时间 1-设备
+          'main_control_code': tempEQList[EQIDX].main_control_code,
+          'name': tempEQList[EQIDX].device_name,
+          'deviceCode': tempEQList[EQIDX].device_code,
+          'id': tempEQList[EQIDX].id,
+          'groupIdx': EQIDX, // 在checkgroup中的索引
+          'whenStatus': '0',
+          'measuringPoint': '',
+          'compare': '',
+          'limitNumber': ''
+        })
       })
       if (choosedItem[0]) {
         let newObj = {
@@ -526,10 +577,11 @@ export default {
         }
         this.ifChooseCondition = false
         this.formAutomation.condition.sensor = [newObj]
-        console.log(this.formAutomation.condition.sensor)
-      } else {
-        this.$Message.warning('请选择一个监测设备!')
       }
+      if (this.conditionEQ.length === 0 && !choosedItem[0]) {
+        this.$Message.warning('请至少选择一个自动化条件!')
+      }
+      this.formAutomation.condition.eq = conditionEqTemp
     },
     // 添加监测条件
     addConditionItem () {
@@ -572,7 +624,14 @@ export default {
       }
     },
     removerCondition (IDX, ID) {
+      if (this.formAutomation.condition.sensor.length === 1) {
+        this.conditionItemId = ''
+      }
       this.formAutomation.condition.sensor.splice(IDX, 1)
+    },
+    removerConditionEQ (IDX, GroupIdx) {
+      this.formAutomation.condition.eq.splice(IDX, 1)
+      this.conditionEQ.splice(GroupIdx, 1)
     },
     // 添加自动化
     handleEditAutomation (name) {
@@ -585,22 +644,18 @@ export default {
             // 有条件可以不定时 判断条件是否填写完整
             for (let i = 0; i < len; i++) {
               for (let key in sensorList[i]) {
-                console.log(sensorList[i])
-                console.log(sensorList[i][key])
                 if (sensorList[i][key].trim() === '') {
                   this.$Message.warning('请将条件信息填写完整!')
                   return false
                 }
               }
             }
-            console.log('1----------------------------')
             this.postAumation(this.formAutomation)
           } else {
             if (this.formAutomation.SceneTime.start === '' || this.formAutomation.SceneTime.end === '') {
               this.$Message.warning('如果为定时任务，请将开始与结束时间填写完整!')
               return false
             }
-            console.log('2----------------------------')
             this.postAumation(this.formAutomation)
           }
         } else {
@@ -609,8 +664,6 @@ export default {
       })
     },
     postAumation (formAutomation) {
-      console.log('formAutomation--------------')
-      console.log(formAutomation)
       let conditionArray = []
       let weekArray = []
       for (var key in formAutomation.SceneWeek) {
@@ -693,8 +746,6 @@ export default {
         auto_execute_device: eqListArray,
         auto_execute_scene: sceneListArray
       }
-      console.log('automation-------')
-      console.log(automation)
       this.btLoading = true
       sendscene({
         name: this.isEdit ? '/updateAuto' : '/insertauto',
@@ -721,7 +772,6 @@ export default {
     },
     // 删除场景
     deleteAutomation (AutomationId) {
-      console.log(AutomationId)
       if (!this.curHome.isCreater) {
         this.$Message.warning('您不是管理员不能进行该操作！')
         return false
@@ -931,8 +981,6 @@ export default {
               }
               // Automation: []
             }
-            console.log('edit------------------')
-            console.log(this.formAutomation)
             this.changeModalShow('Automation')
             break
           default:
@@ -1035,11 +1083,7 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
-            // _res.data.scenelist.map((item) => {
-            //   item.scene_status = item.scene_status === '1' ? true : false
-            // })
             this.sceneList = _res.data.scenelist
-            console.log(this.sceneList)
             break
           default:
             this.$Message.error(_res.data.message)
@@ -1066,7 +1110,6 @@ export default {
                 'valueArray': item.typeValueList
               }
             })
-            console.log(tempActionArray)
             this.settingObj = tempActionArray
             break
           default:

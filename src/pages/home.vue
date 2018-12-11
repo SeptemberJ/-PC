@@ -97,8 +97,6 @@ export default {
   created () {
     this.windowHeight = window.innerHeight
     this.checkIfHasHome()
-    // console.log('this.curHome----------------')
-    // console.log(this.curHome)
   },
   computed: {
     ...mapState({
@@ -150,7 +148,6 @@ export default {
       this.updateCurHome(this.homeList[IDX])
     },
     updateCurHome (HomeInfo) {
-      // console.log(HomeInfo)
       send({
         name: '/home?isdefault=1&id=' + HomeInfo.home_id + '&home_name=' + HomeInfo.home_name + '&faddress=' + HomeInfo.faddress + '&register_id=' + this.$store.state.register_id + '&home_pic=' + HomeInfo.homePic,
         method: 'PUT',
@@ -159,7 +156,6 @@ export default {
       }).then(_res => {
         switch (_res.data.code) {
           case 1:
-            // this.$Message.success('设置成功!')
             // 更新当前家
             let CurHomeTemp = {
               home_name: HomeInfo.home_name,

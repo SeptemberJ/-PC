@@ -489,8 +489,6 @@ export default {
                 this.temp[idx].choosedEQ.push(item.device_name)
             })
         }
-        console.log('输出id')
-        console.log(this.temp)
     },
     checkAllGroupChange (idx, item) {
         if (item.choosedEQ.length !== item.houseList.length) {
@@ -586,14 +584,13 @@ export default {
             }
         }
         if (!ifHasDevice) {
-          console.log('无任何数据---')
           return false
         }
         // 调用授权的接口
         // var objData = {'home':tempArray}
         let DATA = {'home':tempArray}
-        console.log(DATA)
-        console.log(tempArray)
+        // console.log(DATA)
+        // console.log(tempArray)
         axios.post(encodeURI(this.$store.state.home.app_URL + 'authorization?home_id_member=' + this.homeid +'&register_id_member=' + this.memberid + '&timestamp=' + Date.now()),DATA
             ).then((res)=> {
             if (res.data.code == 1){
@@ -610,11 +607,10 @@ export default {
       this.homename = true
       this.home_id = {home_id}.home_id
       this.isdefault = {isdefault}.isdefault
-      console.log(this.isdefault)
-      console.log('输出this.isdefault')
+      // console.log(this.isdefault)
+      // console.log('输出this.isdefault')
       axios.get(encodeURI(this.$store.state.home.app_URL + 'homeDetail?id=' + this.home_id + '&timestamp=' + Date.now())
             ).then((res) => {
-              console.log(res)
               this.form.fname = res.data.home.home_name;
               this.form.faddress = res.data.home.faddress;
               this.form.picture = res.data.home.home_pic;
@@ -714,7 +710,6 @@ export default {
       axios.delete(encodeURI(this.$store.state.home.app_URL + 'home?register_id=' + this.memberid + '&home_id=' + this.homeid
  + '&timestamp=' + Date.now())
       ).then((res) => {
-        console.log(res)
         axios.get(encodeURI(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid + '&timestamp=' + Date.now())
       ).then((res) => {
           if (res.data.code ==1 ){
@@ -807,17 +802,17 @@ export default {
       dataM.map((item, idx) => {
           dataR[idx].menberListcount = item.menberListcount
       })
-      console.log('dataM------------------')
-      console.log(dataM)
+      // console.log('dataM------------------')
+      // console.log(dataM)
       this.homelist = dataR
-      console.log(this.homelist)
+      // console.log(this.homelist)
     },
     edit () {
-      console.log(2222111)
-      console.log(this.$store.state.home.CurType)
+      // console.log(2222111)
+      // console.log(this.$store.state.home.CurType)
       this.changehomeshowtype(5)
-      console.log(this.$store.state.home.CurType)
-      console.log(1111)
+      // console.log(this.$store.state.home.CurType)
+      // console.log(1111)
       this.show = false
       this.cardshow = true
     },
@@ -827,9 +822,9 @@ export default {
       this.menbers = true
       this.homeid = {home_id}.home_id
       this.newregister_id = {register_id}.register_id
-      console.log(this.newregister_id)
-      console.log('this.newregister_id=====')
-      console.log(this.homeid)
+      // console.log(this.newregister_id)
+      // console.log('this.newregister_id=====')
+      // console.log(this.homeid)
       axios.get(encodeURI(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid + '&timestamp=' + Date.now())
             ).then((res) => {
                 if (res.data.code ==1 ){
@@ -854,14 +849,13 @@ export default {
             if (valid) {
                 axios.post(encodeURI(this.$store.state.home.app_URL + 'homeMember?mobile=' + this.menbername.mobile + '&home_id=' + this.homeid + '&timestamp=' + Date.now())
                 ).then((res) => {
-                    console.log(res)
                     if (res.data.code ==1 ){
                         this.$Message.success('添加成功!')
                         axios.get(encodeURI(this.$store.state.home.app_URL + 'homeMember?home_id=' + this.homeid + '&timestamp=' + Date.now())
                         ).then((res) => {
                             if (res.data.code ==1 ){
                                 if (res.data.homeList.length == 0){
-                                    this.$Message.warning('暂无数据!')//here
+                                    this.$Message.warning('暂无数据!')
                                 }else{
                                     this.fnamelist = res.data.homeList
                                     this.adminid = this.fnamelist[0].id
@@ -883,9 +877,9 @@ export default {
     editroom (home_id, isCreater) {
       this.show = false
       this.cardshow = true
-      console.log({home_id})
+      // console.log({home_id})
       this.homeid = {home_id}.home_id
-      console.log(this.homeid)
+      // console.log(this.homeid)
       axios.get(encodeURI(this.$store.state.home.app_URL + 'house?home_id=' + this.homeid + '&timestamp=' + Date.now())
             ).then((res) => {
                 if (res.data.code ==1 ){
@@ -903,10 +897,7 @@ export default {
     // 删除房间
     delhomenames (id) {
       this.modal3 = true
-      console.log({id})
-      console.log({id}.id)
-      this.id = {id}.id//点击删除
-      console.log(this.id)
+      this.id = {id}.id
     },
     suredelete () {
       if (Decrypt(localStorage['openCode']) != this.openCode) {
@@ -918,7 +909,7 @@ export default {
             ).then((res) => {
                 if (res.data.code ==1 ){
                   this.openCode = ''
-                  this.$Message.success('删除成功!')//删除成功重新加载房间列表
+                  this.$Message.success('删除成功!')// 删除成功重新加载房间列表
                 axios.get(encodeURI(this.$store.state.home.app_URL + 'house?home_id=' + this.homeid + '&timestamp=' + Date.now())
                     ).then((res) => {
                         if (res.data.code ==1 ){
@@ -927,7 +918,6 @@ export default {
                             }else{
                                 // this.$Message.success('加载成功!')
                                 this.roomlist = res.data.houseList
-                                console.log(this.roomlist)
                             }
                         }
                     })
@@ -953,7 +943,6 @@ export default {
                                 this.$Message.warning('暂无数据!')
                             }else{
                                 this.roomlist = res.data.houseList
-                                console.log(this.roomlist)
                             }
                         }
                     })
@@ -972,20 +961,17 @@ export default {
       let DATA = {'home_id':this.homeid,'register_id':this.register_id,'house_member':house_member}
       axios.post(encodeURI(this.$store.state.home.app_URL + 'house' + '?timestamp=' + Date.now()),DATA
         ).then((res)=> {
-           console.log(res)
            if (res.data.code == 1){
                 this.$Message.success('增加成功!')
                 axios.get(encodeURI(this.$store.state.home.app_URL + 'house?home_id=' + this.homeid + '&timestamp=' + Date.now())
                     ).then((res) => {
                         if (res.data.code ==1 ){
                             this.roomlist = res.data.houseList
-                            console.log(this.roomlist)
                         }
                     })
             }else{
                 // this.$Message.success('加载成功!')
                 this.roomlist = res.data.houseList
-                console.log(this.roomlist)
             }
         }).catch((error)=> {
             console.log(error)
@@ -1229,22 +1215,6 @@ export default {
               ifHased = true
             }
           })
-          // let fn = () => {
-          //   return new Promise((resolve, reject) => {
-          //     this.defaultRoomList.filter(room => {
-          //       if (room.dhouse_name === this.newRommName) {
-          //         ifHased = true
-          //       }
-          //     })
-          //     resolve(ifHased)
-          //   })
-          // }
-          // let  hased  = fn().then(function(_res) {
-          //   console.log('_res---' + _res)
-          //   return _res
-          // })
-          // // async fn().then(function(_res) {console.log('_res---' + _res)})
-          // console.log(hased)
           if (ifHased) {
             this.$Message.warning('该房间名称已存在！')
           } else {
@@ -1290,8 +1260,6 @@ export default {
       var file = event
       var reader = new FileReader()
       reader.readAsDataURL(file)
-      console.log('-----------------------')
-      console.log(file)
       if (file.size > 1024000 * 2) {
         this.$Notice.warning({
           title: '图片大小警告',
@@ -1303,8 +1271,6 @@ export default {
         _this.homePicture = this.result
         let reg = /^data:image\/(jpeg|png|gif);base64,/
         let jiequ = this.result.replace(reg, "")
-        // console.log(jiequ)
-        // _this.getImgName(jiequ)
         send({
           name: '/uploadBase64',
           method: 'POST',
@@ -1314,7 +1280,6 @@ export default {
         }).then(_res => {
           switch (_res.data.result) {
             case 1:
-              // alert(_res.data.fileName)
               _this.homeinfo.picture = _res.data.fileName
               break
             default:
@@ -1348,7 +1313,6 @@ export default {
         //     this.$Message.error(_res.data.message)
         // }
       }).catch((res) => {
-        console.log('----------')
         console.log(res)
         this.$Message.error('Interface Error!')
       })
@@ -1364,8 +1328,6 @@ export default {
       //   title: '图片大小警告',
       //   desc: '您上传的图片太大了, 请不要超过2M!'
       // })
-      console.log(file)
-      console.log(fileList)
     },
     handleError () {
     },

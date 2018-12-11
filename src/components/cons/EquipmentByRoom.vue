@@ -404,8 +404,6 @@ export default {
         switch (_res.data.code) {
           case 1:
             this.deviceTypeList = _res.data.deviceTypeList
-            console.log('deviceTypeList------------------')
-            console.log(this.deviceTypeList)
             break
           default:
             this.$Message.error(_res.data.message)

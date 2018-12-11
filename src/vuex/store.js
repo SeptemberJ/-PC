@@ -2,11 +2,12 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import sider from './modules/sider'
 import home from './modules/home'
+import vuexAlong from 'vuex-along'
 // import * as actions from './actions'
 
 Vue.use(Vuex)
 
-const debug = process.env.NODE_ENV !== 'production'
+// const debug = process.env.NODE_ENV !== 'production'
 
 const state = {
   count: 10,
@@ -219,13 +220,9 @@ const actions = {
     commit('setSpin', STATUS)
   },
   changeCurHome ({commit, state}, CURHOME) {
-    // console.log('CURHOME-----------------')
-    // console.log(CURHOME)
     commit('setCurHome', CURHOME)
   },
   changeHomeList ({commit, state}, HOMELIST) {
-    console.log('changeHomeList-------------')
-    console.log(HOMELIST)
     commit('setHomeList', HOMELIST)
   },
   changeModalShow ({commit, state}, TYPE) {
@@ -257,7 +254,6 @@ const mutations = {
     state.homeList = HOMELIST
   },
   setRoomList (state, ROOMLIST) {
-    console.log(ROOMLIST)
     state.roomList = ROOMLIST
   },
   setModalShow (state, TYPE) {
@@ -296,6 +292,7 @@ export default new Vuex.Store({
   // getters,
   actions,
   mutations,
-  strict: debug
+  // strict: debug,
+  plugins: [vuexAlong]
   // plugins: debug ? [createLogger()] : []
 })

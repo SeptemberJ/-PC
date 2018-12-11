@@ -12,10 +12,7 @@ let registerId = localStorage['registerId']
 let account = localStorage['account']
 let nickName = localStorage['nickname']
 let userAvatar = localStorage['avatar']
-
-console.log(nickName)
-console.log(userAvatar)
-
+console.log(nickName + userAvatar)
 /**
  * 获取registerId
  * @returns {*}
